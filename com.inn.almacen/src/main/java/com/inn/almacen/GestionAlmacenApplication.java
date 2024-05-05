@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class GestionAlmacenApplication {
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(GestionAlmacenApplication.class, args);
 	}
 
