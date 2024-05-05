@@ -18,9 +18,9 @@ public class UserRestImpl implements UserRest {
     UserService userService;
 
     @Override
-    public ResponseEntity<String> registrarse(Map<String, String> requestMap) {
+    public ResponseEntity<String> Registrarse(Map<String, String> requestMap) {
         try {
-            return userService.registrarse(requestMap);
+            return userService.Registrarse(requestMap);
         }catch (Exception e){
             e.printStackTrace();
         }

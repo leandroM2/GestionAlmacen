@@ -4,7 +4,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Map;
 
@@ -12,6 +11,6 @@ import java.util.Map;
 public interface UserRest {
 
     @PostMapping(path = "/registrarse")
-    public ResponseEntity<String> registrarse(@RequestBody(required = true) Map<String,String> requestMap);
+    public ResponseEntity<String> Registrarse(@RequestBody(required = true) Map<String,String> requestMap);
 
 }

@@ -10,6 +10,8 @@ import java.io.Serializable;
 
 
 @NamedQuery(name="User.findByEmailID",query="select U from User U where U.email=:email")
+
+
 @Data
 @Entity
 @DynamicInsert
