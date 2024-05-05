@@ -12,13 +12,19 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+
+import javax.servlet.Filter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     CustomerUserDetailService customerUserDetailService;
+
+    @Autowired
+    JwtFilter jwtFilter;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception{
@@ -48,6 +54,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().exceptionHandling()
                 .and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        //http.addFilterBefore(jwtFilter,UsernamePasswordAuthenticationFilter.class);
+
 
     }
 }
