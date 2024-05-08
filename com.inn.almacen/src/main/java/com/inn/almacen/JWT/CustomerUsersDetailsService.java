@@ -14,25 +14,25 @@ import java.util.Objects;
 
 @Slf4j
 @Service
-public class CustomerUserDetailService implements UserDetailsService {
+public class CustomerUsersDetailsService implements UserDetailsService {
 
     @Autowired
     UserDao userDao;
 
-    private com.inn.almacen.POJO.User userDetalle;
+    private com.inn.almacen.POJO.User userDetail;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        log.info("Dentro de método loadUserByUsername {}",email);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        log.info("Dentro de método loadUserByUsername {}",username);
 
-        userDetalle = userDao.findByEmailID(email);
-        if(!Objects.isNull(userDetalle))
-            return new User(userDetalle.getEmail(),userDetalle.getContrasena(), new ArrayList<>());
+        userDetail = userDao.findByEmailId(username);
+        if(!Objects.isNull(userDetail))
+            return new User(userDetail.getEmail(), userDetail.getContrasena(), new ArrayList<>());
         else
             throw new UsernameNotFoundException("Usuario no encontrado.");
     }
 
-    public com.inn.almacen.POJO.User getUserDetalle(){
-        return userDetalle;
+    public com.inn.almacen.POJO.User getUserDetail(){
+        return userDetail;
     }
 }

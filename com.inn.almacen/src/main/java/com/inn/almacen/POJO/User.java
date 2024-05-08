@@ -1,15 +1,16 @@
 package com.inn.almacen.POJO;
 
+
 import lombok.Data;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.NamedQuery;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.io.Serializable;
 
 
-
-@NamedQuery(name="User.findByEmailID",query="select U from User U where U.email=:email")
+@NamedQuery(name="User.findByEmailId",query="select U from User U where U.email=:email")
 
 
 @Data

@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
 
         try {
             if(validarRegistrarse(requestMap)){
-                User user=userDao.findByEmailID(requestMap.get("email"));
+                User user=userDao.findByEmailId(requestMap.get("email"));
                 if(Objects.isNull(user)){
                     userDao.save(getUserFromMap(requestMap));
                     return AlmacenUtils.getResponseEntity("Registrado exitosamente.",HttpStatus.OK);

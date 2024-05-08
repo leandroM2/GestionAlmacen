@@ -1,6 +1,5 @@
 package com.inn.almacen.JWT;
 
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -10,19 +9,18 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 
 @Service
 public class JwtUtil {
 
-    private String llave="_!nt3gr@d0rII_";
+    private String secret ="Int3gr@d0r";
 
-    public String extractUsuario(String token){
+    public String extractUsername(String token){
         return extractClaims(token,Claims::getSubject);
     }
 
-    public Date extractExpiracion(String token){
+    public Date extractExpiration(String token){
         return extractClaims(token,Claims::getExpiration);
     }
 
@@ -32,29 +30,32 @@ public class JwtUtil {
     }
 
     public Claims extractAllClaims(String token){
-        return Jwts.parser().setSigningKey(llave).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
     }
 
-    private  Boolean isTokenExpirado(String token){
-        return extractExpiracion(token).before(new Date());
+    private  Boolean isTokenExpired(String token){
+        return extractExpiration(token).before(new Date());
     }
 
-    public String generarToken(String usuario, String rol){
+    public String generateToken(String username, String role){
         Map<String, Object> claims= new HashMap<>();
-        claims.put("rol",rol);
-        return crearToken(claims,usuario);
+        claims.put("role",role);
+        return createToken(claims,username);
 
     }
 
-    private String crearToken(Map<String, Object> claims, String subject){
-        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+    private String createToken(Map<String, Object> claims, String subject){
+        return Jwts.builder().
+                setClaims(claims).
+                setSubject(subject).
+                setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
-                .signWith(SignatureAlgorithm.HS256,llave).compact();
+                .signWith(SignatureAlgorithm.HS256, secret).compact();
     }
 
-    public Boolean validarToken(String token, UserDetails userDetails){
-        final String usuario= extractUsuario(token);
-        return  (usuario.equals(userDetails.getUsername()) && !isTokenExpirado(token));
+    public Boolean validateToken(String token, UserDetails userDetails){
+        final String username= extractUsername(token);
+        return  (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
 }

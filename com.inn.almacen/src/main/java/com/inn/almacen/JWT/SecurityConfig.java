@@ -15,20 +15,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
-import javax.servlet.Filter;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
-    CustomerUserDetailService customerUserDetailService;
+    CustomerUsersDetailsService customerUsersDetailsService;
 
     @Autowired
     JwtFilter jwtFilter;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception{
-        auth.userDetailsService(customerUserDetailService);
+        auth.userDetailsService(customerUsersDetailsService);
     }
 
     @Bean
@@ -36,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return NoOpPasswordEncoder.getInstance();
     }
     @Bean(name= BeanIds.AUTHENTICATION_MANAGER)
-    @Autowired
+    @Override
     public AuthenticationManager authenticationManagerBean() throws Exception{
         return super.authenticationManagerBean();
     }
@@ -52,9 +50,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest()
                 .authenticated()
                 .and().exceptionHandling()
-                .and().sessionManagement()
+                .and()
+                .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        //http.addFilterBefore(jwtFilter,UsernamePasswordAuthenticationFilter.class);
+
+        http.addFilterBefore(jwtFilter,UsernamePasswordAuthenticationFilter.class);
 
 
     }
