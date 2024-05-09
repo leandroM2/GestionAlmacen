@@ -13,4 +13,8 @@ public interface UserRest {
     @PostMapping(path = "/registrarse")
     public ResponseEntity<String> Registrarse(@RequestBody(required = true) Map<String,String> requestMap);
 
+    @PostMapping(path = "/iniciarSesion")
+    public ResponseEntity<String> IniciarSesion(@RequestBody (required = true) Map<String,String> requestMap);
+
+
 }

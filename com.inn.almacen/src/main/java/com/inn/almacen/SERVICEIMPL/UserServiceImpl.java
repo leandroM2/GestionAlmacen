@@ -1,5 +1,7 @@
 package com.inn.almacen.SERVICEIMPL;
 
+import com.inn.almacen.JWT.CustomerUsersDetailsService;
+import com.inn.almacen.JWT.JwtUtil;
 import com.inn.almacen.POJO.User;
 import com.inn.almacen.SERVICE.UserService;
 import com.inn.almacen.UTILS.AlmacenUtils;
@@ -9,6 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -21,6 +26,14 @@ public class UserServiceImpl implements UserService {
     @Autowired
     UserDao userDao;
 
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
+    CustomerUsersDetailsService customerUsersDetailsService;
+
+    @Autowired
+    JwtUtil jwtUtil;
     @Override
     public ResponseEntity<String> Registrarse(Map<String, String> requestMap) {
         log.info("Dentro del registro {}", requestMap);
@@ -42,6 +55,33 @@ public class UserServiceImpl implements UserService {
         }
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
 
+    }
+
+    @Override
+    public ResponseEntity<String> IniciarSesion(Map<String, String> requestMap) {
+        log.info("Dentro de inicio de sesion");
+        try{
+            Authentication auth= authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(requestMap.get("email"),requestMap.get("contrasena"))
+            );
+            if(auth.isAuthenticated()){
+                if(customerUsersDetailsService.getUserDetail().getEstado().equalsIgnoreCase("true")){
+                    return new ResponseEntity<String>("{\"token\":\""+
+                            jwtUtil.generateToken(customerUsersDetailsService.getUserDetail().getEmail(),
+                                    customerUsersDetailsService.getUserDetail().getRol()) + "\"}",
+                    HttpStatus.OK);
+                }else{
+                    return new ResponseEntity<String>
+                            ("{\"mensaje\":\""+"Esperar la aprobacion del administrador."+"\"}",
+                                    HttpStatus.BAD_REQUEST);
+                }
+            }
+        }catch (Exception e){
+            log.error("{}",e);
+        }
+        return new ResponseEntity<String>
+                ("{\"mensaje\":\""+"Credenciales incorrectas."+"\"}",
+                        HttpStatus.BAD_REQUEST);
     }
 
     private boolean validarRegistrarse(Map<String,String> requestMap){

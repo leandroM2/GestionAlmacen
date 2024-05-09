@@ -26,4 +26,14 @@ public class UserRestImpl implements UserRest {
         }
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL,HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @Override
+    public ResponseEntity<String> IniciarSesion(Map<String, String> requestMap) {
+        try {
+            return userService.IniciarSesion(requestMap);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL,HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
