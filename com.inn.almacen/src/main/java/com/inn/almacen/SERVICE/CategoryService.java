@@ -1,11 +1,16 @@
 package com.inn.almacen.SERVICE;
 
+import com.inn.almacen.POJO.Category;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
 import java.util.Map;
 
 public interface CategoryService {
 
-    ResponseEntity<String> NuevaCategoria(Map<String,String> requestMap);
+    ResponseEntity<String> addNewCategory(Map<String,String> requestMap);
 
+    ResponseEntity<List<Category>> getAllCategory(String filterValue);
+
+    ResponseEntity<String> updateCategory(Map<String, String> requestMap);
 }
