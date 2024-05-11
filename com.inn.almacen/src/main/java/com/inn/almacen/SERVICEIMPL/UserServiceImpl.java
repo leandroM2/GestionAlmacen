@@ -94,6 +94,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<List<UserWrapper>> getAllUser() {
+        log.info("Dentro de get all user");
         try {
             if(jwtFilter.esAdmin()){
                 return new ResponseEntity<>(userDao.getAllUser(),HttpStatus.OK);
