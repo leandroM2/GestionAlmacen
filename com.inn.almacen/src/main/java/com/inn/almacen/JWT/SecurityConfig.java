@@ -40,12 +40,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    protected void configure(HttpSecurity http) throws Exception {//,"/user/olvidoContrasena"
         http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/user/login","/user/registrarse","/user/olvidoContrasena")
+                .antMatchers("/user/iniciarSesion","/user/add")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

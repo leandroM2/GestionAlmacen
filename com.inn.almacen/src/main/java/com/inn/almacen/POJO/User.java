@@ -12,6 +12,7 @@ import java.io.Serializable;
 
 @NamedQuery(name="User.findByEmailId",query="select U from User U where U.email=:email")
 
+@NamedQuery(name="User.getAllUser", query = "select new com.inn.almacen.WRAPPER.UserWrapper(u.id, u.nombre, u.email, u.estado) from User u where u.rol='user' ")
 
 @Data
 @Entity
@@ -36,7 +37,7 @@ public class User implements Serializable {
     private String contrasena;
 
     @Column(name="estado")
-    private String estado;
+    private Boolean estado;
 
     @Column(name="rol")
     private String rol;

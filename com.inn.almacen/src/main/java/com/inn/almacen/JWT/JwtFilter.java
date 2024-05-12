@@ -28,10 +28,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
-        if(httpServletRequest.getServletPath().matches("/user/login|/user/olvidoContrasena|/user/registrarse")){
+        if(httpServletRequest.getServletPath().matches("/user/iniciarSesion|/user/add")){//|/user/olvidoContrasena
             filterChain.doFilter(httpServletRequest,httpServletResponse);
         }else{
-            String authorizationHeader= httpServletRequest.getHeader("Autorizacion");
+            String authorizationHeader= httpServletRequest.getHeader("Authorization");
             String token=null;
 
             if(authorizationHeader!=null && authorizationHeader.startsWith("Bearer ")){
@@ -44,9 +44,9 @@ public class JwtFilter extends OncePerRequestFilter {
                 UserDetails userDetails=service.loadUserByUsername(userName);
                 if (jwtUtil.validateToken(token,userDetails)){
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()); //distinto de video
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     usernamePasswordAuthenticationToken.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails((javax.servlet.http.HttpServletRequest) httpServletRequest)
+                            new WebAuthenticationDetailsSource().buildDetails(httpServletRequest)
                     );
                     SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
                 }
@@ -56,11 +56,14 @@ public class JwtFilter extends OncePerRequestFilter {
         }
     }
     public boolean isAdmin(){
-        return "admin".equalsIgnoreCase((String) claims.get("rol"));
+
+        return "admin".
+                equalsIgnoreCase((String) claims.get("rol"));
     }
 
     public boolean isUser(){
-        return "user".equalsIgnoreCase((String) claims.get("rol"));
+        return "user".
+                equalsIgnoreCase((String) claims.get("rol"));
     }
 
     public String getCurrentUser(){
