@@ -21,9 +21,9 @@ public class UserRestImpl implements UserRest {
     UserService userService;
 
     @Override
-    public ResponseEntity<String> Registrarse(Map<String, String> requestMap) {
+    public ResponseEntity<String> addNewUser(Map<String, String> requestMap) {
         try {
-            return userService.Registrarse(requestMap);
+            return userService.addNewUser(requestMap);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -31,9 +31,9 @@ public class UserRestImpl implements UserRest {
     }
 
     @Override
-    public ResponseEntity<String> IniciarSesion(Map<String, String> requestMap) {
+    public ResponseEntity<String> iniciarSesion(Map<String, String> requestMap) {
         try {
-            return userService.IniciarSesion(requestMap);
+            return userService.iniciarSesion(requestMap);
         }catch (Exception e){
             e.printStackTrace();
         }

@@ -32,11 +32,11 @@ public class CategoryServiceImpl implements CategoryService {
     public ResponseEntity<String> addNewCategory(Map<String, String> requestMap) {
         log.info("Dentro de Add New Category");
         try {
-            if(jwtFilter.esAdmin()){
+            if(jwtFilter.isAdmin()){
                 if(validateCategoryMap(requestMap,false)){
                     categoryDao.save(getCategoryFromMap(requestMap, false));
                     return AlmacenUtils.getResponseEntity
-                            ("Nueva categoria agregada con exito", HttpStatus.OK);
+                            ("Nueva categoría agregada con exito.", HttpStatus.OK);
                     
                 }
             }else{
@@ -45,7 +45,7 @@ public class CategoryServiceImpl implements CategoryService {
         }catch (Exception e){
             e.printStackTrace();
         }
-        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL_S, HttpStatus.INTERNAL_SERVER_ERROR);
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
@@ -66,14 +66,14 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public ResponseEntity<String> updateCategory(Map<String, String> requestMap) {
         try {
-            if(jwtFilter.esAdmin()){
+            if(jwtFilter.isAdmin()){
                 if(validateCategoryMap(requestMap, true)){
                     Optional optional = categoryDao.findById(Integer.parseInt(requestMap.get("id")));
                     if(!optional.isEmpty()){
                         categoryDao.save(getCategoryFromMap(requestMap, true));
-                        return AlmacenUtils.getResponseEntity("Categoría actualizada correctamente", HttpStatus.OK);
+                        return AlmacenUtils.getResponseEntity("Categoría actualizada correctamente.", HttpStatus.OK);
                     }else{
-                        return AlmacenUtils.getResponseEntity("Id de categoría no existe", HttpStatus.OK);
+                        return AlmacenUtils.getResponseEntity("Id de categoría no existe.", HttpStatus.OK);
                     }
                 }
                 return AlmacenUtils.getResponseEntity(AlmacenConstants.DATA_INVALIDA, HttpStatus.BAD_REQUEST);

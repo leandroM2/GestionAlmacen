@@ -2,7 +2,6 @@ package com.inn.almacen.WRAPPER;
 
 import lombok.Data;
 
-import javax.persistence.criteria.CriteriaBuilder;
 
 @Data
 public class ProductWrapper {

@@ -43,15 +43,15 @@ public class UserServiceImpl implements UserService {
     JwtFilter jwtFilter;
 
     @Override
-    public ResponseEntity<String> Registrarse(Map<String, String> requestMap) {
+    public ResponseEntity<String> addNewUser(Map<String, String> requestMap) {
         log.info("Dentro del registro {}", requestMap);
 
         try {
-            if(validarRegistrarse(requestMap)){
+            if(validateAdd(requestMap)){
                 User user=userDao.findByEmailId(requestMap.get("email"));
                 if(Objects.isNull(user)){
                     userDao.save(getUserFromMap(requestMap));
-                    return AlmacenUtils.getResponseEntity("Registrado exitosamente.",HttpStatus.OK);
+                    return AlmacenUtils.getResponseEntity("User registrado exitosamente.",HttpStatus.OK);
                 }else{
                     return AlmacenUtils.getResponseEntity("Email ya existe.", HttpStatus.BAD_REQUEST);
                 }
@@ -66,14 +66,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<String> IniciarSesion(Map<String, String> requestMap) {
-        log.info("Dentro de inicio de sesion");
+    public ResponseEntity<String> iniciarSesion(Map<String, String> requestMap) {
+        log.info("Dentro de inicio de sesión");
         try{
             Authentication auth= authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(requestMap.get("email"),requestMap.get("contrasena"))
             );
             if(auth.isAuthenticated()){
-                //if(customerUsersDetailsService.getUserDetail().getEstado().equalsIgnoreCase(true)){
                 if(customerUsersDetailsService.getUserDetail().getEstado()==true){
                     return new ResponseEntity<String>("{\"token\":\""+
                             jwtUtil.generateToken(customerUsersDetailsService.getUserDetail().getEmail(),
@@ -81,7 +80,7 @@ public class UserServiceImpl implements UserService {
                     HttpStatus.OK);
                 }else{
                     return new ResponseEntity<String>
-                            ("{\"mensaje\":\""+"Esperar la aprobacion del administrador."+"\"}",
+                            ("{\"mensaje\":\""+"Esperar la aprobación del administrador."+"\"}",
                                     HttpStatus.BAD_REQUEST);
                 }
             }
@@ -97,7 +96,7 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<List<UserWrapper>> getAllUser() {
         log.info("Dentro de get all user");
         try {
-            if(jwtFilter.esAdmin()){
+            if(jwtFilter.isAdmin()){
                 return new ResponseEntity<>(userDao.getAllUser(),HttpStatus.OK);
 
             }else{
@@ -109,7 +108,7 @@ public class UserServiceImpl implements UserService {
         return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    private boolean validarRegistrarse(Map<String,String> requestMap){
+    private boolean validateAdd(Map<String,String> requestMap){
         if(requestMap.containsKey("nombre") && requestMap.containsKey("email")
                 &&requestMap.containsKey("contrasena")){
             return true;

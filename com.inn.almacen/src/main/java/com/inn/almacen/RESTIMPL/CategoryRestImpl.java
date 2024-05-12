@@ -27,7 +27,7 @@ public class CategoryRestImpl implements CategoryRest {
         }catch (Exception e){
             e.printStackTrace();
         }
-        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL_R, HttpStatus.INTERNAL_SERVER_ERROR);
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override

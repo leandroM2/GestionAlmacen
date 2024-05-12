@@ -12,7 +12,6 @@ import com.inn.almacen.dao.ProductDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -31,7 +30,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ResponseEntity<String> addNewProduct(Map<String, String> requestMap) {
         try {
-            if(jwtFilter.esAdmin()){
+            if(jwtFilter.isAdmin()){
                 if(validateProductMap(requestMap, false)){
                     productDao.save(getProductFromMap(requestMap, false));
                     return AlmacenUtils.getResponseEntity("Producto correctamente ingresado.",HttpStatus.OK);
@@ -60,14 +59,14 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ResponseEntity<String> updateProduct(Map<String, String> requestMap) {
         try {
-            if(jwtFilter.esAdmin()){
+            if(jwtFilter.isAdmin()){
                 if(validateProductMap(requestMap, true)){
                     Optional<Product> optional=productDao.findById(Integer.parseInt(requestMap.get("id")));
                     if(!optional.isEmpty()){
                         Product product= getProductFromMap(requestMap,true);
                         product.setEstado(optional.get().getEstado());
                         productDao.save(product);
-                        return AlmacenUtils.getResponseEntity("Producto actualizado exitosamente", HttpStatus.OK);
+                        return AlmacenUtils.getResponseEntity("Producto actualizado exitosamente.", HttpStatus.OK);
                     }else{
                         return AlmacenUtils.getResponseEntity("Id de producto no existe.", HttpStatus.OK);
                     }
@@ -81,6 +80,25 @@ public class ProductServiceImpl implements ProductService {
             e.printStackTrace();
         }
 
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> deleteProduct(Integer id) {
+        try {
+            if(jwtFilter.isAdmin()){
+                Optional optional=productDao.findById(id);
+                if(!optional.isEmpty()){
+                    productDao.deleteById(id);
+                    return AlmacenUtils.getResponseEntity("Producto eliminado correctamente.", HttpStatus.OK );
+                }
+                return AlmacenUtils.getResponseEntity("Id de producto no existe.", HttpStatus.OK);
+            }else{
+                return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
