@@ -13,9 +13,9 @@ public class UserWrapper {
 
     private String email;
 
-    private String estado;
+    private Boolean estado;
 
-    public UserWrapper(Integer id, String nombre, String email, String estado) {
+    public UserWrapper(Integer id, String nombre, String email, Boolean estado) {
         this.id = id;
         this.nombre = nombre;
         this.email = email;

@@ -73,7 +73,8 @@ public class UserServiceImpl implements UserService {
                     new UsernamePasswordAuthenticationToken(requestMap.get("email"),requestMap.get("contrasena"))
             );
             if(auth.isAuthenticated()){
-                if(customerUsersDetailsService.getUserDetail().getEstado().equalsIgnoreCase("true")){
+                //if(customerUsersDetailsService.getUserDetail().getEstado().equalsIgnoreCase(true)){
+                if(customerUsersDetailsService.getUserDetail().getEstado()==true){
                     return new ResponseEntity<String>("{\"token\":\""+
                             jwtUtil.generateToken(customerUsersDetailsService.getUserDetail().getEmail(),
                                     customerUsersDetailsService.getUserDetail().getRol()) + "\"}",
@@ -122,8 +123,8 @@ public class UserServiceImpl implements UserService {
         user.setNombre(requestMap.get("nombre"));
         user.setEmail(requestMap.get("email"));
         user.setContrasena(requestMap.get("contrasena"));
-        user.setEstado("false");
-        user.setRol("usuario");
+        user.setEstado(false);
+        user.setRol("user");
         return user;
     }
 }

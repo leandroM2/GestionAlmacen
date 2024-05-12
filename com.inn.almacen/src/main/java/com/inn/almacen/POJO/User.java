@@ -37,7 +37,7 @@ public class User implements Serializable {
     private String contrasena;
 
     @Column(name="estado")
-    private String estado;
+    private Boolean estado;
 
     @Column(name="rol")
     private String rol;
