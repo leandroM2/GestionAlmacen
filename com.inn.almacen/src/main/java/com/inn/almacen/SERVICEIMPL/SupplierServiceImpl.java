@@ -125,7 +125,7 @@ public class SupplierServiceImpl implements SupplierService {
             supplier.setId(Integer.parseInt(requestMap.get("id")));
         }
         supplier.setRazonSocial(requestMap.get("razonSocial"));
-        supplier.setRuc(Integer.parseInt(requestMap.get("ruc")));
+        supplier.setRuc(Long.parseLong(requestMap.get("ruc")));
         supplier.setContacto(Integer.parseInt(requestMap.get("contacto")));
         return supplier;
     }

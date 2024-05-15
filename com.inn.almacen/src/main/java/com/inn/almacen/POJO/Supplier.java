@@ -27,7 +27,7 @@ public class Supplier implements Serializable {
     private String razonSocial;
 
     @Column(name = "ruc")
-    private Integer ruc;
+    private Long ruc;
 
     @Column(name = "contacto")
     private Integer contacto;

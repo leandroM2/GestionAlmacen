@@ -10,7 +10,7 @@ public class ProductWrapper {
 
     String nombre;
 
-    String descripcion;
+    String color;
 
     Float precio;
 
@@ -26,16 +26,16 @@ public class ProductWrapper {
 
     String supplierRazonSocial;
 
-    Integer supplierRuc;
+    Long supplierRuc;
 
     Integer supplierContacto;
 
-    public ProductWrapper(Integer id, String nombre, String descripcion, Float precio,
+    public ProductWrapper(Integer id, String nombre, String color, Float precio,
                           Integer stock, Boolean estado, Integer categoryId, String categoryNombre,
-                          Integer supplierId, String supplierRazonSocial, Integer supplierRuc, Integer supplierContacto) {
+                          Integer supplierId, String supplierRazonSocial, Long supplierRuc, Integer supplierContacto) {
         this.id=id;
         this.nombre=nombre;
-        this.descripcion=descripcion;
+        this.color=color;
         this.precio=precio;
         this.stock=stock;
         this.estado=estado;

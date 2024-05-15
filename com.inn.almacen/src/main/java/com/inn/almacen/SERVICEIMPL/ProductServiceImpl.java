@@ -129,10 +129,11 @@ public class ProductServiceImpl implements ProductService {
         }
 
         product.setCategory(category);
+        product.setSupplier(supplier);
         product.setNombre(requestMap.get("nombre"));
         product.setPrecio(Float.parseFloat(requestMap.get("precio")));
         product.setStock(Integer.parseInt(requestMap.get("stock")));
-        product.setDescripcion(requestMap.get("descripcion"));
+        product.setColor(requestMap.get("color"));
         return product;
     }
 }
