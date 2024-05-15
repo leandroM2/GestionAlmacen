@@ -18,10 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -45,12 +42,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<String> addNewUser(Map<String, String> requestMap) {
         log.info("Dentro del registro {}", requestMap);
-
         try {
             if(validateAdd(requestMap)){
                 User user=userDao.findByEmailId(requestMap.get("email"));
                 if(Objects.isNull(user)){
-                    userDao.save(getUserFromMap(requestMap));
+                    userDao.save(getUserFromMap(requestMap, false));
                     return AlmacenUtils.getResponseEntity("User registrado exitosamente.",HttpStatus.OK);
                 }else{
                     return AlmacenUtils.getResponseEntity("Email ya existe.", HttpStatus.BAD_REQUEST);
@@ -108,6 +104,67 @@ public class UserServiceImpl implements UserService {
         return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @Override
+    public ResponseEntity<String> updateUser(Map<String, String> requestMap) {
+        log.info("Dentro de update user");
+        try {
+            if(jwtFilter.isAdmin()){
+                if(valdateUserMap(requestMap, true)){
+                    Optional optional=userDao.findById(Integer.parseInt(requestMap.get("id")));
+                    if(!optional.isEmpty()){
+                        userDao.save(getUserFromMap(requestMap, true));
+                        return AlmacenUtils.getResponseEntity("Usuario actualizado correctamente.", HttpStatus.OK);
+                    }else{
+                        return AlmacenUtils.getResponseEntity("Id de usuario no existe.", HttpStatus.OK);
+                    }
+                }
+                return AlmacenUtils.getResponseEntity(AlmacenConstants.DATA_INVALIDA, HttpStatus.BAD_REQUEST);
+            }else{
+                return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private boolean valdateUserMap(Map<String, String> requestMap, boolean validateId) {
+        if(requestMap.containsKey("nombre") && requestMap.containsKey("email")
+                && requestMap.containsKey("contrasena")){
+            if(requestMap.containsKey("id") && validateId){
+                return true;
+            } else if (!validateId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public ResponseEntity<String> deleteUser(Integer id) {
+        log.info("Dentro de delete user");
+        try {
+            if (jwtFilter.isAdmin()){
+                Optional optional=userDao.findById(id);
+                if(!optional.isEmpty()){
+                    User user=userDao.findByRol(id);
+                    if(user.getRol().equalsIgnoreCase("user")){
+                        userDao.deleteById(id);
+                        return AlmacenUtils.getResponseEntity("Usuario eliminado correctamente.", HttpStatus.OK);
+                    }else{
+                        return AlmacenUtils.getResponseEntity("No tiene permisos suficientes para eliminar este registro.", HttpStatus.OK);
+                    }
+                }
+                return AlmacenUtils.getResponseEntity("Id de usuario no existe.", HttpStatus.OK);
+            }else{
+                return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     private boolean validateAdd(Map<String,String> requestMap){
         if(requestMap.containsKey("nombre") && requestMap.containsKey("email")
                 && requestMap.containsKey("contrasena")){
@@ -117,8 +174,11 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private User getUserFromMap(Map<String,String> requestMap){
+    private User getUserFromMap(Map<String,String> requestMap, boolean esAdd){
         User user= new User();
+        if(esAdd){
+            user.setId(Integer.parseInt(requestMap.get("id")));
+        }
         user.setNombre(requestMap.get("nombre"));
         user.setEmail(requestMap.get("email"));
         user.setContrasena(requestMap.get("contrasena"));

@@ -10,8 +10,12 @@ public interface UserService {
 
     ResponseEntity<String> addNewUser(Map<String,String> requestMap);
 
-    ResponseEntity<String> iniciarSesion(Map<String,String> requestMap);
-
     ResponseEntity<List<UserWrapper>> getAllUser();
+
+    ResponseEntity<String> updateUser(Map<String, String> requestMap);
+
+    ResponseEntity<String> deleteUser(Integer id);
+
+    ResponseEntity<String> iniciarSesion(Map<String,String> requestMap);
 
 }

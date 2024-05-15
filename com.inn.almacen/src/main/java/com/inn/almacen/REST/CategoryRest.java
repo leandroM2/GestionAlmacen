@@ -21,4 +21,7 @@ public interface CategoryRest {
     @PostMapping(path = "/update")
     ResponseEntity<String> updateCategory(@RequestBody(required = true)
                                           Map<String, String> requestMap);
+
+    @PostMapping(path = "/delete/{id}")
+    ResponseEntity<String> deleteProduct(@PathVariable Integer id);
 }

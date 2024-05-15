@@ -12,6 +12,8 @@ import java.io.Serializable;
 
 @NamedQuery(name="User.findByEmailId",query="select U from User U where U.email=:email")
 
+@NamedQuery(name="User.findByRol",query="select U from User U where U.id=:id")
+
 @NamedQuery(name="User.getAllUser", query = "select new com.inn.almacen.WRAPPER.UserWrapper(u.id, u.nombre, u.email, u.estado) from User u where u.rol='user' ")
 
 @Data

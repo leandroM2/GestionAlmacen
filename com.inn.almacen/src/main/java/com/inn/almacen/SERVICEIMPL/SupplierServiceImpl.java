@@ -109,7 +109,7 @@ public class SupplierServiceImpl implements SupplierService {
 
 
     private boolean validateSupplierMap(Map<String, String> requestMap, boolean validateId) {
-        if(requestMap.containsKey("razonSocial") && requestMap.containsKey("ruc")){
+        if(requestMap.containsKey("razonSocial") && requestMap.containsKey("ruc") && requestMap.containsKey("contacto")){
             if(requestMap.containsKey("id") && validateId){
                 return true;
             } else if (!validateId) {

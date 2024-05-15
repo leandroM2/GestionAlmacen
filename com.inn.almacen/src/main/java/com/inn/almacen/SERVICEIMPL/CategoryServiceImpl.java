@@ -86,6 +86,27 @@ public class CategoryServiceImpl implements CategoryService {
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @Override
+    public ResponseEntity<String> deleteCategory(Integer id) {
+        log.info("Dentro de delete category");
+        try {
+            if(jwtFilter.isAdmin()){
+                Optional optional=categoryDao.findById(id);
+                if(!optional.isEmpty()){
+                    categoryDao.deleteById(id);
+                    return AlmacenUtils.getResponseEntity("Categoría eliminada correctamente", HttpStatus.OK);
+                }
+                return AlmacenUtils.getResponseEntity("Id de categoría no existe.", HttpStatus.OK);
+            }else{
+                return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.BAD_REQUEST);
+    }
+
     private boolean validateCategoryMap(Map<String, String> requestMap, boolean validarId) {
         if(requestMap.containsKey("nombre")){
             if (requestMap.containsKey("id") && validarId){
