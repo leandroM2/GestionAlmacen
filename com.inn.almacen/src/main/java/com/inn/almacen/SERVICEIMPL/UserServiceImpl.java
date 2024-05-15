@@ -110,7 +110,7 @@ public class UserServiceImpl implements UserService {
 
     private boolean validateAdd(Map<String,String> requestMap){
         if(requestMap.containsKey("nombre") && requestMap.containsKey("email")
-                &&requestMap.containsKey("contrasena")){
+                && requestMap.containsKey("contrasena")){
             return true;
         }else{
             return false;

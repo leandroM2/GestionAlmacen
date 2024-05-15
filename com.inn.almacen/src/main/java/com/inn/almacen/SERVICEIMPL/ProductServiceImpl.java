@@ -3,6 +3,7 @@ package com.inn.almacen.SERVICEIMPL;
 import com.inn.almacen.JWT.JwtFilter;
 import com.inn.almacen.POJO.Category;
 import com.inn.almacen.POJO.Product;
+import com.inn.almacen.POJO.Supplier;
 import com.inn.almacen.SERVICE.ProductService;
 
 import com.inn.almacen.UTILS.AlmacenUtils;
@@ -102,9 +103,23 @@ public class ProductServiceImpl implements ProductService {
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    private boolean validateProductMap(Map<String, String> requestMap, boolean validarId) {
+        if(requestMap.containsKey("nombre")){
+            if(requestMap.containsKey("id") && validarId){
+                return true;
+            }else if(!validarId){
+                return true;
+            }
+        }
+        return false;
+    }
+
     private Product getProductFromMap(Map<String, String> requestMap, boolean esAdd) {
         Category category=new Category();
         category.setId(Integer.parseInt(requestMap.get("categoryId")));
+
+        Supplier supplier=new Supplier();
+        supplier.setId(Integer.parseInt(requestMap.get("supplierId")));
 
         Product product=new Product();
         if(esAdd){
@@ -119,16 +134,5 @@ public class ProductServiceImpl implements ProductService {
         product.setStock(Integer.parseInt(requestMap.get("stock")));
         product.setDescripcion(requestMap.get("descripcion"));
         return product;
-    }
-
-    private boolean validateProductMap(Map<String, String> requestMap, boolean validarId) {
-        if(requestMap.containsKey("nombre")){
-            if(requestMap.containsKey("id") && validarId){
-                return true;
-            }else if(!validarId){
-                return true;
-            }
-        }
-        return false;
     }
 }
