@@ -7,6 +7,9 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.io.Serializable;
 
+@NamedQuery(name="Client.getAllClient",query = "select c from Client c")
+
+
 @Data
 @Entity
 @DynamicInsert
@@ -27,12 +30,12 @@ public class Client implements Serializable {
     private Long ruc;
 
     @Column(name = "correo")
-    private Integer correo;
+    private String correo;
 
     @Column(name = "contacto")
     private Integer contacto;
 
     @Column(name = "direccion")
-    private Integer direccion;
+    private String direccion;
 
 }

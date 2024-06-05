@@ -1,8 +1,8 @@
 package com.inn.almacen.RESTIMPL;
 
-import com.inn.almacen.POJO.Supplier;
-import com.inn.almacen.REST.SupplierRest;
-import com.inn.almacen.SERVICE.SupplierService;
+import com.inn.almacen.POJO.Client;
+import com.inn.almacen.REST.ClientRest;
+import com.inn.almacen.SERVICE.ClientService;
 import com.inn.almacen.UTILS.AlmacenUtils;
 import com.inn.almacen.constens.AlmacenConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +15,15 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-public class SupplierRestImpl implements SupplierRest {
+public class ClientRestImpl implements ClientRest {
 
     @Autowired
-    SupplierService supplierService;
+    ClientService clientService;
 
     @Override
-    public ResponseEntity<String> addNewSupplier(Map<String, String> requestMap) {
+    public ResponseEntity<String> addNewClient(Map<String, String> requestMap) {
         try {
-            return supplierService.addNewSupplier(requestMap);
+            return clientService.addNewClient(requestMap);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -33,9 +33,9 @@ public class SupplierRestImpl implements SupplierRest {
     }
 
     @Override
-    public ResponseEntity<List<Supplier>> getAllSupplier(String filterValue) {
+    public ResponseEntity<List<Client>> getAllClient(String filterValue) {
         try {
-            return supplierService.getAllSupplier(filterValue);
+            return clientService.getAllClient(filterValue);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -43,9 +43,9 @@ public class SupplierRestImpl implements SupplierRest {
     }
 
     @Override
-    public ResponseEntity<String> updateSupplier(Map<String, String> requestMap) {
+    public ResponseEntity<String> updateClient(Map<String, String> requestMap) {
         try {
-            return supplierService.updateSupplier(requestMap);
+            return clientService.updateClient(requestMap);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -53,9 +53,9 @@ public class SupplierRestImpl implements SupplierRest {
     }
 
     @Override
-    public ResponseEntity<String> deleteSupplier(Integer id) {
+    public ResponseEntity<String> deleteClient(Integer id) {
         try {
-            return supplierService.deleteSupplier(id);
+            return clientService.deleteClient(id);
         }catch (Exception e){
             e.printStackTrace();
         }

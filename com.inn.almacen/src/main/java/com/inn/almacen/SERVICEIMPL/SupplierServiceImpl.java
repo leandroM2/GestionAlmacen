@@ -97,7 +97,7 @@ public class SupplierServiceImpl implements SupplierService {
                     supplierDao.deleteById(id);
                     return AlmacenUtils.getResponseEntity("Proveedor eliminado correctamente.", HttpStatus.OK);
                 }
-                return AlmacenUtils.getResponseEntity("Id de producto no existe.", HttpStatus.OK);
+                return AlmacenUtils.getResponseEntity("Id de proveedor no existe.", HttpStatus.OK);
             }else{
                 return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
             }
