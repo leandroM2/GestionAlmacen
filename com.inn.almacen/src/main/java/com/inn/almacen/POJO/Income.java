@@ -8,6 +8,8 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Date;
 
+@NamedQuery(name = "Income.getAllIncome", query = "select new com.inn.almacen.WRAPPER.IncomeWrapper(i.id, i.fecha, i.supplier.id, i.supplier.razonSocial, i.supplier.ruc, i.supplier.contacto) from Income i")
+
 @Data
 @Entity
 @DynamicInsert
@@ -15,7 +17,7 @@ import java.sql.Date;
 @Table(name="income")
 public class Income implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID=123456L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
