@@ -7,6 +7,8 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.io.Serializable;
 
+@NamedQuery(name = "IncomeDetail.getAllIncomeDetail", query = "select new com.inn.almacen.WRAPPER.IncomeDetailWrapper(i.id, i.cantidad, i.income.id, i.income.fecha, i.income.supplier.id, i.income.supplier.razonSocial, i.income.supplier.ruc, i.income.supplier.contacto,i.product.id, i.product.nombre, i.product.color, i.product.precio, i.product.stock, i.product.estado, i.product.category.id, i.product.category.nombre, i.product.supplier.id, i.product.supplier.razonSocial, i.product.supplier.ruc, i.product.supplier.contacto) from IncomeDetail i")
+
 @Data
 @Entity
 @DynamicUpdate

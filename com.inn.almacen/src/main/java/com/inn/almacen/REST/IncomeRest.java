@@ -1,7 +1,6 @@
 package com.inn.almacen.REST;
 
 import com.inn.almacen.WRAPPER.IncomeWrapper;
-import com.inn.almacen.WRAPPER.ProductWrapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
