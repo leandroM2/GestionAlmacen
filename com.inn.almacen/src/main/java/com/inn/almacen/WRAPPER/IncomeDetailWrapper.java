@@ -7,45 +7,45 @@ import java.sql.Date;
 @Data
 public class IncomeDetailWrapper {
 
-    Integer id;
+    private Integer id;
 
-    Integer cantidad;
+    private Integer cantidad;
 
-    Integer incomeId;
+    private Integer incomeId;
 
-    Date incomeFecha;
+    private Date incomeFecha;
 
-    Integer incomeSupplierId;
+    private Integer incomeSupplierId;
 
-    String incomeSupplierRazonSocial;
+    private String incomeSupplierRazonSocial;
 
-    Long incomeSupplierRuc;
+    private Long incomeSupplierRuc;
 
-    Integer incomeSupplierContacto;
+    private Integer incomeSupplierContacto;
 
-    Integer productId;
+    private Integer productId;
 
-    String productNombre;
+    private String productNombre;
 
-    String productColor;
+    private String productColor;
 
-    Float productPrecio;
+    private Float productPrecio;
 
-    Integer productStock;
+    private Integer productStock;
 
-    Boolean productEstado;
+    private Boolean productEstado;
 
-    Integer productCategoryId;
+    private Integer productCategoryId;
 
-    String productCategoryNombre;
+    private String productCategoryNombre;
 
-    Integer productSupplierId;
+    private Integer productSupplierId;
 
-    String productSupplierRazonSocial;
+    private String productSupplierRazonSocial;
 
-    Long productSupplierRuc;
+    private Long productSupplierRuc;
 
-    Integer productSupplierContacto;
+    private Integer productSupplierContacto;
 
     public IncomeDetailWrapper(Integer id, Integer cantidad, Integer incomeId, java.util.Date incomeFecha,
                                Integer incomeSupplierId, String incomeSupplierRazonSocial,

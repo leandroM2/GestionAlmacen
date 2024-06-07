@@ -6,29 +6,29 @@ import lombok.Data;
 @Data
 public class ProductWrapper {
 
-    Integer id;
+    private Integer id;
 
-    String nombre;
+    private String nombre;
 
-    String color;
+    private String color;
 
-    Float precio;
+    private Float precio;
 
-    Integer stock;
+    private Integer stock;
 
-    Boolean estado;
+    private Boolean estado;
 
-    Integer categoryId;
+    private Integer categoryId;
 
-    String categoryNombre;
+    private String categoryNombre;
 
-    Integer supplierId;
+    private Integer supplierId;
 
-    String supplierRazonSocial;
+    private String supplierRazonSocial;
 
-    Long supplierRuc;
+    private Long supplierRuc;
 
-    Integer supplierContacto;
+    private Integer supplierContacto;
 
     public ProductWrapper(Integer id, String nombre, String color, Float precio,
                           Integer stock, Boolean estado, Integer categoryId, String categoryNombre,

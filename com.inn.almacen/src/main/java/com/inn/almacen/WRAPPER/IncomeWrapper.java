@@ -6,17 +6,17 @@ import java.sql.Date;
 
 @Data
 public class IncomeWrapper {
-    Integer id;
+    private Integer id;
 
-    Date fecha;
+    private Date fecha;
 
-    Integer supplierId;
+    private Integer supplierId;
 
-    String supplierRazonSocial;
+    private String supplierRazonSocial;
 
-    Long supplierRuc;
+    private Long supplierRuc;
 
-    Integer supplierContacto;
+    private Integer supplierContacto;
 
     public IncomeWrapper(Integer id, java.util.Date fecha, Integer supplierId,
                          String supplierRazonSocial, Long supplierRuc,

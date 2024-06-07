@@ -8,6 +8,8 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Date;
 
+@NamedQuery(name = "Outcome.getAllOutcome", query = "select new com.inn.almacen.WRAPPER.OutcomeWrapper(o.id, o.fecha, o.client.id, o.client.razonSocial, o.client.ruc, o.client.correo, o.client.contacto, o.client.direccion, o.user.id, o.user.nombre, o.user.email, o.user.estado) from Outcome o")
+
 @Data
 @Entity
 @DynamicInsert
