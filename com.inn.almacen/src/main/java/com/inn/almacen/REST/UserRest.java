@@ -1,5 +1,6 @@
 package com.inn.almacen.REST;
 
+import com.inn.almacen.POJO.User;
 import com.inn.almacen.WRAPPER.UserWrapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,9 @@ public interface UserRest {
 
     @PostMapping(path = "/delete/{id}")
     ResponseEntity<String> deleteUser(@PathVariable Integer id);
+
+    @PostMapping(path = "/get/{id}")
+    ResponseEntity<List<User>> getById(@PathVariable Integer id);
 
     @PostMapping(path = "/iniciarSesion")
     public ResponseEntity<String> iniciarSesion(@RequestBody (required = true) Map<String,String> requestMap);

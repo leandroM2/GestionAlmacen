@@ -1,5 +1,6 @@
 package com.inn.almacen.RESTIMPL;
 
+import com.inn.almacen.POJO.User;
 import com.inn.almacen.REST.UserRest;
 import com.inn.almacen.SERVICE.UserService;
 import com.inn.almacen.UTILS.AlmacenUtils;
@@ -69,5 +70,16 @@ public class UserRestImpl implements UserRest {
             e.printStackTrace();
         }
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<User>> getById(Integer id) {
+        try {
+            return userService.getById(id);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<List<User>>( new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

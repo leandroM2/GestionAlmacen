@@ -14,7 +14,10 @@ import java.io.Serializable;
 
 @NamedQuery(name="User.findByRol",query="select U from User U where U.id=:id")
 
-@NamedQuery(name="User.getAllUser", query = "select new com.inn.almacen.WRAPPER.UserWrapper(u.id, u.nombre, u.email, u.estado) from User u where u.rol='user' ")
+@NamedQuery(name="User.getById", query = "select new com.inn.almacen.WRAPPER.UserWrapper(u.id, u.nombre, u.email, u.estado, u.rol) from User u where u.id=id ")
+
+@NamedQuery(name="User.getAllUser", query = "select new com.inn.almacen.WRAPPER.UserWrapper(u.id, u.nombre, u.email, u.estado, u.rol) from User u ")
+//@NamedQuery(name="User.getAllUser", query = "select new com.inn.almacen.WRAPPER.UserWrapper(u.id, u.nombre, u.email, u.estado) from User u where u.rol='user' ")
 
 @Data
 @Entity

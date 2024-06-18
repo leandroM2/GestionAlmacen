@@ -13,5 +13,7 @@ public interface UserDao extends JpaRepository<User, Integer> {
 
     User findByRol(@Param("id") Integer id);
 
+    User getById(@Param("id") Integer id);
+
     List<UserWrapper> getAllUser();
 }

@@ -165,6 +165,28 @@ public class UserServiceImpl implements UserService {
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @Override
+    public ResponseEntity<List<User>> getById(Integer id) {
+        log.info("Dentro de get user by id");
+        try {
+            if (jwtFilter.isAdmin()){
+                Optional optional=userDao.findById(id);
+                if(!optional.isEmpty()){
+                    User user=userDao.findByRol(id);
+                        List<User> myList = new ArrayList<User>();
+                        myList.add(userDao.getById(id));
+                        return new ResponseEntity<>(myList,HttpStatus.OK);
+                }
+                return new ResponseEntity<>(new ArrayList<>(),HttpStatus.OK);
+            }else{
+                return new ResponseEntity<>(new ArrayList<>(),HttpStatus.UNAUTHORIZED);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     private boolean validateAdd(Map<String,String> requestMap){
         if(requestMap.containsKey("nombre") && requestMap.containsKey("email")
                 && requestMap.containsKey("contrasena")){

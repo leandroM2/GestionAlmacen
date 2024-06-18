@@ -1,5 +1,6 @@
 package com.inn.almacen.SERVICE;
 
+import com.inn.almacen.POJO.User;
 import com.inn.almacen.WRAPPER.UserWrapper;
 import org.springframework.http.ResponseEntity;
 
@@ -15,6 +16,8 @@ public interface UserService {
     ResponseEntity<String> updateUser(Map<String, String> requestMap);
 
     ResponseEntity<String> deleteUser(Integer id);
+
+    ResponseEntity<List<User>> getById(Integer id);
 
     ResponseEntity<String> iniciarSesion(Map<String,String> requestMap);
 
