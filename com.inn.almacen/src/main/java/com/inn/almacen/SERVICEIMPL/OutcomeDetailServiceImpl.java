@@ -4,7 +4,6 @@ import com.inn.almacen.JWT.JwtFilter;
 import com.inn.almacen.POJO.*;
 import com.inn.almacen.SERVICE.OutcomeDetailService;
 import com.inn.almacen.UTILS.AlmacenUtils;
-import com.inn.almacen.WRAPPER.IncomeDetailWrapper;
 import com.inn.almacen.WRAPPER.OutcomeDetailWrapper;
 import com.inn.almacen.constens.AlmacenConstants;
 import com.inn.almacen.dao.OutcomeDetailDao;
