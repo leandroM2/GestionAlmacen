@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,6 +26,8 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
     @Autowired
     OutcomeDetailDao outcomeDetailDao;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     @Autowired
     JwtFilter jwtFilter;
 
@@ -161,7 +164,38 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
         }
         outcomeDetail.setOutcome(outcome);
         outcomeDetail.setProduct(product);
-        outcomeDetail.setCantidad(Integer.parseInt(requestMap.get("cantidad")));
+        Integer cant=Integer.parseInt(requestMap.get("cantidad"));
+        outcomeDetail.setCantidad(cant);
+        ProductUpdate(product.getId(), cant, outcomeDetail.getId(), esAdd);
         return outcomeDetail;
+    }
+
+    private void ProductUpdate(Integer id, Integer cant, Integer incomeId, boolean esAdd){
+        log.info("Hemos llegado hasta actualizacion de stock producto.");
+        String sql = "SELECT stock FROM product WHERE id = ?";
+        Integer stock = jdbcTemplate.queryForObject(sql, new Integer[]{id}, Integer.class);
+        if(esAdd){
+            sql = "SELECT cantidad FROM outcome_detail WHERE id = ?";
+            Integer oldCant = jdbcTemplate.queryForObject(sql, new Integer[]{incomeId}, Integer.class);
+            if(cant!=oldCant){
+                log.info("Estamos actualizando Outcome detail.");
+                Integer total = (cant > oldCant) ? cant-oldCant : oldCant-cant;
+                boolean oper = (cant > oldCant) ? true : false;
+
+                if(oper){
+                    stock=stock-total;
+                }else{
+                    stock=stock+total;
+                }
+                sql = "UPDATE product SET stock = ? WHERE id = ?";
+                jdbcTemplate.update(sql, stock, id);
+            }
+            log.info("Cantidades no fueron modificadas por user.");
+        }else{
+            log.info("Estamos insertando Outcome detail.");
+            stock=stock-cant;
+            sql = "UPDATE product SET stock = ? WHERE id = ?";
+            jdbcTemplate.update(sql, stock, id);
+        }
     }
 }
