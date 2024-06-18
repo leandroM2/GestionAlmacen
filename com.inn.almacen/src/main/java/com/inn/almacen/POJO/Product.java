@@ -7,6 +7,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.io.Serializable;
 
+@NamedQuery(name = "Product.getById", query = "select new com.inn.almacen.WRAPPER.ProductWrapper(p.id, p.nombre, p.color, p.precio, p.stock, p.estado, p.category.id, p.category.nombre, p.supplier.id, p.supplier.razonSocial, p.supplier.ruc, p.supplier.contacto) from Product p where p.id=:id")
 @NamedQuery(name = "Product.getAllProduct", query = "select new com.inn.almacen.WRAPPER.ProductWrapper(p.id, p.nombre, p.color, p.precio, p.stock, p.estado, p.category.id, p.category.nombre, p.supplier.id, p.supplier.razonSocial, p.supplier.ruc, p.supplier.contacto) from Product p")
 
 @Data

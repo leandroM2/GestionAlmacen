@@ -73,13 +73,13 @@ public class UserRestImpl implements UserRest {
     }
 
     @Override
-    public ResponseEntity<List<User>> getById(Integer id) {
+    public ResponseEntity<List<UserWrapper>> getById(Integer id) {
         try {
             return userService.getById(id);
 
         }catch (Exception e){
             e.printStackTrace();
         }
-        return new ResponseEntity<List<User>>( new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<List<UserWrapper>>( new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -10,6 +10,7 @@ import com.inn.almacen.UTILS.AlmacenUtils;
 import com.inn.almacen.WRAPPER.ProductWrapper;
 import com.inn.almacen.constens.AlmacenConstants;
 import com.inn.almacen.dao.ProductDao;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
+@Slf4j
 @Service
 public class ProductServiceImpl implements ProductService {
 
@@ -82,6 +83,32 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<ProductWrapper>> getById(Integer id) {
+        log.info("Dentro de get product by id");
+        try {
+            if (jwtFilter.isAdmin()){
+                Optional optional=productDao.findById(id);
+                if(!optional.isEmpty()){
+                    Product product=productDao.getById(id);
+                    List<ProductWrapper> myList = new ArrayList<>();
+                    myList.add(new ProductWrapper(product.getId(), product.getNombre(), product.getColor(),
+                            product.getPrecio(), product.getStock(), product.getEstado(), product.getCategory().getId(),
+                            product.getCategory().getNombre(), product.getSupplier().getId(),
+                            product.getSupplier().getRazonSocial(), product.getSupplier().getRuc(),
+                            product.getSupplier().getContacto()));
+                    return new ResponseEntity<>(myList,HttpStatus.OK);
+                }
+                return new ResponseEntity<>(new ArrayList<>(),HttpStatus.OK);
+            }else{
+                return new ResponseEntity<>(new ArrayList<>(),HttpStatus.UNAUTHORIZED);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override

@@ -14,4 +14,6 @@ public interface OutcomeService {
     ResponseEntity<String> updateOutcome(Map<String, String> requestMap);
 
     ResponseEntity<String> deleteOutcome(Integer id);
+
+    ResponseEntity<List<OutcomeWrapper>> getById(Integer id);
 }

@@ -60,4 +60,15 @@ public class IncomeRestImpl implements IncomeRest {
         }
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @Override
+    public ResponseEntity<List<IncomeWrapper>> getById(Integer id) {
+        try {
+            return incomeService.getById(id);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<List<IncomeWrapper>>( new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

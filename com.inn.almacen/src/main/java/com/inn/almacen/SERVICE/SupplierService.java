@@ -1,6 +1,7 @@
 package com.inn.almacen.SERVICE;
 
 import com.inn.almacen.POJO.Supplier;
+import com.inn.almacen.WRAPPER.UserWrapper;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -15,4 +16,7 @@ public interface SupplierService {
     ResponseEntity<String> updateSupplier(Map<String, String> requestMap);
 
     ResponseEntity<String> deleteSupplier(Integer id);
+
+    ResponseEntity<List<Supplier>> getById(Integer id);
+
 }

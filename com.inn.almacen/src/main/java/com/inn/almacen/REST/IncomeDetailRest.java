@@ -23,4 +23,7 @@ public interface IncomeDetailRest {
     @PostMapping(path = "/delete/{id}")
     ResponseEntity<String> deleteIncomeDetail(@PathVariable Integer id);
 
+    @PostMapping(path = "/get/{id}")
+    ResponseEntity<List<IncomeDetailWrapper>> getById(@PathVariable Integer id);
+
 }

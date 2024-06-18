@@ -61,4 +61,15 @@ public class ClientRestImpl implements ClientRest {
         }
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @Override
+    public ResponseEntity<List<Client>> getById(Integer id) {
+        try {
+            return clientService.getById(id);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<List<Client>>( new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

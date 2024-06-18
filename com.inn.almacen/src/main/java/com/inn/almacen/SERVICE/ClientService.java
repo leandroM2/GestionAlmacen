@@ -16,4 +16,7 @@ public interface ClientService {
 
     ResponseEntity<String> deleteClient(Integer id);
 
+    ResponseEntity<List<Client>> getById(Integer id);
+
+
 }

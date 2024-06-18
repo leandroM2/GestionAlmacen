@@ -166,15 +166,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<List<User>> getById(Integer id) {
+    public ResponseEntity<List<UserWrapper>> getById(Integer id) {
         log.info("Dentro de get user by id");
         try {
             if (jwtFilter.isAdmin()){
                 Optional optional=userDao.findById(id);
                 if(!optional.isEmpty()){
-                    User user=userDao.findByRol(id);
-                        List<User> myList = new ArrayList<User>();
-                        myList.add(userDao.getById(id));
+                        User user=userDao.getById(id);
+                        List<UserWrapper> myList = new ArrayList<>();
+                        myList.add(new UserWrapper(user.getId(), user.getNombre(), user.getEmail(), user.getEstado(), user.getRol()));
                         return new ResponseEntity<>(myList,HttpStatus.OK);
                 }
                 return new ResponseEntity<>(new ArrayList<>(),HttpStatus.OK);

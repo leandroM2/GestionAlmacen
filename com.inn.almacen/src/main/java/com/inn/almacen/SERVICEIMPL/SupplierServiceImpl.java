@@ -3,8 +3,10 @@ package com.inn.almacen.SERVICEIMPL;
 import com.google.common.base.Strings;
 import com.inn.almacen.JWT.JwtFilter;
 import com.inn.almacen.POJO.Supplier;
+import com.inn.almacen.POJO.User;
 import com.inn.almacen.SERVICE.SupplierService;
 import com.inn.almacen.UTILS.AlmacenUtils;
+import com.inn.almacen.WRAPPER.UserWrapper;
 import com.inn.almacen.constens.AlmacenConstants;
 import com.inn.almacen.dao.SupplierDao;
 import lombok.extern.slf4j.Slf4j;
@@ -105,6 +107,27 @@ public class SupplierServiceImpl implements SupplierService {
             e.printStackTrace();
         }
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<Supplier>> getById(Integer id) {
+        log.info("Dentro de get supplier by id");
+        try {
+            if (jwtFilter.isAdmin()){
+                Optional optional=supplierDao.findById(id);
+                if(!optional.isEmpty()){
+                    List<Supplier> myList = new ArrayList<>();
+                    myList.add(supplierDao.getById(id));
+                    return new ResponseEntity<>(myList,HttpStatus.OK);
+                }
+                return new ResponseEntity<>(new ArrayList<>(),HttpStatus.OK);
+            }else{
+                return new ResponseEntity<>(new ArrayList<>(),HttpStatus.UNAUTHORIZED);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 

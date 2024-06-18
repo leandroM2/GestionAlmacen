@@ -60,4 +60,15 @@ public class OutcomeDetailRestImpl implements OutcomeDetailRest {
         }
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @Override
+    public ResponseEntity<List<OutcomeDetailWrapper>> getById(Integer id) {
+        try {
+            return outcomeDetailService.getById(id);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<List<OutcomeDetailWrapper>>( new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

@@ -105,6 +105,27 @@ public class ClientServiceImpl implements ClientService {
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @Override
+    public ResponseEntity<List<Client>> getById(Integer id) {
+        log.info("Dentro de client supplier by id");
+        try {
+            if (jwtFilter.isAdmin()){
+                Optional optional=clientDao.findById(id);
+                if(!optional.isEmpty()){
+                    List<Client> myList = new ArrayList<>();
+                    myList.add(clientDao.getById(id));
+                    return new ResponseEntity<>(myList,HttpStatus.OK);
+                }
+                return new ResponseEntity<>(new ArrayList<>(),HttpStatus.OK);
+            }else{
+                return new ResponseEntity<>(new ArrayList<>(),HttpStatus.UNAUTHORIZED);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     private boolean validateClientMap(Map<String, String> requestMap, boolean validateId) {
         if(requestMap.containsKey("razonSocial") && requestMap.containsKey("ruc") && requestMap.containsKey("contacto")
             && requestMap.containsKey("correo") && requestMap.containsKey("direccion")){

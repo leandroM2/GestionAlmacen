@@ -14,4 +14,6 @@ public interface IncomeService {
     ResponseEntity<String> updateIncome(Map<String, String> requestMap);
 
     ResponseEntity<String> deleteIncome(Integer id);
+
+    ResponseEntity<List<IncomeWrapper>> getById(Integer id);
 }

@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Date;
 
+@NamedQuery(name = "Income.getById", query = "select new com.inn.almacen.WRAPPER.IncomeWrapper(i.id, i.fecha, i.supplier.id, i.supplier.razonSocial, i.supplier.ruc, i.supplier.contacto) from Income i where i.id=:id")
 @NamedQuery(name = "Income.getAllIncome", query = "select new com.inn.almacen.WRAPPER.IncomeWrapper(i.id, i.fecha, i.supplier.id, i.supplier.razonSocial, i.supplier.ruc, i.supplier.contacto) from Income i")
 
 @Data

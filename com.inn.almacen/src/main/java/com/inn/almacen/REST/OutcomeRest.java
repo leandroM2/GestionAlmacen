@@ -21,4 +21,7 @@ public interface OutcomeRest {
 
     @PostMapping(path = "/delete/{id}")
     ResponseEntity<String> deleteOutcome(@PathVariable Integer id);
+
+    @PostMapping(path = "/get/{id}")
+    ResponseEntity<List<OutcomeWrapper>> getById(@PathVariable Integer id);
 }

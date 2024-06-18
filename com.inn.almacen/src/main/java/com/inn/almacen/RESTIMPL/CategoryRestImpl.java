@@ -1,6 +1,7 @@
 package com.inn.almacen.RESTIMPL;
 
 import com.inn.almacen.POJO.Category;
+import com.inn.almacen.POJO.Supplier;
 import com.inn.almacen.REST.CategoryRest;
 import com.inn.almacen.SERVICE.CategoryService;
 import com.inn.almacen.UTILS.AlmacenUtils;
@@ -58,5 +59,16 @@ public class CategoryRestImpl implements CategoryRest {
             e.printStackTrace();
         }
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<Category>> getById(Integer id) {
+        try {
+            return categoryService.getById(id);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<List<Category>>( new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

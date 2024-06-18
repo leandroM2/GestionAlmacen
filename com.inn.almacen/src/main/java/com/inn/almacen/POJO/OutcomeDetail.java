@@ -7,6 +7,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.io.Serializable;
 
+@NamedQuery(name = "OutcomeDetail.getById", query = "select new com.inn.almacen.WRAPPER.OutcomeDetailWrapper(i.id, i.cantidad, i.outcome.id, i.outcome.fecha, i.outcome.client.id, i.outcome.client.razonSocial, i.outcome.client.ruc, i.outcome.client.correo, i.outcome.client.contacto, i.outcome.client.direccion, i.outcome.user.id, i.outcome.user.nombre, i.outcome.user.email, i.outcome.user.estado, i.product.id, i.product.nombre, i.product.color, i.product.precio, i.product.stock, i.product.estado, i.product.category.id, i.product.category.nombre, i.product.supplier.id, i.product.supplier.razonSocial, i.product.supplier.ruc, i.product.supplier.contacto) from OutcomeDetail i where i.id=:id")
 @NamedQuery(name = "OutcomeDetail.getAllOutcomeDetail", query = "select new com.inn.almacen.WRAPPER.OutcomeDetailWrapper(i.id, i.cantidad, i.outcome.id, i.outcome.fecha, i.outcome.client.id, i.outcome.client.razonSocial, i.outcome.client.ruc, i.outcome.client.correo, i.outcome.client.contacto, i.outcome.client.direccion, i.outcome.user.id, i.outcome.user.nombre, i.outcome.user.email, i.outcome.user.estado, i.product.id, i.product.nombre, i.product.color, i.product.precio, i.product.stock, i.product.estado, i.product.category.id, i.product.category.nombre, i.product.supplier.id, i.product.supplier.razonSocial, i.product.supplier.ruc, i.product.supplier.contacto) from OutcomeDetail i")
 
 @Data

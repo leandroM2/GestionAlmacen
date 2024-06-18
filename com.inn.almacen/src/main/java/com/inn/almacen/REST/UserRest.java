@@ -25,7 +25,7 @@ public interface UserRest {
     ResponseEntity<String> deleteUser(@PathVariable Integer id);
 
     @PostMapping(path = "/get/{id}")
-    ResponseEntity<List<User>> getById(@PathVariable Integer id);
+    ResponseEntity<List<UserWrapper>> getById(@PathVariable Integer id);
 
     @PostMapping(path = "/iniciarSesion")
     public ResponseEntity<String> iniciarSesion(@RequestBody (required = true) Map<String,String> requestMap);

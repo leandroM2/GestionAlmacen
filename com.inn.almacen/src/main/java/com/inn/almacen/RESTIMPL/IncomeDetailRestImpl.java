@@ -60,4 +60,15 @@ public class IncomeDetailRestImpl implements IncomeDetailRest {
         }
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @Override
+    public ResponseEntity<List<IncomeDetailWrapper>> getById(Integer id) {
+        try {
+            return incomeDetailService.getById(id);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<List<IncomeDetailWrapper>>( new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

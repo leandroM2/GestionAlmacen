@@ -15,4 +15,6 @@ public interface IncomeDetailService {
     ResponseEntity<String> updateIncomeDetail(Map<String, String> requestMap);
 
     ResponseEntity<String> deleteIncomeDetail(Integer id);
+
+    ResponseEntity<List<IncomeDetailWrapper>> getById(Integer id);
 }

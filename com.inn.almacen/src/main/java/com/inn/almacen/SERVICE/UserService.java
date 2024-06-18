@@ -17,7 +17,7 @@ public interface UserService {
 
     ResponseEntity<String> deleteUser(Integer id);
 
-    ResponseEntity<List<User>> getById(Integer id);
+    ResponseEntity<List<UserWrapper>> getById(Integer id);
 
     ResponseEntity<String> iniciarSesion(Map<String,String> requestMap);
 

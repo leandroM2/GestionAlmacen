@@ -7,6 +7,8 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.io.Serializable;
 
+@NamedQuery(name="Client.getById",query = "select c from Client c where c.id=:id")
+
 @NamedQuery(name="Client.getAllClient",query = "select c from Client c")
 
 

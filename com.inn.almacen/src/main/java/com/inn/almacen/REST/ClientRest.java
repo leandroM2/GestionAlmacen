@@ -24,4 +24,7 @@ public interface ClientRest {
 
     @PostMapping(path = "/delete/{id}")
     ResponseEntity<String> deleteClient(@PathVariable Integer id);
+
+    @PostMapping(path = "/get/{id}")
+    ResponseEntity<List<Client>> getById(@PathVariable Integer id);
 }

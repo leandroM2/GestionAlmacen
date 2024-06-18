@@ -1,6 +1,5 @@
 package com.inn.almacen.RESTIMPL;
 
-import com.inn.almacen.POJO.Outcome;
 import com.inn.almacen.REST.OutcomeRest;
 import com.inn.almacen.SERVICE.OutcomeService;
 import com.inn.almacen.UTILS.AlmacenUtils;
@@ -60,5 +59,16 @@ public class OutcomeRestImpl implements OutcomeRest {
             e.printStackTrace();
         }
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<OutcomeWrapper>> getById(Integer id) {
+        try {
+            return outcomeService.getById(id);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<List<OutcomeWrapper>>( new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

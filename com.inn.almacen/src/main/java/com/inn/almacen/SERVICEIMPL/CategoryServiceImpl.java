@@ -107,6 +107,27 @@ public class CategoryServiceImpl implements CategoryService {
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.BAD_REQUEST);
     }
 
+    @Override
+    public ResponseEntity<List<Category>> getById(Integer id) {
+        log.info("Dentro de get category by id");
+        try {
+            if (jwtFilter.isAdmin()){
+                Optional optional=categoryDao.findById(id);
+                if(!optional.isEmpty()){
+                    List<Category> myList = new ArrayList<>();
+                    myList.add(categoryDao.getById(id));
+                    return new ResponseEntity<>(myList,HttpStatus.OK);
+                }
+                return new ResponseEntity<>(new ArrayList<>(),HttpStatus.OK);
+            }else{
+                return new ResponseEntity<>(new ArrayList<>(),HttpStatus.UNAUTHORIZED);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     private boolean validateCategoryMap(Map<String, String> requestMap, boolean validarId) {
         if(requestMap.containsKey("nombre")){
             if (requestMap.containsKey("id") && validarId){

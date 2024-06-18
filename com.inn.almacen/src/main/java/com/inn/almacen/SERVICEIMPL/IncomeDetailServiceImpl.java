@@ -9,6 +9,7 @@ import com.inn.almacen.UTILS.AlmacenUtils;
 import com.inn.almacen.WRAPPER.IncomeDetailWrapper;
 import com.inn.almacen.constens.AlmacenConstants;
 import com.inn.almacen.dao.IncomeDetailDao;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
+@Slf4j
 @Service
 public class IncomeDetailServiceImpl implements IncomeDetailService {
 
@@ -102,6 +103,36 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
             e.printStackTrace();
         }
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<IncomeDetailWrapper>> getById(Integer id) {
+        log.info("Dentro de get Income Detail by id");
+        try {
+            if (jwtFilter.isAdmin()){
+                Optional optional=incomeDetailDao.findById(id);
+                if(!optional.isEmpty()){
+                    IncomeDetail incomeDetail=incomeDetailDao.getById(id);
+                    List<IncomeDetailWrapper> myList = new ArrayList<>();
+                    myList.add(new IncomeDetailWrapper(incomeDetail.getId(),incomeDetail.getCantidad(),incomeDetail.getIncome().getId(),
+                            incomeDetail.getIncome().getFecha(), incomeDetail.getIncome().getSupplier().getId(),
+                            incomeDetail.getIncome().getSupplier().getRazonSocial(), incomeDetail.getIncome().getSupplier().getRuc(),
+                            incomeDetail.getIncome().getSupplier().getContacto(), incomeDetail.getProduct().getId(),
+                            incomeDetail.getProduct().getNombre(), incomeDetail.getProduct().getColor(), incomeDetail.getProduct().getPrecio(),
+                            incomeDetail.getProduct().getStock(), incomeDetail.getProduct().getEstado(), incomeDetail.getProduct().getCategory().getId(),
+                            incomeDetail.getProduct().getCategory().getNombre(), incomeDetail.getProduct().getSupplier().getId(),
+                            incomeDetail.getProduct().getSupplier().getRazonSocial(), incomeDetail.getProduct().getSupplier().getRuc(),
+                            incomeDetail.getProduct().getSupplier().getContacto()));
+                    return new ResponseEntity<>(myList,HttpStatus.OK);
+                }
+                return new ResponseEntity<>(new ArrayList<>(),HttpStatus.OK);
+            }else{
+                return new ResponseEntity<>(new ArrayList<>(),HttpStatus.UNAUTHORIZED);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private boolean validateIncomeDetailMap(Map<String, String> requestMap, boolean validateId){

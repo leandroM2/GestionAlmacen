@@ -4,9 +4,11 @@ import com.inn.almacen.JWT.JwtFilter;
 import com.inn.almacen.POJO.*;
 import com.inn.almacen.SERVICE.OutcomeDetailService;
 import com.inn.almacen.UTILS.AlmacenUtils;
+import com.inn.almacen.WRAPPER.IncomeDetailWrapper;
 import com.inn.almacen.WRAPPER.OutcomeDetailWrapper;
 import com.inn.almacen.constens.AlmacenConstants;
 import com.inn.almacen.dao.OutcomeDetailDao;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
+@Slf4j
 @Service
 public class OutcomeDetailServiceImpl implements OutcomeDetailService {
 
@@ -100,6 +102,39 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
             e.printStackTrace();
         }
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<OutcomeDetailWrapper>> getById(Integer id) {
+        log.info("Dentro de get Income Detail by id");
+        try {
+            if (jwtFilter.isAdmin()){
+                Optional optional=outcomeDetailDao.findById(id);
+                if(!optional.isEmpty()){
+                    OutcomeDetail outcomeDetail=outcomeDetailDao.getById(id);
+                    List<OutcomeDetailWrapper> myList = new ArrayList<>();
+                    myList.add(new OutcomeDetailWrapper(outcomeDetail.getId(),outcomeDetail.getCantidad(),outcomeDetail.getOutcome().getId(),
+                            outcomeDetail.getOutcome().getFecha(), outcomeDetail.getOutcome().getClient().getId(),
+                            outcomeDetail.getOutcome().getClient().getRazonSocial(), outcomeDetail.getOutcome().getClient().getRuc(),
+                            outcomeDetail.getOutcome().getClient().getCorreo(), outcomeDetail.getOutcome().getClient().getContacto(),
+                            outcomeDetail.getOutcome().getClient().getDireccion(), outcomeDetail.getOutcome().getUser().getId(),
+                            outcomeDetail.getOutcome().getUser().getNombre(), outcomeDetail.getOutcome().getUser().getEmail(),
+                            outcomeDetail.getOutcome().getUser().getEstado(), outcomeDetail.getProduct().getId(),
+                            outcomeDetail.getProduct().getNombre(), outcomeDetail.getProduct().getColor(), outcomeDetail.getProduct().getPrecio(),
+                            outcomeDetail.getProduct().getStock(), outcomeDetail.getProduct().getEstado(), outcomeDetail.getProduct().getCategory().getId(),
+                            outcomeDetail.getProduct().getCategory().getNombre(), outcomeDetail.getProduct().getSupplier().getId(),
+                            outcomeDetail.getProduct().getSupplier().getRazonSocial(), outcomeDetail.getProduct().getSupplier().getRuc(),
+                            outcomeDetail.getProduct().getSupplier().getContacto()));
+                    return new ResponseEntity<>(myList,HttpStatus.OK);
+                }
+                return new ResponseEntity<>(new ArrayList<>(),HttpStatus.OK);
+            }else{
+                return new ResponseEntity<>(new ArrayList<>(),HttpStatus.UNAUTHORIZED);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private boolean validateOutcomeDetailMap(Map<String, String> requestMap, boolean validateId){

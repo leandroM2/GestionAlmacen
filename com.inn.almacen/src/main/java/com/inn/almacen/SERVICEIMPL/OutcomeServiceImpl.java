@@ -10,6 +10,7 @@ import com.inn.almacen.UTILS.AlmacenUtils;
 import com.inn.almacen.WRAPPER.OutcomeWrapper;
 import com.inn.almacen.constens.AlmacenConstants;
 import com.inn.almacen.dao.OutcomeDao;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
+@Slf4j
 @Service
 public class OutcomeServiceImpl implements OutcomeService {
     @Autowired
@@ -103,6 +104,31 @@ public class OutcomeServiceImpl implements OutcomeService {
             e.printStackTrace();
         }
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<OutcomeWrapper>> getById(Integer id) {
+        log.info("Dentro de get Outcome by id");
+        try {
+            if (jwtFilter.isAdmin()){
+                Optional optional=outcomeDao.findById(id);
+                if(!optional.isEmpty()){
+                    Outcome outcome=outcomeDao.getById(id);
+                    List<OutcomeWrapper> myList = new ArrayList<>();
+                    myList.add(new OutcomeWrapper(outcome.getId(), outcome.getFecha(), outcome.getClient().getId(),
+                            outcome.getClient().getRazonSocial(), outcome.getClient().getRuc(), outcome.getClient().getCorreo(),
+                            outcome.getClient().getContacto(), outcome.getClient().getDireccion(), outcome.getUser().getId(),
+                            outcome.getUser().getNombre(), outcome.getUser().getEmail(), outcome.getUser().getEstado()));
+                    return new ResponseEntity<>(myList,HttpStatus.OK);
+                }
+                return new ResponseEntity<>(new ArrayList<>(),HttpStatus.OK);
+            }else{
+                return new ResponseEntity<>(new ArrayList<>(),HttpStatus.UNAUTHORIZED);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private boolean validateOutcomeMap(Map<String, String> requestMap, boolean validateId) {
