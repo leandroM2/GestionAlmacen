@@ -7,8 +7,8 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.io.Serializable;
 
-@NamedQuery(name = "IncomeDetail.getById", query = "select new com.inn.almacen.WRAPPER.IncomeDetailWrapper(i.id, i.cantidad, i.income.id, i.income.fecha, i.income.supplier.id, i.income.supplier.razonSocial, i.income.supplier.ruc, i.income.supplier.contacto,i.product.id, i.product.nombre, i.product.color, i.product.precio, i.product.stock, i.product.estado, i.product.category.id, i.product.category.nombre, i.product.supplier.id, i.product.supplier.razonSocial, i.product.supplier.ruc, i.product.supplier.contacto) from IncomeDetail i where i.id=:id")
-@NamedQuery(name = "IncomeDetail.getAllIncomeDetail", query = "select new com.inn.almacen.WRAPPER.IncomeDetailWrapper(i.id, i.cantidad, i.income.id, i.income.fecha, i.income.supplier.id, i.income.supplier.razonSocial, i.income.supplier.ruc, i.income.supplier.contacto,i.product.id, i.product.nombre, i.product.color, i.product.precio, i.product.stock, i.product.estado, i.product.category.id, i.product.category.nombre, i.product.supplier.id, i.product.supplier.razonSocial, i.product.supplier.ruc, i.product.supplier.contacto) from IncomeDetail i")
+@NamedQuery(name = "IncomeDetail.getById", query = "select new com.inn.almacen.WRAPPER.IncomeDetailWrapper(i.id, i.cantidad, i.precioVentaUnit, i.income.id, i.income.fecha, i.income.estado, i.income.user.id, i.income.user.nombre, i.income.userAuth.id, i.income.userAuth.nombre, i.product.id, i.product.nombre, i.product.color, i.product.precio, i.product.stock, i.product.estado, i.product.category.id, i.product.category.nombre, i.product.supplier.id, i.product.supplier.razonSocial, i.product.supplier.ruc, i.product.supplier.contacto) from IncomeDetail i where i.id=:id")
+@NamedQuery(name = "IncomeDetail.getAllIncomeDetail", query = "select new com.inn.almacen.WRAPPER.IncomeDetailWrapper(i.id, i.cantidad, i.precioVentaUnit, i.income.id, i.income.fecha, i.income.estado, i.income.user.id, i.income.user.nombre, i.income.userAuth.id, i.income.userAuth.nombre, i.product.id, i.product.nombre, i.product.color, i.product.precio, i.product.stock, i.product.estado, i.product.category.id, i.product.category.nombre, i.product.supplier.id, i.product.supplier.razonSocial, i.product.supplier.ruc, i.product.supplier.contacto) from IncomeDetail i")
 
 @Data
 @Entity
@@ -26,6 +26,9 @@ public class IncomeDetail implements Serializable {
 
     @Column(name = "cantidad")
     private Integer cantidad;
+
+    @Column(name="precioVentaUnit")
+    private Float precioVentaUnit;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "income_fk", nullable = false)

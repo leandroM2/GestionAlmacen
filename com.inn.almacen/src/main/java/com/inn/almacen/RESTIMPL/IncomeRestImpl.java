@@ -71,4 +71,14 @@ public class IncomeRestImpl implements IncomeRest {
         }
         return new ResponseEntity<List<IncomeWrapper>>( new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @Override
+    public ResponseEntity<String> authorizeIncome(Integer id) {
+        try {
+            return incomeService.authorizeIncome(id);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

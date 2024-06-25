@@ -111,7 +111,7 @@ public class CategoryServiceImpl implements CategoryService {
     public ResponseEntity<List<Category>> getById(Integer id) {
         log.info("Dentro de get category by id");
         try {
-            if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
+            if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 Optional optional=categoryDao.findById(id);
                 if(!optional.isEmpty()){
                     List<Category> myList = new ArrayList<>();

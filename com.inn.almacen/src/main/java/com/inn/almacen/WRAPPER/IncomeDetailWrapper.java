@@ -11,17 +11,21 @@ public class IncomeDetailWrapper {
 
     private Integer cantidad;
 
+    private Float precioVentaUnit;
+
     private Integer incomeId;
 
     private Date incomeFecha;
 
-    private Integer incomeSupplierId;
+    private Boolean incomeEstado;
 
-    private String incomeSupplierRazonSocial;
+    private Integer incomeUserId;
 
-    private Long incomeSupplierRuc;
+    private String incomeUserNombre;
 
-    private Integer incomeSupplierContacto;
+    private Integer incomeUserAuthId;
+
+    private String incomeUserAuthNombre;
 
     private Integer productId;
 
@@ -47,21 +51,24 @@ public class IncomeDetailWrapper {
 
     private Integer productSupplierContacto;
 
-    public IncomeDetailWrapper(Integer id, Integer cantidad, Integer incomeId, java.util.Date incomeFecha,
-                               Integer incomeSupplierId, String incomeSupplierRazonSocial,
-                               Long incomeSupplierRuc, Integer incomeSupplierContacto, Integer productId,
-                               String productNombre, String productColor, Float productPrecio,
-                               Integer productStock, Boolean productEstado, Integer productCategoryId,
-                               String productCategoryNombre, Integer productSupplierId,
-                               String productSupplierRazonSocial, Long productSupplierRuc, Integer productSupplierContacto) {
+    public IncomeDetailWrapper(Integer id, Integer cantidad, Float precioVentaUnit, Integer incomeId,
+                               java.util.Date incomeFecha, Boolean incomeEstado, Integer incomeUserId,
+                               String incomeUserNombre, Integer incomeUserAuthId,
+                               String incomeUserAuthNombre, Integer productId, String productNombre,
+                               String productColor, Float productPrecio, Integer productStock,
+                               Boolean productEstado, Integer productCategoryId, String productCategoryNombre,
+                               Integer productSupplierId, String productSupplierRazonSocial,
+                               Long productSupplierRuc, Integer productSupplierContacto) {
         this.id = id;
         this.cantidad = cantidad;
+        this.precioVentaUnit = precioVentaUnit;
         this.incomeId = incomeId;
         this.incomeFecha = (Date) incomeFecha;
-        this.incomeSupplierId = incomeSupplierId;
-        this.incomeSupplierRazonSocial = incomeSupplierRazonSocial;
-        this.incomeSupplierRuc = incomeSupplierRuc;
-        this.incomeSupplierContacto = incomeSupplierContacto;
+        this.incomeEstado = incomeEstado;
+        this.incomeUserId = incomeUserId;
+        this.incomeUserNombre = incomeUserNombre;
+        this.incomeUserAuthId = incomeUserAuthId;
+        this.incomeUserAuthNombre = incomeUserAuthNombre;
         this.productId = productId;
         this.productNombre = productNombre;
         this.productColor = productColor;

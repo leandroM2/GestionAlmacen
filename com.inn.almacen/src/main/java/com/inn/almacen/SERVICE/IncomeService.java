@@ -16,4 +16,6 @@ public interface IncomeService {
     ResponseEntity<String> deleteIncome(Integer id);
 
     ResponseEntity<List<IncomeWrapper>> getById(Integer id);
+
+    ResponseEntity<String> authorizeIncome(Integer id);
 }

@@ -26,4 +26,7 @@ public interface IncomeRest {
     @PostMapping(path = "/get/{id}")
     ResponseEntity<List<IncomeWrapper>> getById(@PathVariable Integer id);
 
+    @PostMapping(path = "/auth/{id}")
+    ResponseEntity<String> authorizeIncome(@PathVariable Integer id);
+
 }

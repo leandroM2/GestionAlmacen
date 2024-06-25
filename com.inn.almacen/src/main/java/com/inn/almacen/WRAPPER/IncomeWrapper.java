@@ -10,22 +10,25 @@ public class IncomeWrapper {
 
     private Date fecha;
 
-    private Integer supplierId;
+    private Boolean estado;
 
-    private String supplierRazonSocial;
+    private Integer userId;
 
-    private Long supplierRuc;
+    private String userNombre;
 
-    private Integer supplierContacto;
+    private Integer userAuthId;
 
-    public IncomeWrapper(Integer id, java.util.Date fecha, Integer supplierId,
-                         String supplierRazonSocial, Long supplierRuc,
-                         Integer supplierContacto) {
+    private String userAuthNombre;
+
+    public IncomeWrapper(Integer id, java.util.Date fecha, Boolean estado,
+                         Integer receptorId, String userNombre,
+                         Integer userAuthId, String userAuthNombre) {
         this.id = id;
         this.fecha = (Date) fecha;
-        this.supplierId = supplierId;
-        this.supplierRazonSocial = supplierRazonSocial;
-        this.supplierRuc = supplierRuc;
-        this.supplierContacto = supplierContacto;
+        this.estado = estado;
+        this.userId = receptorId;
+        this.userNombre = userNombre;
+        this.userAuthId = userAuthId;
+        this.userAuthNombre = userAuthNombre;
     }
 }

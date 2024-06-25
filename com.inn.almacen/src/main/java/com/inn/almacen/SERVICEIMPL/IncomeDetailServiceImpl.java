@@ -8,6 +8,7 @@ import com.inn.almacen.SERVICE.IncomeDetailService;
 import com.inn.almacen.UTILS.AlmacenUtils;
 import com.inn.almacen.WRAPPER.IncomeDetailWrapper;
 import com.inn.almacen.constens.AlmacenConstants;
+import com.inn.almacen.dao.IncomeDao;
 import com.inn.almacen.dao.IncomeDetailDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
 
     @Autowired
     IncomeDetailDao incomeDetailDao;
+
+    @Autowired
+    IncomeDao incomeDao;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -118,11 +122,12 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
                 if(!optional.isEmpty()){
                     incomeDetail=incomeDetailDao.getById(id);
                     List<IncomeDetailWrapper> myList = new ArrayList<>();
-                    myList.add(new IncomeDetailWrapper(incomeDetail.getId(),incomeDetail.getCantidad(),incomeDetail.getIncome().getId(),
-                            incomeDetail.getIncome().getFecha(), incomeDetail.getIncome().getSupplier().getId(),
-                            incomeDetail.getIncome().getSupplier().getRazonSocial(), incomeDetail.getIncome().getSupplier().getRuc(),
-                            incomeDetail.getIncome().getSupplier().getContacto(), incomeDetail.getProduct().getId(),
-                            incomeDetail.getProduct().getNombre(), incomeDetail.getProduct().getColor(), incomeDetail.getProduct().getPrecio(),
+                    myList.add(new IncomeDetailWrapper(incomeDetail.getId(),incomeDetail.getCantidad(),
+                            incomeDetail.getPrecioVentaUnit(),incomeDetail.getIncome().getId(),
+                            incomeDetail.getIncome().getFecha(), incomeDetail.getIncome().getEstado(),
+                            incomeDetail.getIncome().getUser().getId(), incomeDetail.getIncome().getUser().getNombre(),
+                            incomeDetail.getIncome().getUserAuth().getId(), incomeDetail.getIncome().getUserAuth().getNombre(),
+                            incomeDetail.getProduct().getId(), incomeDetail.getProduct().getNombre(), incomeDetail.getProduct().getColor(), incomeDetail.getProduct().getPrecio(),
                             incomeDetail.getProduct().getStock(), incomeDetail.getProduct().getEstado(), incomeDetail.getProduct().getCategory().getId(),
                             incomeDetail.getProduct().getCategory().getNombre(), incomeDetail.getProduct().getSupplier().getId(),
                             incomeDetail.getProduct().getSupplier().getRazonSocial(), incomeDetail.getProduct().getSupplier().getRuc(),
@@ -140,7 +145,8 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
     }
 
     private boolean validateIncomeDetailMap(Map<String, String> requestMap, boolean validateId){
-        if(requestMap.containsKey("cantidad")){
+        if(requestMap.containsKey("cantidad") && requestMap.containsKey("precioVentaUnit")
+            && requestMap.containsKey("incomeId") && requestMap.containsKey("productId")){
             if(requestMap.containsKey("id") && validateId){
                 return true;
             }else if (!validateId){
@@ -158,18 +164,25 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
         product.setId(Integer.parseInt(requestMap.get("productId")));
 
         IncomeDetail incomeDetail=new IncomeDetail();
-        if(esAdd){
-            incomeDetail.setId(Integer.parseInt(requestMap.get("id")));
-        }
+        if(esAdd) incomeDetail.setId(Integer.parseInt(requestMap.get("id")));
         incomeDetail.setIncome(income);
         incomeDetail.setProduct(product);
+        incomeDetail.setPrecioVentaUnit(Float.parseFloat(requestMap.get("precioVentaUnit")));
         Integer cant=Integer.parseInt(requestMap.get("cantidad"));
         incomeDetail.setCantidad(cant);
-        ProductUpdate(product.getId(), cant, incomeDetail.getId(), esAdd);
+        Boolean state=validateState(Integer.parseInt(requestMap.get("incomeId")));
+        if(state) updateProduct(product.getId(), cant, incomeDetail.getId(), esAdd);
         return incomeDetail;
     }
 
-    private void ProductUpdate(Integer id, Integer cant, Integer incomeId, boolean esAdd){
+    private Boolean validateState(Integer incomeId){
+        Income income;
+        income=incomeDao.getById(incomeId);
+        Boolean state=income.getEstado();
+        return state;
+    }
+
+    private void updateProduct(Integer id, Integer cant, Integer incomeId, boolean esAdd){
         log.info("Hemos llegado hasta actualizacion de stock producto.");
         String sql = "SELECT stock FROM product WHERE id = ?";
         Integer stock = jdbcTemplate.queryForObject(sql, new Integer[]{id}, Integer.class);
