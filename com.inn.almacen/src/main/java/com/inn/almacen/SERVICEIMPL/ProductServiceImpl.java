@@ -32,7 +32,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ResponseEntity<String> addNewProduct(Map<String, String> requestMap) {
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 if(validateProductMap(requestMap, false)){
                     productDao.save(getProductFromMap(requestMap, false));
                     return AlmacenUtils.getResponseEntity("Producto correctamente ingresado.",HttpStatus.OK);
@@ -61,7 +61,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ResponseEntity<String> updateProduct(Map<String, String> requestMap) {
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 if(validateProductMap(requestMap, true)){
                     Optional<Product> optional=productDao.findById(Integer.parseInt(requestMap.get("id")));
                     if(!optional.isEmpty()){
@@ -89,7 +89,7 @@ public class ProductServiceImpl implements ProductService {
     public ResponseEntity<List<ProductWrapper>> getById(Integer id) {
         log.info("Dentro de get product by id");
         try {
-            if (jwtFilter.isAdmin()){
+            if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 Optional optional=productDao.findById(id);
                 if(!optional.isEmpty()){
                     Product product=productDao.getById(id);
@@ -114,7 +114,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ResponseEntity<String> deleteProduct(Integer id) {
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 Optional optional=productDao.findById(id);
                 if(!optional.isEmpty()){
                     productDao.deleteById(id);

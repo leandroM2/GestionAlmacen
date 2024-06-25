@@ -1,6 +1,7 @@
 package com.inn.almacen.SERVICEIMPL;
 
 import com.inn.almacen.JWT.CustomerUsersDetailsService;
+import com.inn.almacen.JWT.Jasypt;
 import com.inn.almacen.JWT.JwtFilter;
 import com.inn.almacen.JWT.JwtUtil;
 import com.inn.almacen.POJO.User;
@@ -18,6 +19,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import javax.sql.rowset.serial.SerialBlob;
+import java.sql.Blob;
 import java.util.*;
 
 @Slf4j
@@ -39,21 +42,23 @@ public class UserServiceImpl implements UserService {
     @Autowired
     JwtFilter jwtFilter;
 
+    @Autowired
+    Jasypt jasypt;
     @Override
     public ResponseEntity<String> addNewUser(Map<String, String> requestMap) {
-        log.info("Dentro del registro {}", requestMap);
+        log.info("Dentro del registro");
         try {
-            if(validateAdd(requestMap)){
-                User user=userDao.findByEmailId(requestMap.get("email"));
-                if(Objects.isNull(user)){
-                    userDao.save(getUserFromMap(requestMap, false));
-                    return AlmacenUtils.getResponseEntity("User registrado exitosamente.",HttpStatus.OK);
+                if(validateAdd(requestMap)){
+                    User user=userDao.findByEmailId(requestMap.get("email"));
+                    if(Objects.isNull(user)){
+                        userDao.save(getUserFromMap(requestMap, false));
+                        return AlmacenUtils.getResponseEntity("User registrado exitosamente.",HttpStatus.OK);
+                    }else{
+                        return AlmacenUtils.getResponseEntity("Email ya existe.", HttpStatus.BAD_REQUEST);
+                    }
                 }else{
-                    return AlmacenUtils.getResponseEntity("Email ya existe.", HttpStatus.BAD_REQUEST);
+                    return AlmacenUtils.getResponseEntity(AlmacenConstants.DATA_INVALIDA, HttpStatus.BAD_REQUEST);
                 }
-            }else{
-                return AlmacenUtils.getResponseEntity(AlmacenConstants.DATA_INVALIDA, HttpStatus.BAD_REQUEST);
-            }
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -66,7 +71,7 @@ public class UserServiceImpl implements UserService {
         log.info("Dentro de inicio de sesión");
         try{
             Authentication auth= authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(requestMap.get("email"),requestMap.get("contrasena"))
+                    new UsernamePasswordAuthenticationToken(requestMap.get("email"), requestMap.get("contrasena"))
             );
             if(auth.isAuthenticated()){
                 if(customerUsersDetailsService.getUserDetail().getEstado()==true){
@@ -92,7 +97,7 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<List<UserWrapper>> getAllUser() {
         log.info("Dentro de get all user");
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 return new ResponseEntity<>(userDao.getAllUser(),HttpStatus.OK);
 
             }else{
@@ -108,7 +113,7 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<String> updateUser(Map<String, String> requestMap) {
         log.info("Dentro de update user");
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 if(valdateUserMap(requestMap, true)){
                     Optional optional=userDao.findById(Integer.parseInt(requestMap.get("id")));
                     if(!optional.isEmpty()){
@@ -144,7 +149,7 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<String> deleteUser(Integer id) {
         log.info("Dentro de delete user");
         try {
-            if (jwtFilter.isAdmin()){
+            if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 Optional optional=userDao.findById(id);
                 if(!optional.isEmpty()){
                     User user=userDao.findByRol(id);
@@ -169,7 +174,7 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<List<UserWrapper>> getById(Integer id) {
         log.info("Dentro de get user by id");
         try {
-            if (jwtFilter.isAdmin()){
+            if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 Optional optional=userDao.findById(id);
                 if(!optional.isEmpty()){
                         User user=userDao.getById(id);
@@ -196,16 +201,23 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private User getUserFromMap(Map<String,String> requestMap, boolean esAdd){
+    private User getUserFromMap(Map<String,String> requestMap, boolean esAdd) {
+        String password;
         User user= new User();
-        if(esAdd){
-            user.setId(Integer.parseInt(requestMap.get("id")));
-        }
+        if(esAdd) user.setId(Integer.parseInt(requestMap.get("id")));
         user.setNombre(requestMap.get("nombre"));
         user.setEmail(requestMap.get("email"));
-        user.setContrasena(requestMap.get("contrasena"));
-        user.setEstado(false);
-        user.setRol("user");
+        password=requestMap.get("contrasena");
+        user.setRol(requestMap.containsKey("rol") ? requestMap.get("rol") : "user");
+        user.setEstado(requestMap.containsKey("estado") ? Boolean.parseBoolean(requestMap.get("estado")) : false);
+        try{
+            password=jasypt.encrypting(password);
+            byte[] byteData = password.getBytes("UTF-8");
+            Blob blob=new SerialBlob(byteData);
+            user.setContrasena(blob);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         return user;
     }
 }

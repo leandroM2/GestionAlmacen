@@ -35,7 +35,7 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
     @Override
     public ResponseEntity<String> addNewIncomeDetail(Map<String, String> requestMap) {
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 if(validateIncomeDetailMap(requestMap, false)){
                     incomeDetailDao.save(getIncomeDetailFromMap(requestMap, false));
                     return AlmacenUtils.getResponseEntity("Producto de ingreso correctamente registrado.", HttpStatus.OK);
@@ -66,7 +66,7 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
     @Override
     public ResponseEntity<String> updateIncomeDetail(Map<String, String> requestMap) {
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 if(validateIncomeDetailMap(requestMap, true)){
                     Optional<IncomeDetail> optional=incomeDetailDao.findById(Integer.parseInt(requestMap.get("id")));
                     if(!optional.isEmpty()){
@@ -92,7 +92,7 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
     @Override
     public ResponseEntity<String> deleteIncomeDetail(Integer id) {
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 Optional optional=incomeDetailDao.findById(id);
                 if(!optional.isEmpty()){
                     incomeDetailDao.deleteById(id);
@@ -113,7 +113,7 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
         log.info("Dentro de get Income Detail by id");
         IncomeDetail incomeDetail;
         try {
-            if (jwtFilter.isAdmin()){
+            if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 Optional optional=incomeDetailDao.findById(id);
                 if(!optional.isEmpty()){
                     incomeDetail=incomeDetailDao.getById(id);

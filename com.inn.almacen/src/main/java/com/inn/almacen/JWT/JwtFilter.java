@@ -28,7 +28,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
-        if(httpServletRequest.getServletPath().matches("/user/iniciarSesion|/user/add")){//|/user/olvidoContrasena
+        if(httpServletRequest.getServletPath().matches("/user/iniciarSesion|/user/add")){
             filterChain.doFilter(httpServletRequest,httpServletResponse);
         }else{
             String authorizationHeader= httpServletRequest.getHeader("Authorization");
@@ -63,6 +63,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
     public boolean isUser(){
         return "user".
+                equalsIgnoreCase((String) claims.get("rol"));
+    }
+
+    public boolean isSuperAdmin(){
+        return "superadmin".
                 equalsIgnoreCase((String) claims.get("rol"));
     }
 

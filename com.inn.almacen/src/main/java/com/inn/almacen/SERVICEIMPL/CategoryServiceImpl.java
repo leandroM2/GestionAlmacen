@@ -32,7 +32,7 @@ public class CategoryServiceImpl implements CategoryService {
     public ResponseEntity<String> addNewCategory(Map<String, String> requestMap) {
         log.info("Dentro de Add New Category");
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 if(validateCategoryMap(requestMap,false)){
                     categoryDao.save(getCategoryFromMap(requestMap, false));
                     return AlmacenUtils.getResponseEntity
@@ -66,7 +66,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public ResponseEntity<String> updateCategory(Map<String, String> requestMap) {
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 if(validateCategoryMap(requestMap, true)){
                     Optional optional = categoryDao.findById(Integer.parseInt(requestMap.get("id")));
                     if(!optional.isEmpty()){
@@ -90,7 +90,7 @@ public class CategoryServiceImpl implements CategoryService {
     public ResponseEntity<String> deleteCategory(Integer id) {
         log.info("Dentro de delete category");
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 Optional optional=categoryDao.findById(id);
                 if(!optional.isEmpty()){
                     categoryDao.deleteById(id);
@@ -111,7 +111,7 @@ public class CategoryServiceImpl implements CategoryService {
     public ResponseEntity<List<Category>> getById(Integer id) {
         log.info("Dentro de get category by id");
         try {
-            if (jwtFilter.isAdmin()){
+            if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 Optional optional=categoryDao.findById(id);
                 if(!optional.isEmpty()){
                     List<Category> myList = new ArrayList<>();

@@ -33,7 +33,7 @@ public class OutcomeServiceImpl implements OutcomeService {
     @Override
     public ResponseEntity<String> addNewOutcome(Map<String, String> requestMap) {
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 if(validateOutcomeMap(requestMap, false)){
                     outcomeDao.save(getOutcomeFromMap(requestMap, false));
                     return AlmacenUtils.getResponseEntity("Salida correctamente registrado.", HttpStatus.OK);
@@ -64,7 +64,7 @@ public class OutcomeServiceImpl implements OutcomeService {
     @Override
     public ResponseEntity<String> updateOutcome(Map<String, String> requestMap) {
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 if(validateOutcomeMap(requestMap, true)){
                     Optional<Outcome> optional=outcomeDao.findById(Integer.parseInt(requestMap.get("id")));
                     if(!optional.isEmpty()){
@@ -90,7 +90,7 @@ public class OutcomeServiceImpl implements OutcomeService {
     @Override
     public ResponseEntity<String> deleteOutcome(Integer id) {
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 Optional optional=outcomeDao.findById(id);
                 if(!optional.isEmpty()){
                     outcomeDao.deleteById(id);
@@ -110,7 +110,7 @@ public class OutcomeServiceImpl implements OutcomeService {
     public ResponseEntity<List<OutcomeWrapper>> getById(Integer id) {
         log.info("Dentro de get Outcome by id");
         try {
-            if (jwtFilter.isAdmin()){
+            if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 Optional optional=outcomeDao.findById(id);
                 if(!optional.isEmpty()){
                     Outcome outcome=outcomeDao.getById(id);

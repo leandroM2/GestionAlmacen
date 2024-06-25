@@ -32,7 +32,7 @@ public class ClientServiceImpl implements ClientService {
     public ResponseEntity<String> addNewClient(Map<String, String> requestMap) {
         log.info("Dentro de add new client");
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 if(validateClientMap(requestMap, false)){
                     clientDao.save(getClientFromMap(requestMap,false));
                     return AlmacenUtils.getResponseEntity("Nuevo cliente agregado exitosamente.", HttpStatus.OK);
@@ -65,7 +65,7 @@ public class ClientServiceImpl implements ClientService {
     public ResponseEntity<String> updateClient(Map<String, String> requestMap) {
         log.info("Dentro de update client");
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 if(validateClientMap(requestMap, true)){
                     Optional optional= clientDao.findById(Integer.parseInt(requestMap.get("id")));
                     if (!optional.isEmpty()){
@@ -89,7 +89,7 @@ public class ClientServiceImpl implements ClientService {
     public ResponseEntity<String> deleteClient(Integer id) {
         log.info("Dentro de delete client");
         try {
-            if (jwtFilter.isAdmin()){
+            if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 Optional optional=clientDao.findById(id);
                 if (!optional.isEmpty()){
                     clientDao.deleteById(id);
@@ -109,7 +109,7 @@ public class ClientServiceImpl implements ClientService {
     public ResponseEntity<List<Client>> getById(Integer id) {
         log.info("Dentro de client supplier by id");
         try {
-            if (jwtFilter.isAdmin()){
+            if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 Optional optional=clientDao.findById(id);
                 if(!optional.isEmpty()){
                     List<Client> myList = new ArrayList<>();

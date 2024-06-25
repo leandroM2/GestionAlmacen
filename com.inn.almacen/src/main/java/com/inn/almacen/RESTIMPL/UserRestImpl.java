@@ -1,6 +1,5 @@
 package com.inn.almacen.RESTIMPL;
 
-import com.inn.almacen.POJO.User;
 import com.inn.almacen.REST.UserRest;
 import com.inn.almacen.SERVICE.UserService;
 import com.inn.almacen.UTILS.AlmacenUtils;

@@ -1,5 +1,6 @@
 package com.inn.almacen.JWT;
 
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder(){
         return NoOpPasswordEncoder.getInstance();
     }
+
     @Bean(name= BeanIds.AUTHENTICATION_MANAGER)
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception{
@@ -40,7 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {//,"/user/olvidoContrasena"
+    protected void configure(HttpSecurity http) throws Exception {
         http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
                 .and()
                 .csrf().disable()

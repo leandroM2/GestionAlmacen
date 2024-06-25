@@ -1,6 +1,6 @@
 package com.inn.almacen.POJO;
 
-
+import java.sql.Blob;
 import lombok.Data;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -17,7 +17,6 @@ import java.io.Serializable;
 @NamedQuery(name="User.getById", query = "select new com.inn.almacen.WRAPPER.UserWrapper(u.id, u.nombre, u.email, u.estado, u.rol) from User u where u.id=id ")
 
 @NamedQuery(name="User.getAllUser", query = "select new com.inn.almacen.WRAPPER.UserWrapper(u.id, u.nombre, u.email, u.estado, u.rol) from User u ")
-//@NamedQuery(name="User.getAllUser", query = "select new com.inn.almacen.WRAPPER.UserWrapper(u.id, u.nombre, u.email, u.estado) from User u where u.rol='user' ")
 
 @Data
 @Entity
@@ -39,7 +38,7 @@ public class User implements Serializable {
     private String email;
 
     @Column(name="contrasena")
-    private String contrasena;
+    private Blob contrasena;
 
     @Column(name="estado")
     private Boolean estado;

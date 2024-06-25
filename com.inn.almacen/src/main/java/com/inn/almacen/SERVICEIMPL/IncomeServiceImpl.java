@@ -34,7 +34,7 @@ public class IncomeServiceImpl implements IncomeService {
     @Override
     public ResponseEntity<String> addNewIncome(Map<String, String> requestMap) {
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 if(validateIncomeMap(requestMap, false)){
                     incomeDao.save(getIncomeFromMap(requestMap, false));
                     return AlmacenUtils.getResponseEntity("Ingreso correctamente registrado.", HttpStatus.OK);
@@ -65,7 +65,7 @@ public class IncomeServiceImpl implements IncomeService {
     @Override
     public ResponseEntity<String> updateIncome(Map<String, String> requestMap) {
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 if(validateIncomeMap(requestMap, true)){
                     Optional<Income> optional=incomeDao.findById(Integer.parseInt(requestMap.get("id")));
                     if(!optional.isEmpty()){
@@ -91,7 +91,7 @@ public class IncomeServiceImpl implements IncomeService {
     @Override
     public ResponseEntity<String> deleteIncome(Integer id) {
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 Optional optional=incomeDao.findById(id);
                 if(!optional.isEmpty()){
                     incomeDao.deleteById(id);
@@ -111,7 +111,7 @@ public class IncomeServiceImpl implements IncomeService {
     public ResponseEntity<List<IncomeWrapper>> getById(Integer id) {
         log.info("Dentro de get Income by id");
         try {
-            if (jwtFilter.isAdmin()){
+            if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 Optional optional=incomeDao.findById(id);
                 if(!optional.isEmpty()){
                     Income income=incomeDao.getById(id);

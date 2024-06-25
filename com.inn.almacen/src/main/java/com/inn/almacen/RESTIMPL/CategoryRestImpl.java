@@ -1,7 +1,6 @@
 package com.inn.almacen.RESTIMPL;
 
 import com.inn.almacen.POJO.Category;
-import com.inn.almacen.POJO.Supplier;
 import com.inn.almacen.REST.CategoryRest;
 import com.inn.almacen.SERVICE.CategoryService;
 import com.inn.almacen.UTILS.AlmacenUtils;

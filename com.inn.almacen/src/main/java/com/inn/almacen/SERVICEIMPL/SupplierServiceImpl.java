@@ -34,7 +34,7 @@ public class SupplierServiceImpl implements SupplierService {
     public ResponseEntity<String> addNewSupplier(Map<String, String> requestMap) {
         log.info("Dentro de add new supplier");
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isSuperAdmin()){
                 if(validateSupplierMap(requestMap, false)){
                     supplierDao.save(getSupplierFromMap(requestMap, false));
                     return AlmacenUtils.getResponseEntity("Nuevo proveedor agregado con exito.", HttpStatus.OK);
@@ -69,7 +69,7 @@ public class SupplierServiceImpl implements SupplierService {
     public ResponseEntity<String> updateSupplier(Map<String, String> requestMap) {
         log.info("Dentro de update supplier");
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isSuperAdmin()){
                 if(validateSupplierMap(requestMap, true)){
                     Optional optional= supplierDao.findById(Integer.parseInt(requestMap.get("id")));
                     if (!optional.isEmpty()){
@@ -93,7 +93,7 @@ public class SupplierServiceImpl implements SupplierService {
     public ResponseEntity<String> deleteSupplier(Integer id) {
         log.info("Dentro de delete supplier");
         try {
-            if (jwtFilter.isAdmin()){
+            if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isSuperAdmin()){
                 Optional optional=supplierDao.findById(id);
                 if (!optional.isEmpty()){
                     supplierDao.deleteById(id);
@@ -113,7 +113,7 @@ public class SupplierServiceImpl implements SupplierService {
     public ResponseEntity<List<Supplier>> getById(Integer id) {
         log.info("Dentro de get supplier by id");
         try {
-            if (jwtFilter.isAdmin()){
+            if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isSuperAdmin()){
                 Optional optional=supplierDao.findById(id);
                 if(!optional.isEmpty()){
                     List<Supplier> myList = new ArrayList<>();

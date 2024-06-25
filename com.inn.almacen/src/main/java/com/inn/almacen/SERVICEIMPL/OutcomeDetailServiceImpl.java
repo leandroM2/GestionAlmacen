@@ -33,7 +33,7 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
     @Override
     public ResponseEntity<String> addNewOutcomeDetail(Map<String, String> requestMap) {
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 if(validateOutcomeDetailMap(requestMap, false)){
                     outcomeDetailDao.save(getOutcomeDetailFromMap(requestMap, false));
                     return AlmacenUtils.getResponseEntity("Producto de salida correctamente registrado.", HttpStatus.OK);
@@ -64,7 +64,7 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
     @Override
     public ResponseEntity<String> updateOutcomeDetail(Map<String, String> requestMap) {
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 if(validateOutcomeDetailMap(requestMap, true)){
                     Optional<OutcomeDetail> optional=outcomeDetailDao.findById(Integer.parseInt(requestMap.get("id")));
                     if(!optional.isEmpty()){
@@ -90,7 +90,7 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
     @Override
     public ResponseEntity<String> deleteOutcomeDetail(Integer id) {
         try {
-            if(jwtFilter.isAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 Optional optional=outcomeDetailDao.findById(id);
                 if(!optional.isEmpty()){
                     outcomeDetailDao.deleteById(id);
@@ -110,7 +110,7 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
     public ResponseEntity<List<OutcomeDetailWrapper>> getById(Integer id) {
         log.info("Dentro de get Income Detail by id");
         try {
-            if (jwtFilter.isAdmin()){
+            if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 Optional optional=outcomeDetailDao.findById(id);
                 if(!optional.isEmpty()){
                     OutcomeDetail outcomeDetail=outcomeDetailDao.getById(id);

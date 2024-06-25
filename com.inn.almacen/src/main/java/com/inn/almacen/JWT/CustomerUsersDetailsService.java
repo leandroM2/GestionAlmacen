@@ -19,6 +19,9 @@ public class CustomerUsersDetailsService implements UserDetailsService {
     @Autowired
     UserDao userDao;
 
+    @Autowired
+    Jasypt jasypt;
+
     private com.inn.almacen.POJO.User userDetail;
 
     @Override
@@ -26,10 +29,13 @@ public class CustomerUsersDetailsService implements UserDetailsService {
         log.info("Dentro de método loadUserByUsername {}",username);
 
         userDetail = userDao.findByEmailId(username);
-        if(!Objects.isNull(userDetail))
-            return new User(userDetail.getEmail(), userDetail.getContrasena(), new ArrayList<>());
-        else
+        if(!Objects.isNull(userDetail)){
+            return new User(userDetail.getEmail(), jasypt.decrypting(userDetail.getContrasena()), new ArrayList<>());
+
+        }else{
             throw new UsernameNotFoundException("Usuario no encontrado.");
+
+        }
     }
 
     public com.inn.almacen.POJO.User getUserDetail(){
