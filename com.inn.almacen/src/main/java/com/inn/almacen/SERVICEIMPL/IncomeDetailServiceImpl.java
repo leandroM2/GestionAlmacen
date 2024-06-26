@@ -59,7 +59,11 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
     @Override
     public ResponseEntity<List<IncomeDetailWrapper>> getAllIncomeDetail() {
         try {
-            return new ResponseEntity<>(incomeDetailDao.getAllIncomeDetail(), HttpStatus.OK);
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
+                return new ResponseEntity<>(incomeDetailDao.getAllIncomeDetail(), HttpStatus.OK);
+            }else{
+                return new ResponseEntity<>(new ArrayList<>(), HttpStatus.UNAUTHORIZED);
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -70,7 +74,7 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
     @Override
     public ResponseEntity<String> updateIncomeDetail(Map<String, String> requestMap) {
         try {
-            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 if(validateIncomeDetailMap(requestMap, true)){
                     Optional<IncomeDetail> optional=incomeDetailDao.findById(Integer.parseInt(requestMap.get("id")));
                     if(!optional.isEmpty()){
@@ -96,7 +100,7 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
     @Override
     public ResponseEntity<String> deleteIncomeDetail(Integer id) {
         try {
-            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 Optional optional=incomeDetailDao.findById(id);
                 IncomeDetail incomeDetail=incomeDetailDao.getById(id);
                 if(!optional.isEmpty()){

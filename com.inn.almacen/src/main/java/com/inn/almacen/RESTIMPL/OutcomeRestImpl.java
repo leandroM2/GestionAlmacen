@@ -71,4 +71,14 @@ public class OutcomeRestImpl implements OutcomeRest {
         }
         return new ResponseEntity<List<OutcomeWrapper>>( new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @Override
+    public ResponseEntity<String> authorizeIncome(Integer id) {
+        try {
+            return outcomeService.authorizeOutcome(id);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

@@ -11,11 +11,13 @@ public class OutcomeDetailWrapper {
 
     private Integer cantidad;
 
+    private Float precioDeVenta;
+
     private Integer outcomeId;
 
     private Date outcomeFecha;
 
-    private Integer  outcomeClientId;
+    private Integer outcomeClientId;
 
     private String outcomeClientRazonSocial;
 
@@ -31,9 +33,9 @@ public class OutcomeDetailWrapper {
 
     private String outcomeUserNombre;
 
-    private String outcomeUserEmail;
+    private Integer outcomeUserAuthId;
 
-    private Boolean outcomeUserEstado;
+    private String outcomeUserAuthNombre;
 
     private Integer productId;
 
@@ -59,17 +61,18 @@ public class OutcomeDetailWrapper {
 
     private Integer productSupplierContacto;
 
-    public OutcomeDetailWrapper(Integer id, Integer cantidad, Integer outcomeId, java.util.Date outcomeFecha,
+    public OutcomeDetailWrapper(Integer id, Integer cantidad, Float precioDeVenta, Integer outcomeId, java.util.Date outcomeFecha,
                                 Integer outcomeClientId, String outcomeClientRazonSocial, Long outcomeClientRuc,
-                                String outcomeClientCorreo, Integer outcomeClientContacto,
-                                String outcomeClientDireccion, Integer outcomeUserId, String outcomeUserNombre,
-                                String outcomeUserEmail, Boolean outcomeUserEstado, Integer productId,
-                                String productNombre, String productColor, Float productPrecio,
-                                Integer productStock, Boolean productEstado, Integer productCategoryId,
-                                String productCategoryNombre, Integer productSupplierId,
-                                String productSupplierRazonSocial, Long productSupplierRuc, Integer productSupplierContacto) {
+                                String outcomeClientCorreo, Integer outcomeClientContacto, String outcomeClientDireccion,
+                                Integer outcomeUserId, String outcomeUserNombre, Integer outcomeUserAuthId,
+                                String outcomeUserAuthNombre, Integer productId, String productNombre,
+                                String productColor, Float productPrecio, Integer productStock, Boolean productEstado,
+                                Integer productCategoryId, String productCategoryNombre, Integer productSupplierId,
+                                String productSupplierRazonSocial, Long productSupplierRuc,
+                                Integer productSupplierContacto) {
         this.id = id;
         this.cantidad = cantidad;
+        this.precioDeVenta = precioDeVenta;
         this.outcomeId = outcomeId;
         this.outcomeFecha = (Date) outcomeFecha;
         this.outcomeClientId = outcomeClientId;
@@ -80,8 +83,8 @@ public class OutcomeDetailWrapper {
         this.outcomeClientDireccion = outcomeClientDireccion;
         this.outcomeUserId = outcomeUserId;
         this.outcomeUserNombre = outcomeUserNombre;
-        this.outcomeUserEmail = outcomeUserEmail;
-        this.outcomeUserEstado = outcomeUserEstado;
+        this.outcomeUserAuthId = outcomeUserAuthId;
+        this.outcomeUserAuthNombre = outcomeUserAuthNombre;
         this.productId = productId;
         this.productNombre = productNombre;
         this.productColor = productColor;

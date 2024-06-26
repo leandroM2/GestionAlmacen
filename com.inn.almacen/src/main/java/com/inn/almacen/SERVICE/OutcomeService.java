@@ -16,4 +16,6 @@ public interface OutcomeService {
     ResponseEntity<String> deleteOutcome(Integer id);
 
     ResponseEntity<List<OutcomeWrapper>> getById(Integer id);
+
+    ResponseEntity<String> authorizeOutcome(Integer id);
 }

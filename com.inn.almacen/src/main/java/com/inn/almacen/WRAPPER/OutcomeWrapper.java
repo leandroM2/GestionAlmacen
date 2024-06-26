@@ -11,6 +11,8 @@ public class OutcomeWrapper {
 
     private Date fecha;
 
+    private Boolean estado;
+
     private Integer clientId;
 
     private String clientRazonSocial;
@@ -27,16 +29,16 @@ public class OutcomeWrapper {
 
     private String userNombre;
 
-    private String userEmail;
+    private Integer userAuthId;
 
-    private Boolean userEstado;
+    private String userAuthNombre;
 
-    public OutcomeWrapper(Integer id, java.util.Date fecha, Integer clientId, String clientRazonSocial,
-                          Long clientRuc, String clientCorreo, Integer clientContacto,
-                          String clientDireccion, Integer userId, String userNombre,
-                          String userEmail, Boolean userEstado) {
+    public OutcomeWrapper(Integer id, java.util.Date fecha, Boolean estado, Integer clientId, String clientRazonSocial,
+                          Long clientRuc, String clientCorreo, Integer clientContacto, String clientDireccion,
+                          Integer userId, String userNombre, Integer userAuthId, String userAuthNombre) {
         this.id = id;
         this.fecha = (Date) fecha;
+        this.estado = estado;
         this.clientId = clientId;
         this.clientRazonSocial = clientRazonSocial;
         this.clientRuc = clientRuc;
@@ -45,7 +47,7 @@ public class OutcomeWrapper {
         this.clientDireccion = clientDireccion;
         this.userId = userId;
         this.userNombre = userNombre;
-        this.userEmail = userEmail;
-        this.userEstado = userEstado;
+        this.userAuthId = userAuthId;
+        this.userAuthNombre = userAuthNombre;
     }
 }

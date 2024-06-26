@@ -108,7 +108,7 @@ public class IncomeServiceImpl implements IncomeService {
     @Override
     public ResponseEntity<String> deleteIncome(Integer id) {
         try {
-            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 Optional optional=incomeDao.findById(id);
                 if(!optional.isEmpty()){
                     incomeDao.deleteById(id);
@@ -211,7 +211,7 @@ public class IncomeServiceImpl implements IncomeService {
         // Obtener una lista de Strings
         List<Integer> ids = jdbcTemplate.queryForList(sql, new Integer[]{incomeId}, Integer.class);
 
-        log.info("Vamos a efectuar las actualizaciones de monto y precio en los productos");
+        log.info("Vamos a efectuar las actualizaciones de stock y precio en los productos");
         Integer i=0;
         while(i<ids.size()){;
             IncomeDetail incomeDetail=incomeDetailDao.getById(ids.get(i));

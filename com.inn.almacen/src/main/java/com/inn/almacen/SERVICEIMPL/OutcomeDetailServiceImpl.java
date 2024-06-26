@@ -6,7 +6,9 @@ import com.inn.almacen.SERVICE.OutcomeDetailService;
 import com.inn.almacen.UTILS.AlmacenUtils;
 import com.inn.almacen.WRAPPER.OutcomeDetailWrapper;
 import com.inn.almacen.constens.AlmacenConstants;
+import com.inn.almacen.dao.OutcomeDao;
 import com.inn.almacen.dao.OutcomeDetailDao;
+import com.inn.almacen.dao.ProductDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,12 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
     OutcomeDetailDao outcomeDetailDao;
 
     @Autowired
+    OutcomeDao outcomeDao;
+
+    @Autowired
+    ProductDao productDao;
+
+    @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
     JwtFilter jwtFilter;
@@ -35,8 +43,14 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
         try {
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 if(validateOutcomeDetailMap(requestMap, false)){
-                    outcomeDetailDao.save(getOutcomeDetailFromMap(requestMap, false));
-                    return AlmacenUtils.getResponseEntity("Producto de salida correctamente registrado.", HttpStatus.OK);
+                    Boolean bool=validateStock(Integer.parseInt(requestMap.get("productId")),
+                            Integer.parseInt(requestMap.get("cantidad")));
+                    if(bool){
+                        outcomeDetailDao.save(getOutcomeDetailFromMap(requestMap, false));
+                        return AlmacenUtils.getResponseEntity("Producto de salida correctamente registrado.", HttpStatus.OK);
+                    }else{
+                        return AlmacenUtils.getResponseEntity("Advertencia: stock quedará por debajo de los mínimos recomendados (200 u).", HttpStatus.OK);
+                    }
                 }
                 return AlmacenUtils.getResponseEntity(AlmacenConstants.DATA_INVALIDA, HttpStatus.BAD_REQUEST);
             }else{
@@ -53,7 +67,11 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
     @Override
     public ResponseEntity<List<OutcomeDetailWrapper>> getAllOutcomeDetail() {
         try {
-            return new ResponseEntity<>(outcomeDetailDao.getAllOutcomeDetail(), HttpStatus.OK);
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
+                return new ResponseEntity<>(outcomeDetailDao.getAllOutcomeDetail(), HttpStatus.OK);
+            }else{
+                return new ResponseEntity<>(new ArrayList<>(), HttpStatus.UNAUTHORIZED);
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -64,7 +82,7 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
     @Override
     public ResponseEntity<String> updateOutcomeDetail(Map<String, String> requestMap) {
         try {
-            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 if(validateOutcomeDetailMap(requestMap, true)){
                     Optional<OutcomeDetail> optional=outcomeDetailDao.findById(Integer.parseInt(requestMap.get("id")));
                     if(!optional.isEmpty()){
@@ -90,11 +108,13 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
     @Override
     public ResponseEntity<String> deleteOutcomeDetail(Integer id) {
         try {
-            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 Optional optional=outcomeDetailDao.findById(id);
+                OutcomeDetail outcomeDetail=outcomeDetailDao.getById(id);
                 if(!optional.isEmpty()){
+                    String msg=restoreProduct(outcomeDetail.getCantidad(), outcomeDetail.getProduct().getId(), outcomeDetail.getOutcome().getId());
                     outcomeDetailDao.deleteById(id);
-                    return AlmacenUtils.getResponseEntity("Producto de salida eliminado correctamente.", HttpStatus.OK );
+                    return AlmacenUtils.getResponseEntity("Salida de producto eliminado correctamente. "+msg, HttpStatus.OK );
                 }
                 return AlmacenUtils.getResponseEntity("Id de salida de producto no existe.", HttpStatus.OK);
             }else{
@@ -115,13 +135,13 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
                 if(!optional.isEmpty()){
                     OutcomeDetail outcomeDetail=outcomeDetailDao.getById(id);
                     List<OutcomeDetailWrapper> myList = new ArrayList<>();
-                    myList.add(new OutcomeDetailWrapper(outcomeDetail.getId(),outcomeDetail.getCantidad(),outcomeDetail.getOutcome().getId(),
+                    myList.add(new OutcomeDetailWrapper(outcomeDetail.getId(),outcomeDetail.getCantidad(), outcomeDetail.getPrecioDeVenta(), outcomeDetail.getOutcome().getId(),
                             outcomeDetail.getOutcome().getFecha(), outcomeDetail.getOutcome().getClient().getId(),
                             outcomeDetail.getOutcome().getClient().getRazonSocial(), outcomeDetail.getOutcome().getClient().getRuc(),
                             outcomeDetail.getOutcome().getClient().getCorreo(), outcomeDetail.getOutcome().getClient().getContacto(),
                             outcomeDetail.getOutcome().getClient().getDireccion(), outcomeDetail.getOutcome().getUser().getId(),
-                            outcomeDetail.getOutcome().getUser().getNombre(), outcomeDetail.getOutcome().getUser().getEmail(),
-                            outcomeDetail.getOutcome().getUser().getEstado(), outcomeDetail.getProduct().getId(),
+                            outcomeDetail.getOutcome().getUser().getNombre(), outcomeDetail.getOutcome().getUserAuth().getId(),
+                            outcomeDetail.getOutcome().getUserAuth().getNombre(), outcomeDetail.getProduct().getId(),
                             outcomeDetail.getProduct().getNombre(), outcomeDetail.getProduct().getColor(), outcomeDetail.getProduct().getPrecio(),
                             outcomeDetail.getProduct().getStock(), outcomeDetail.getProduct().getEstado(), outcomeDetail.getProduct().getCategory().getId(),
                             outcomeDetail.getProduct().getCategory().getNombre(), outcomeDetail.getProduct().getSupplier().getId(),
@@ -140,7 +160,8 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
     }
 
     private boolean validateOutcomeDetailMap(Map<String, String> requestMap, boolean validateId){
-        if(requestMap.containsKey("cantidad")){
+        if(requestMap.containsKey("cantidad") && requestMap.containsKey("outcomeId")
+                && requestMap.containsKey("productId")){
             if(requestMap.containsKey("id") && validateId){
                 return true;
             }else if (!validateId){
@@ -154,22 +175,28 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
         Outcome outcome=new Outcome();
         outcome.setId(Integer.parseInt(requestMap.get("outcomeId")));
 
-        Product product=new Product();
-        product.setId(Integer.parseInt(requestMap.get("productId")));
+        Product product=productDao.getById(Integer.parseInt(requestMap.get("productId")));
 
         OutcomeDetail outcomeDetail=new OutcomeDetail();
-        if(esAdd){
-            outcomeDetail.setId(Integer.parseInt(requestMap.get("id")));
-        }
+        if(esAdd) outcomeDetail.setId(Integer.parseInt(requestMap.get("id")));
         outcomeDetail.setOutcome(outcome);
         outcomeDetail.setProduct(product);
         Integer cant=Integer.parseInt(requestMap.get("cantidad"));
         outcomeDetail.setCantidad(cant);
-        ProductUpdate(product.getId(), cant, outcomeDetail.getId(), esAdd);
+        outcomeDetail.setPrecioDeVenta(product.getPrecio());
+        Boolean state=validateState(Integer.parseInt(requestMap.get("outcomeId")));
+        if(state) updateProduct(product.getId(), cant, outcomeDetail.getId(), esAdd);
         return outcomeDetail;
     }
 
-    private void ProductUpdate(Integer id, Integer cant, Integer incomeId, boolean esAdd){
+    private Boolean validateState(Integer outcomeId){
+        Outcome outcome;
+        outcome=outcomeDao.getById(outcomeId);
+        Boolean state=outcome.getEstado();
+        return state;
+    }
+
+    private void updateProduct(Integer id, Integer cant, Integer incomeId, boolean esAdd){
         log.info("Hemos llegado hasta actualizacion de stock producto.");
         String sql = "SELECT stock FROM product WHERE id = ?";
         Integer stock = jdbcTemplate.queryForObject(sql, new Integer[]{id}, Integer.class);
@@ -196,5 +223,30 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
             sql = "UPDATE product SET stock = ? WHERE id = ?";
             jdbcTemplate.update(sql, stock, id);
         }
+    }
+
+    private String restoreProduct(Integer cant, Integer productId, Integer outcomeId){
+        log.info("Se retirará el stock actualizado en producto si registro fue autorizado");
+        String msg;
+        Outcome outcome=outcomeDao.getById(outcomeId);
+        if(outcome.getEstado()){
+            String sql = "SELECT stock from product WHERE id = ?";
+            Integer stock = jdbcTemplate.queryForObject(sql, new Integer[]{productId}, Integer.class);
+            stock=stock+cant;
+            sql = "UPDATE product SET stock = ? WHERE id = ?";
+            jdbcTemplate.update(sql, stock, productId);
+            msg="El stock retirado ha sido reasignado al producto";
+        }else{
+            msg="Stock de productos no fueron modificados debido a que el registro nunca fue autorizado";
+        }
+        return msg;
+    }
+
+    private Boolean validateStock(Integer productId, Integer cant){
+        Product product;
+        product=productDao.getById(productId);
+        Integer dif=product.getStock()-cant;
+        Boolean bool=(dif>200) ? true : false;
+        return bool;
     }
 }
