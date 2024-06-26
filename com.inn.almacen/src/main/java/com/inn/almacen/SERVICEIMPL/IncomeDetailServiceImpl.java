@@ -98,9 +98,11 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
         try {
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 Optional optional=incomeDetailDao.findById(id);
+                IncomeDetail incomeDetail=incomeDetailDao.getById(id);
                 if(!optional.isEmpty()){
+                    String msg=restoreProduct(incomeDetail.getCantidad(), incomeDetail.getProduct().getId(), incomeDetail.getIncome().getId());
                     incomeDetailDao.deleteById(id);
-                    return AlmacenUtils.getResponseEntity("Producto de ingreso eliminado correctamente.", HttpStatus.OK );
+                    return AlmacenUtils.getResponseEntity("Ingreso de producto eliminado correctamente. "+msg, HttpStatus.OK );
                 }
                 return AlmacenUtils.getResponseEntity("Id de ingreso de producto no existe.", HttpStatus.OK);
             }else{
@@ -209,5 +211,22 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
             sql = "UPDATE product SET stock = ? WHERE id = ?";
             jdbcTemplate.update(sql, stock, id);
         }
+    }
+
+    private String restoreProduct(Integer cant, Integer productId, Integer incomeId){
+        log.info("Se retirará el stock actualizado en producto si registro fue autorizado");
+        String msg;
+        Income income=incomeDao.getById(incomeId);
+        if(income.getEstado()){
+            String sql = "SELECT stock from product WHERE id = ?";
+            Integer stock = jdbcTemplate.queryForObject(sql, new Integer[]{productId}, Integer.class);
+            stock=stock-cant;
+            sql = "UPDATE product SET stock = ? WHERE id = ?";
+            jdbcTemplate.update(sql, stock, productId);
+            msg="El stock asignado por entrada ha sido retirado del producto";
+        }else{
+            msg="Stock de productos no fueron modificados debido a que el registro nunca fue autorizado";
+        }
+        return msg;
     }
 }

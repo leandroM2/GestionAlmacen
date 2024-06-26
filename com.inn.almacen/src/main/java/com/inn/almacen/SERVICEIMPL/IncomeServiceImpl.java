@@ -213,9 +213,7 @@ public class IncomeServiceImpl implements IncomeService {
 
         log.info("Vamos a efectuar las actualizaciones de monto y precio en los productos");
         Integer i=0;
-        while(i<ids.size()){
-            //sql = "SELECT i FROM income_detail i WHERE i.id=?";
-            //IncomeDetail incomeDetail = jdbcTemplate.queryForObject(sql, new Integer[]{ids.get(i)}, IncomeDetail.class);
+        while(i<ids.size()){;
             IncomeDetail incomeDetail=incomeDetailDao.getById(ids.get(i));
             updateProduct(incomeDetail.getProduct().getId(), incomeDetail.getCantidad(), incomeDetail.getPrecioVentaUnit());
             i++;
@@ -225,8 +223,6 @@ public class IncomeServiceImpl implements IncomeService {
     private void updateProduct(Integer ProductId, Integer cant, Float precioVentaUnit){
         log.info("Hemos llegado hasta actualizacion de stock y precio producto.");
         String sql;
-        //sql = "SELECT p FROM product p WHERE p.id = ?";
-        //Product product = jdbcTemplate.queryForObject(sql, new Integer[]{ProductId}, Product.class);
         Product product=productDao.getById(ProductId);
             log.info("Estamos insertando y precios a Income detail.");
             Integer stock=product.getStock();
