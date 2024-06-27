@@ -14,4 +14,8 @@ public class AlmacenUtils {
 
     }
 
+    public static ResponseEntity<String> getResponseComplex(ResponseEntity<String> complex){
+        return complex;
+    }
+
 }

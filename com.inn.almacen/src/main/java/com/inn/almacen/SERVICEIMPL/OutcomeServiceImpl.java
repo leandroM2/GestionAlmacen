@@ -46,7 +46,7 @@ public class OutcomeServiceImpl implements OutcomeService {
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 if(validateOutcomeMap(requestMap, false)){
                     outcomeDao.save(getOutcomeFromMap(requestMap, false));
-                    return AlmacenUtils.getResponseEntity("Salida correctamente registrado.", HttpStatus.OK);
+                    return AlmacenUtils.getResponseEntity("Solicitud de salida iniciada. Inserte los productos.", HttpStatus.OK);
                 }
                 return AlmacenUtils.getResponseEntity(AlmacenConstants.DATA_INVALIDA, HttpStatus.BAD_REQUEST);
             }else{

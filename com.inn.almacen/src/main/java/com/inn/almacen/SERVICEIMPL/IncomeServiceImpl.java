@@ -45,11 +45,12 @@ public class IncomeServiceImpl implements IncomeService {
     private JdbcTemplate jdbcTemplate;
     @Override
     public ResponseEntity<String> addNewIncome(Map<String, String> requestMap) {
+        log.info("Entra a add new income");
         try {
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 if(validateIncomeMap(requestMap, false)){
                     incomeDao.save(getIncomeFromMap(requestMap, false));
-                    return AlmacenUtils.getResponseEntity("Ingreso correctamente registrado.", HttpStatus.OK);
+                    return AlmacenUtils.getResponseEntity("Solicitud de entrada iniciada. Inserte los productos.", HttpStatus.OK);
                 }
                 return AlmacenUtils.getResponseEntity(AlmacenConstants.DATA_INVALIDA, HttpStatus.BAD_REQUEST);
             }else{
@@ -88,9 +89,9 @@ public class IncomeServiceImpl implements IncomeService {
                     if(!optional.isEmpty()){
                         Income income= getIncomeFromMap(requestMap,true);
                         incomeDao.save(income);
-                        return AlmacenUtils.getResponseEntity("Ingreso actualizado exitosamente.", HttpStatus.OK);
+                        return AlmacenUtils.getResponseEntity("Entrada actualizada exitosamente.", HttpStatus.OK);
                     }else{
-                        return AlmacenUtils.getResponseEntity("Id de ingreso no existe.", HttpStatus.OK);
+                        return AlmacenUtils.getResponseEntity("Id de entrada no existe.", HttpStatus.OK);
                     }
                 }else{
                     return AlmacenUtils.getResponseEntity(AlmacenConstants.DATA_INVALIDA, HttpStatus.BAD_REQUEST);
@@ -112,9 +113,9 @@ public class IncomeServiceImpl implements IncomeService {
                 Optional optional=incomeDao.findById(id);
                 if(!optional.isEmpty()){
                     incomeDao.deleteById(id);
-                    return AlmacenUtils.getResponseEntity("Ingreso eliminado correctamente.", HttpStatus.OK );
+                    return AlmacenUtils.getResponseEntity("Entrada eliminada correctamente.", HttpStatus.OK );
                 }
-                return AlmacenUtils.getResponseEntity("Id de ingreso no existe.", HttpStatus.OK);
+                return AlmacenUtils.getResponseEntity("Id de entrada no existe.", HttpStatus.OK);
             }else{
                 return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
             }
@@ -156,9 +157,9 @@ public class IncomeServiceImpl implements IncomeService {
                 if(!optional.isEmpty()){
                     String user=jwtFilter.getCurrentUser();
                     updateState(user, id);
-                    return AlmacenUtils.getResponseEntity("Ingresos autorizados por el supervisor "+user, HttpStatus.OK );
+                    return AlmacenUtils.getResponseEntity("Entradas autorizadas por el supervisor "+user, HttpStatus.OK );
                 }
-                return AlmacenUtils.getResponseEntity("Id de ingreso no existe.", HttpStatus.OK);
+                return AlmacenUtils.getResponseEntity("Id de entrada no existe.", HttpStatus.OK);
             }else{
                 return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
             }

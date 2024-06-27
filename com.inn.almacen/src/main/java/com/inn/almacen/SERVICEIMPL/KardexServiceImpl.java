@@ -3,8 +3,12 @@ package com.inn.almacen.SERVICEIMPL;
 import com.inn.almacen.JWT.JwtFilter;
 import com.inn.almacen.POJO.Income;
 import com.inn.almacen.POJO.Outcome;
+import com.inn.almacen.SERVICE.IncomeService;
 import com.inn.almacen.SERVICE.KardexService;
+import com.inn.almacen.SERVICE.OutcomeService;
+import com.inn.almacen.UTILS.AlmacenUtils;
 import com.inn.almacen.WRAPPER.*;
+import com.inn.almacen.constens.AlmacenConstants;
 import com.inn.almacen.dao.IncomeDao;
 import com.inn.almacen.dao.IncomeDetailDao;
 import com.inn.almacen.dao.OutcomeDao;
@@ -39,9 +43,31 @@ public class KardexServiceImpl implements KardexService {
     @Autowired
     JwtFilter jwtFilter;
 
+    @Autowired
+    OutcomeService outcomeService;
+
+    @Autowired
+    IncomeService incomeService;
     @Override
     public ResponseEntity<String> addNewKardexEntry(Map<String, String> requestMap) {
-        return null;
+        log.info("Entrando a new kardex");
+        try {
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
+                if(validateKardexMap(requestMap)){
+                    if(requestMap.containsKey("clientId")){
+                        return AlmacenUtils.getResponseComplex(outcomeService.addNewOutcome(requestMap));
+                    }
+                    return AlmacenUtils.getResponseComplex(incomeService.addNewIncome(requestMap));
+                }
+                log.info("Data invalida en kardex service");
+                return AlmacenUtils.getResponseEntity(AlmacenConstants.DATA_INVALIDA, HttpStatus.BAD_REQUEST);
+            }else{
+                return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
+                }
+            }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
@@ -123,12 +149,11 @@ public class KardexServiceImpl implements KardexService {
     private List<KardexWrapper> KardexIncome(){
         List<IncomeWrapper> Inheader=incomeDao.getAllIncome();
         List<KardexWrapper> KW=new ArrayList<>();
-        List<KardexDetailWrapper> InDetail=new ArrayList<>();
+        List<KardexDetailWrapper> InDetail;
         for (IncomeWrapper IW: Inheader) {
             Integer rawId=IW.getId();
             String ini="E";
             String KID=kardexId(ini, rawId);
-            InDetail.clear();
             InDetail=incomeDetailDao.getAllByFk(IW.getId());
             KW.add(new KardexWrapper(KID, IW.getFecha(), IW.getEstado(),"Entrada","-",IW.getId(),InDetail));
         }
@@ -138,12 +163,11 @@ public class KardexServiceImpl implements KardexService {
     private List<KardexWrapper> KardexOutcome(){
         List<OutcomeWrapper> Outheader=outcomeDao.getAllOutcome();
         List<KardexWrapper> KW=new ArrayList<>();
-        List<KardexDetailWrapper> OutDetail=new ArrayList<>();
+        List<KardexDetailWrapper> OutDetail;
         for (OutcomeWrapper OW: Outheader) {
             Integer rawId=OW.getId();
             String ini="S";
             String KID=kardexId(ini, rawId);
-            OutDetail.clear();
             OutDetail=outcomeDetailDao.getAllByFk(OW.getId());
             KW.add(new KardexWrapper(KID, OW.getFecha(), OW.getEstado(),"Salida",OW.getClientRazonSocial(),OW.getId(),OutDetail));
         }
@@ -192,4 +216,16 @@ public class KardexServiceImpl implements KardexService {
     private static Integer extractNumbers(String input) {
         return Integer.parseInt(input.replaceAll("[^0-9]", ""));
     }
+
+    private boolean validateKardexMap(Map<String, String> requestMap) {
+        if (!requestMap.containsKey("fecha") || !requestMap.containsKey("tipo")) {
+            return false;
+        }
+        if (Integer.parseInt(requestMap.get("tipo"))==1) {
+            return true; // income
+        }else{
+            return requestMap.containsKey("clientId"); // outcome
+        }
+    }
+
 }
