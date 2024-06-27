@@ -26,4 +26,35 @@ public class KardexRestImpl implements KardexRest {
         }
         return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @Override
+    public ResponseEntity<List<KardexWrapper>> getById(String id) {
+        try {
+            return kardexService.getById(id);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<KardexWrapper>> getAllKardexIncome() {
+        try {
+            return kardexService.getAllKardexIncome();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<KardexWrapper>> getAllKardexOutcome() {
+        try {
+            return kardexService.getAllKardexOutcome();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+
+    }
 }

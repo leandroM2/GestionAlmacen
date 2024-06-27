@@ -1,6 +1,8 @@
 package com.inn.almacen.SERVICEIMPL;
 
 import com.inn.almacen.JWT.JwtFilter;
+import com.inn.almacen.POJO.Income;
+import com.inn.almacen.POJO.Outcome;
 import com.inn.almacen.SERVICE.KardexService;
 import com.inn.almacen.WRAPPER.*;
 import com.inn.almacen.dao.IncomeDao;
@@ -11,12 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -33,9 +35,6 @@ public class KardexServiceImpl implements KardexService {
 
     @Autowired
     OutcomeDetailDao outcomeDetailDao;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     JwtFilter jwtFilter;
@@ -64,7 +63,64 @@ public class KardexServiceImpl implements KardexService {
         return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public List<KardexWrapper> KardexIncome(){
+    @Override
+    public ResponseEntity<List<KardexWrapper>> getAllKardexIncome() {
+        try {
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
+                List<KardexWrapper> kardexI=this.KardexIncome();
+                return new ResponseEntity<>(kardexI, HttpStatus.OK);
+            }else{
+                return new ResponseEntity<>(new ArrayList<>(), HttpStatus.UNAUTHORIZED);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<KardexWrapper>> getAllKardexOutcome() {
+        try {
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
+                List<KardexWrapper> kardexO=this.KardexOutcome();
+                return new ResponseEntity<>(kardexO, HttpStatus.OK);
+            }else{
+                return new ResponseEntity<>(new ArrayList<>(), HttpStatus.UNAUTHORIZED);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<KardexWrapper>> getById(String id) {
+        try {
+            if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
+                List<KardexWrapper> kardex=new ArrayList<>();
+                Integer anyId=extractNumbers(id);
+                Optional optional;
+                if(id.charAt(0)=='S'){
+                    optional=outcomeDao.findById(anyId);
+                    if(!optional.isEmpty()) kardex=kardexOutcomeById(anyId);
+                } else if (id.charAt(0)=='E') {
+                    optional=incomeDao.findById(anyId);
+                    if(!optional.isEmpty()) kardex=kardexIncomeById(anyId);
+                }else{
+                    return new ResponseEntity<>(new ArrayList<>(),HttpStatus.OK);
+                }
+                return new ResponseEntity<>(kardex, HttpStatus.OK);
+            }else{
+                return new ResponseEntity<>(new ArrayList<>(),HttpStatus.UNAUTHORIZED);
+                }
+            }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
+    private List<KardexWrapper> KardexIncome(){
         List<IncomeWrapper> Inheader=incomeDao.getAllIncome();
         List<KardexWrapper> KW=new ArrayList<>();
         List<KardexDetailWrapper> InDetail=new ArrayList<>();
@@ -79,7 +135,7 @@ public class KardexServiceImpl implements KardexService {
         return KW;
     }
 
-    public List<KardexWrapper> KardexOutcome(){
+    private List<KardexWrapper> KardexOutcome(){
         List<OutcomeWrapper> Outheader=outcomeDao.getAllOutcome();
         List<KardexWrapper> KW=new ArrayList<>();
         List<KardexDetailWrapper> OutDetail=new ArrayList<>();
@@ -94,7 +150,7 @@ public class KardexServiceImpl implements KardexService {
         return KW;
     }
 
-    public String kardexId(String ini, Integer rawId){
+    private String kardexId(String ini, Integer rawId){
         StringBuilder id = new StringBuilder(ini);
         Integer auxId=rawId;
         if(auxId==0) auxId++;
@@ -107,28 +163,33 @@ public class KardexServiceImpl implements KardexService {
         return id.toString();
     }
 
-    @Override
-    public ResponseEntity<List<KardexWrapper>> getAllKardexIncome() {
-        return null;
+    private List<KardexWrapper> kardexOutcomeById(Integer id){
+        Outcome outcome=outcomeDao.getById(id);
+        List<KardexWrapper> KW=new ArrayList<>();
+        List<KardexDetailWrapper> OutDetail;
+        Integer rawId=outcome.getId();
+        String ini="S";
+        String KID=kardexId(ini, rawId);
+        OutDetail=outcomeDetailDao.getAllByFk(outcome.getId());
+        log.info("Dentro de kardexoutcomebyid "+OutDetail);
+        KW.add(new KardexWrapper(KID, outcome.getFecha(), outcome.getEstado(),"Salida",outcome.getClient().getRazonSocial(),outcome.getId(),OutDetail));
+        return KW;
     }
 
-    @Override
-    public ResponseEntity<List<KardexWrapper>> getAllKardexOutcomwe() {
-        return null;
+    private List<KardexWrapper> kardexIncomeById(Integer id){
+        Income income=incomeDao.getById(id);
+        List<KardexWrapper> KW=new ArrayList<>();
+        List<KardexDetailWrapper> InDetail;
+        Integer rawId=income.getId();
+        String ini="E";
+        String KID=kardexId(ini, rawId);
+        InDetail=incomeDetailDao.getAllByFk(income.getId());
+        log.info("Dentro de kardexoutcomebyid "+InDetail);
+        KW.add(new KardexWrapper(KID, income.getFecha(), income.getEstado(),"Entrada","-",income.getId(),InDetail));
+        return KW;
     }
 
-    @Override
-    public ResponseEntity<List<KardexWrapper>> getById(String id) {
-        return null;
-    }
-
-    @Override
-    public ResponseEntity<String> deleteKardexHeader(String id) {
-        return null;
-    }
-
-    @Override
-    public ResponseEntity<String> deleteKardexDetail(Integer id) {
-        return null;
+    private static Integer extractNumbers(String input) {
+        return Integer.parseInt(input.replaceAll("[^0-9]", ""));
     }
 }

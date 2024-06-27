@@ -69,7 +69,7 @@ public class OutcomeRestImpl implements OutcomeRest {
         }catch (Exception e){
             e.printStackTrace();
         }
-        return new ResponseEntity<List<OutcomeWrapper>>( new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override

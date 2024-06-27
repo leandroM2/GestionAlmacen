@@ -14,11 +14,7 @@ public interface KardexService {
 
     ResponseEntity<List<KardexWrapper>> getAllKardexIncome();
 
-    ResponseEntity<List<KardexWrapper>> getAllKardexOutcomwe();
+    ResponseEntity<List<KardexWrapper>> getAllKardexOutcome();
     ResponseEntity<List<KardexWrapper>> getById(String id);
-
-    ResponseEntity<String> deleteKardexHeader(String id);
-
-    ResponseEntity<String> deleteKardexDetail(Integer id);
 
 }
