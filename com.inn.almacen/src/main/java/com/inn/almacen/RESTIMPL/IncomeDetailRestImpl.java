@@ -69,6 +69,6 @@ public class IncomeDetailRestImpl implements IncomeDetailRest {
         }catch (Exception e){
             e.printStackTrace();
         }
-        return new ResponseEntity<List<IncomeDetailWrapper>>( new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>( new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

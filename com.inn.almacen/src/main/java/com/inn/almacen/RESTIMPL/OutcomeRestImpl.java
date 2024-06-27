@@ -73,7 +73,7 @@ public class OutcomeRestImpl implements OutcomeRest {
     }
 
     @Override
-    public ResponseEntity<String> authorizeIncome(Integer id) {
+    public ResponseEntity<String> authorizeOutcome(Integer id) {
         try {
             return outcomeService.authorizeOutcome(id);
         }catch (Exception e){

@@ -69,6 +69,6 @@ public class OutcomeDetailRestImpl implements OutcomeDetailRest {
         }catch (Exception e){
             e.printStackTrace();
         }
-        return new ResponseEntity<List<OutcomeDetailWrapper>>( new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>( new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

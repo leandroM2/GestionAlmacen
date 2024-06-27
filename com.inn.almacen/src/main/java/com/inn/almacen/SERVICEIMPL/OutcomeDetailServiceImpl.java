@@ -136,7 +136,7 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
                     OutcomeDetail outcomeDetail=outcomeDetailDao.getById(id);
                     List<OutcomeDetailWrapper> myList = new ArrayList<>();
                     myList.add(new OutcomeDetailWrapper(outcomeDetail.getId(),outcomeDetail.getCantidad(), outcomeDetail.getPrecioDeVenta(), outcomeDetail.getOutcome().getId(),
-                            outcomeDetail.getOutcome().getFecha(), outcomeDetail.getOutcome().getClient().getId(),
+                            outcomeDetail.getOutcome().getFecha(), outcomeDetail.getOutcome().getEstado(), outcomeDetail.getOutcome().getClient().getId(),
                             outcomeDetail.getOutcome().getClient().getRazonSocial(), outcomeDetail.getOutcome().getClient().getRuc(),
                             outcomeDetail.getOutcome().getClient().getCorreo(), outcomeDetail.getOutcome().getClient().getContacto(),
                             outcomeDetail.getOutcome().getClient().getDireccion(), outcomeDetail.getOutcome().getUser().getId(),
