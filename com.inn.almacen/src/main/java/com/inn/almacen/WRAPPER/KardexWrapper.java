@@ -18,12 +18,12 @@ public class KardexWrapper {
 
     private String persona;
 
-    private Integer archivesId;
+    private String archivesId;
 
     private List<KardexDetailWrapper> detalles;
 
     public KardexWrapper(String id, java.util.Date fecha, Boolean estado, String tipoMov,
-                         String persona, Integer archivesId, List<KardexDetailWrapper> detalles) {
+                         String persona, String archivesId, List<KardexDetailWrapper> detalles) {
         this.id = id;
         this.fecha = (Date) fecha;
         this.estado = estado;
