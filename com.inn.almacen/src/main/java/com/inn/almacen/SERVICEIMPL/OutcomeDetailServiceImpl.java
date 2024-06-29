@@ -135,13 +135,13 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
                 if(!optional.isEmpty()){
                     OutcomeDetail outcomeDetail=outcomeDetailDao.getById(id);
                     List<OutcomeDetailWrapper> myList = new ArrayList<>();
-                    myList.add(new OutcomeDetailWrapper(outcomeDetail.getId(),outcomeDetail.getCantidad(), outcomeDetail.getPrecioDeVenta(), outcomeDetail.getOutcome().getId(),
-                            outcomeDetail.getOutcome().getFecha(), outcomeDetail.getOutcome().getEstado(), outcomeDetail.getOutcome().getClient().getId(),
-                            outcomeDetail.getOutcome().getClient().getRazonSocial(), outcomeDetail.getOutcome().getClient().getRuc(),
-                            outcomeDetail.getOutcome().getClient().getCorreo(), outcomeDetail.getOutcome().getClient().getContacto(),
-                            outcomeDetail.getOutcome().getClient().getDireccion(), outcomeDetail.getOutcome().getUser().getId(),
-                            outcomeDetail.getOutcome().getUser().getNombre(), outcomeDetail.getOutcome().getUserAuth().getId(),
-                            outcomeDetail.getOutcome().getUserAuth().getNombre(), outcomeDetail.getProduct().getId(),
+                    myList.add(new OutcomeDetailWrapper(outcomeDetail.getId(),outcomeDetail.getCantidad(), outcomeDetail.getPrecioDeVenta(), outcomeDetail.getSaldo(),
+                            outcomeDetail.getOutcome().getId(), outcomeDetail.getOutcome().getFecha(), outcomeDetail.getOutcome().getEstado(),
+                            outcomeDetail.getOutcome().getClient().getId(), outcomeDetail.getOutcome().getClient().getRazonSocial(),
+                            outcomeDetail.getOutcome().getClient().getRuc(), outcomeDetail.getOutcome().getClient().getCorreo(),
+                            outcomeDetail.getOutcome().getClient().getContacto(), outcomeDetail.getOutcome().getClient().getDireccion(),
+                            outcomeDetail.getOutcome().getUser().getId(), outcomeDetail.getOutcome().getUser().getNombre(),
+                            outcomeDetail.getOutcome().getUserAuth().getId(), outcomeDetail.getOutcome().getUserAuth().getNombre(), outcomeDetail.getProduct().getId(),
                             outcomeDetail.getProduct().getNombre(), outcomeDetail.getProduct().getColor(), outcomeDetail.getProduct().getPrecio(),
                             outcomeDetail.getProduct().getStock(), outcomeDetail.getProduct().getEstado(), outcomeDetail.getProduct().getCategory().getId(),
                             outcomeDetail.getProduct().getCategory().getNombre(), outcomeDetail.getProduct().getSupplier().getId(),
@@ -182,10 +182,14 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
         outcomeDetail.setOutcome(outcome);
         outcomeDetail.setProduct(product);
         Integer cant=Integer.parseInt(requestMap.get("cantidad"));
+        outcomeDetail.setSaldo(product.getStock());
         outcomeDetail.setCantidad(cant);
         outcomeDetail.setPrecioDeVenta(product.getPrecio());
         Boolean state=validateState(Integer.parseInt(requestMap.get("outcomeId")));
-        if(state) updateProduct(product.getId(), cant, outcomeDetail.getId(), esAdd);
+        if(state){
+            Integer stock=updateProduct(product.getId(), cant, outcomeDetail.getId(), esAdd);
+            outcomeDetail.setSaldo(stock);
+        }
         return outcomeDetail;
     }
 
@@ -196,7 +200,7 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
         return state;
     }
 
-    private void updateProduct(Integer id, Integer cant, Integer incomeId, boolean esAdd){
+    private Integer updateProduct(Integer id, Integer cant, Integer incomeId, boolean esAdd){
         log.info("Hemos llegado hasta actualizacion de stock producto.");
         String sql = "SELECT stock FROM product WHERE id = ?";
         Integer stock = jdbcTemplate.queryForObject(sql, new Integer[]{id}, Integer.class);
@@ -223,6 +227,7 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
             sql = "UPDATE product SET stock = ? WHERE id = ?";
             jdbcTemplate.update(sql, stock, id);
         }
+        return stock;
     }
 
     private String restoreProduct(Integer cant, Integer productId, Integer outcomeId){

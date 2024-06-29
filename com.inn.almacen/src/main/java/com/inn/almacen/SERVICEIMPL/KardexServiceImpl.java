@@ -208,7 +208,7 @@ public class KardexServiceImpl implements KardexService {
         String ini="E";
         String KID=kardexId(ini, rawId);
         InDetail=incomeDetailDao.getAllByFk(income.getId());
-        log.info("Dentro de kardexoutcomebyid "+InDetail);
+        log.info("Dentro de kardexincomebyid "+InDetail);
         KW.add(new KardexWrapper(KID, income.getFecha(), income.getEstado(),"Entrada","-",KID,InDetail));
         return KW;
     }

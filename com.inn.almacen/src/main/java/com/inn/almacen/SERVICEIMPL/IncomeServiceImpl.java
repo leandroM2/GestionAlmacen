@@ -216,23 +216,25 @@ public class IncomeServiceImpl implements IncomeService {
         Integer i=0;
         while(i<ids.size()){;
             IncomeDetail incomeDetail=incomeDetailDao.getById(ids.get(i));
-            updateProduct(incomeDetail.getProduct().getId(), incomeDetail.getCantidad(), incomeDetail.getPrecioVentaUnit());
+            updateProduct(incomeDetail.getProduct().getId(), incomeDetail.getId(), incomeDetail.getCantidad(), incomeDetail.getPrecioVentaUnit());
             i++;
         }
     }
 
-    private void updateProduct(Integer ProductId, Integer cant, Float precioVentaUnit){
+    private void updateProduct(Integer productId, Integer incomeDetailId, Integer cant, Float precioVentaUnit){
         log.info("Hemos llegado hasta actualizacion de stock y precio producto.");
         String sql;
-        Product product=productDao.getById(ProductId);
+        Product product=productDao.getById(productId);
             log.info("Estamos insertando y precios a Income detail.");
             Integer stock=product.getStock();
             stock=stock+cant;
             Float precio=product.getPrecio();
             precio=Math.round(((precio+precioVentaUnit)/2) * 100.0f) / 100.0f;
             sql = "UPDATE product SET stock = ?, precio=? WHERE id = ?";
-            jdbcTemplate.update(sql, stock, precio, ProductId);
-            log.info("Valores de stock y precio de producto actualizado");
+            jdbcTemplate.update(sql, stock, precio, productId);
+            sql="UPDATE income_detail SET saldo = ? WHERE id = ?";
+            jdbcTemplate.update(sql, stock, incomeDetailId);
+        log.info("Valores de precio y stock de producto y detalle income actualizado");
     }
 
 }

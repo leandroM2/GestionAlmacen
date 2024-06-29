@@ -13,10 +13,13 @@ public class KardexDetailWrapper {
 
     private Float precioVenta;
 
-    public KardexDetailWrapper(Integer id, String producto, Integer cantidad, Float precioVenta) {
+    private Integer saldo;
+
+    public KardexDetailWrapper(Integer id, String producto, Integer cantidad, Float precioVenta, Integer saldo) {
         this.id = id;
         this.producto = producto;
         this.cantidad = cantidad;
         this.precioVenta = precioVenta;
+        this.saldo=saldo;
     }
 }

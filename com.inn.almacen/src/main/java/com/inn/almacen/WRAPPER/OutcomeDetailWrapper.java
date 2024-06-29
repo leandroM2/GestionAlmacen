@@ -13,6 +13,8 @@ public class OutcomeDetailWrapper {
 
     private Float precioDeVenta;
 
+    private Integer saldo;
+
     private Integer outcomeId;
 
     private Date outcomeFecha;
@@ -63,7 +65,7 @@ public class OutcomeDetailWrapper {
 
     private Integer productSupplierContacto;
 
-    public OutcomeDetailWrapper(Integer id, Integer cantidad, Float precioDeVenta, Integer outcomeId, java.util.Date outcomeFecha,
+    public OutcomeDetailWrapper(Integer id, Integer cantidad, Float precioDeVenta, Integer saldo, Integer outcomeId, java.util.Date outcomeFecha,
                                 Boolean outcomeEstado, Integer outcomeClientId, String outcomeClientRazonSocial, Long outcomeClientRuc,
                                 String outcomeClientCorreo, Integer outcomeClientContacto, String outcomeClientDireccion,
                                 Integer outcomeUserId, String outcomeUserNombre, Integer outcomeUserAuthId,
@@ -75,6 +77,7 @@ public class OutcomeDetailWrapper {
         this.id = id;
         this.cantidad = cantidad;
         this.precioDeVenta = precioDeVenta;
+        this.saldo=saldo;
         this.outcomeId = outcomeId;
         this.outcomeFecha = (Date) outcomeFecha;
         this.outcomeEstado= outcomeEstado;
