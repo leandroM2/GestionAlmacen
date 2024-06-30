@@ -5,6 +5,7 @@ import com.inn.almacen.POJO.Income;
 import com.inn.almacen.POJO.IncomeDetail;
 import com.inn.almacen.POJO.Product;
 import com.inn.almacen.POJO.User;
+import com.inn.almacen.SERVICE.ArchivesService;
 import com.inn.almacen.SERVICE.IncomeService;
 import com.inn.almacen.UTILS.AlmacenUtils;
 import com.inn.almacen.WRAPPER.IncomeWrapper;
@@ -38,6 +39,9 @@ public class IncomeServiceImpl implements IncomeService {
 
     @Autowired
     ProductDao productDao;
+
+    @Autowired
+    ArchivesService archivesService;
 
     @Autowired
     JwtFilter jwtFilter;
@@ -224,10 +228,15 @@ public class IncomeServiceImpl implements IncomeService {
         JRBeanCollectionDataSource OrderDataSource=new JRBeanCollectionDataSource(incomeOrder);
         parameters.put("OrderCompraWrapper",OrderDataSource);
         try{
-            JasperReport report= JasperCompileManager.compileReport(AlmacenConstants.RUTA_ORDEN_COMPRA_ORDEN);
+            String ruta=AlmacenConstants.RUTA_ORDEN_COMPRA_PDF+"ORDEN"+kardexId("S",income.getId())+".pdf";
+            JasperReport report= JasperCompileManager.compileReport(AlmacenConstants.RUTA_ORDEN_COMPRA);
             JasperPrint print= JasperFillManager.fillReport(report, parameters, new JREmptyDataSource());
-            JasperExportManager.exportReportToPdfFile(print,AlmacenConstants.RUTA_ORDEN_COMPRA_PDF+"Orden"+income.getId()+".pdf");
-            return "Orden"+income.getId()+" GENERADA CON ÉXITO";
+            JasperExportManager.exportReportToPdfFile(print,ruta);
+            Map<String, String> arch=new HashMap<>();
+            arch.put("id",kardexId("S",income.getId()));
+            arch.put("ruta",ruta);
+            archivesService.addArchive(arch);
+            return "ORDEN"+kardexId("S",income.getId())+ " GENERADA CON ÉXITO";
         }catch (Exception e){
             e.printStackTrace();
             return "ERROR DURANTE LA GENERACIÓN DE ORDEN DE COMPRA: "+e.getMessage();
@@ -300,6 +309,19 @@ public class IncomeServiceImpl implements IncomeService {
             sql="UPDATE income_detail SET saldo = ? WHERE id = ?";
             jdbcTemplate.update(sql, stock, incomeDetailId);
         log.info("Valores de precio y stock de producto y detalle income actualizado");
+    }
+
+    private String kardexId(String ini, Integer rawId){
+        StringBuilder id = new StringBuilder(ini);
+        Integer auxId=rawId;
+        if(auxId==0) auxId++;
+        double cont=Math.floor(Math.log10(Math.abs(auxId)) + 1);
+        cont=5-cont;
+        for (Integer i = 0; i<cont; i++){
+            id.append("0");
+        }
+        id.append(rawId);
+        return id.toString();
     }
 
 }
