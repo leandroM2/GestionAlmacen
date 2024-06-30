@@ -15,8 +15,11 @@ public interface KardexService {
     ResponseEntity<List<KardexWrapper>> getAllKardexIncome();
 
     ResponseEntity<List<KardexWrapper>> getAllKardexOutcome();
+
     ResponseEntity<List<KardexWrapper>> getById(String id);
 
     ResponseEntity<String> generateFile(String kardexId);
+
+    ResponseEntity<String> authorizeKardex(String kardexId);
 
 }

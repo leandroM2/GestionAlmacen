@@ -81,4 +81,14 @@ public class KardexRestImpl implements KardexRest {
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
 
     }
+
+    @Override
+    public ResponseEntity<String> authorizeKardex(String kardexId) {
+        try {
+            return kardexService.authorizeKardex(kardexId);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

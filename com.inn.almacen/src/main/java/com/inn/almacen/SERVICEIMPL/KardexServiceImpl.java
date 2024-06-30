@@ -166,6 +166,24 @@ public class KardexServiceImpl implements KardexService {
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @Override
+    public ResponseEntity<String> authorizeKardex(String kardexId) {
+        try {
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
+                Integer id=extractNumbers(kardexId);
+                    if(extractLetters(kardexId).equalsIgnoreCase("E")){
+                        return AlmacenUtils.getResponseComplex(incomeService.authorizeIncome(id));
+                    }else if(extractLetters(kardexId).equalsIgnoreCase("S")){
+                        return AlmacenUtils.getResponseComplex(outcomeService.authorizeOutcome(id));
+                    }
+                return AlmacenUtils.getResponseEntity("ID de kardex no se corresponde con entrada o salida.", HttpStatus.OK);
+                }
+            }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 
     private List<KardexWrapper> KardexIncome(){
         List<IncomeWrapper> Inheader=incomeDao.getAllIncome();

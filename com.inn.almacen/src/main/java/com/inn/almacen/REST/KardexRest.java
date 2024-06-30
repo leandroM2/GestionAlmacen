@@ -27,4 +27,7 @@ public interface KardexRest {
 
     @PostMapping(path = "/file/{kardexId}")
     ResponseEntity<String> generateFile(@PathVariable String kardexId);
+
+    @PostMapping(path = "/auth/{kardexId}")
+    ResponseEntity<String> authorizeKardex(@PathVariable String kardexId);
 }
