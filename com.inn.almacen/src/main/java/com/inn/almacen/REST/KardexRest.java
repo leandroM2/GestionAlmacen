@@ -25,6 +25,6 @@ public interface KardexRest {
     @GetMapping(path = "/get/out")
     ResponseEntity<List<KardexWrapper>> getAllKardexOutcome();
 
-    @PostMapping(path = "/file/{id}")
-    ResponseEntity<String> generateFile(@PathVariable String id);
+    @PostMapping(path = "/file/{kardexId}")
+    ResponseEntity<String> generateFile(@PathVariable String kardexId);
 }
