@@ -17,4 +17,6 @@ public interface KardexService {
     ResponseEntity<List<KardexWrapper>> getAllKardexOutcome();
     ResponseEntity<List<KardexWrapper>> getById(String id);
 
+    ResponseEntity<String> generateFile(String kardexId);
+
 }

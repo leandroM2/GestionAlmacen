@@ -18,4 +18,6 @@ public interface IncomeService {
     ResponseEntity<List<IncomeWrapper>> getById(Integer id);
 
     ResponseEntity<String> authorizeIncome(Integer id);
+
+    ResponseEntity<String> generateOrdenCompra(Integer id);
 }

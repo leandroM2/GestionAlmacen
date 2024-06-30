@@ -8,11 +8,15 @@ import com.inn.almacen.POJO.User;
 import com.inn.almacen.SERVICE.IncomeService;
 import com.inn.almacen.UTILS.AlmacenUtils;
 import com.inn.almacen.WRAPPER.IncomeWrapper;
+import com.inn.almacen.WRAPPER.KardexDetailWrapper;
+import com.inn.almacen.WRAPPER.OrderCompraWrapper;
 import com.inn.almacen.constens.AlmacenConstants;
 import com.inn.almacen.dao.IncomeDao;
 import com.inn.almacen.dao.IncomeDetailDao;
 import com.inn.almacen.dao.ProductDao;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +24,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -167,6 +168,70 @@ public class IncomeServiceImpl implements IncomeService {
             e.printStackTrace();
         }
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> generateOrdenCompra(Integer id){
+        try {
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
+                Optional optional=incomeDao.findById(id);
+                if(!optional.isEmpty()){
+                    Income income=incomeDao.getById(id);;
+                    String msg=createJOrden(income);
+                    return AlmacenUtils.getResponseEntity(msg, HttpStatus.OK);
+                }
+                return AlmacenUtils.getResponseEntity("ID DE ENTRADA NO EXISTE.", HttpStatus.OK);
+            }else{
+                return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
+            }
+            }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private String createJOrden(Income income){
+        String sql = "SELECT id FROM income_detail WHERE income_fk = ? ORDER BY id LIMIT 1";
+        Integer incomeDetailId = jdbcTemplate.queryForObject(sql, new Integer[]{income.getId()}, Integer.class);
+        IncomeDetail incomeDetail=incomeDetailDao.getByFk(incomeDetailId, income.getId());
+        List<KardexDetailWrapper> incomeDetailWrappers=incomeDetailDao.getAllOrderByFk(income.getId());
+        List<OrderCompraWrapper> incomeOrder=new ArrayList<>();
+        Float subtotal= 0.0f;
+
+        for (KardexDetailWrapper KDW: incomeDetailWrappers){
+            subtotal=subtotal+KDW.getTotal();
+            incomeOrder.add(new OrderCompraWrapper(KDW.getProductId(), KDW.getProducto(), KDW.getCantidad(),
+                    Float.parseFloat(String.format("%.2f", KDW.getPrecioVenta())),
+                    Float.parseFloat(String.format("%.2f", KDW.getTotal()))));
+        }
+        subtotal=Float.parseFloat(String.format("%.2f", subtotal));
+        Float igv=Float.parseFloat(String.format("%.2f", subtotal*0.18f));
+        Float total=Float.parseFloat(String.format("%.2f", subtotal+igv));
+
+        Map<String, Object> parameters=new HashMap<>();
+        parameters.put("incomeId",income.getId());
+        parameters.put("incomeFecha",income.getFecha());
+        parameters.put("supplierRazonSocial",incomeDetail.getProduct().getSupplier().getRazonSocial());
+        parameters.put("supplierRuc",incomeDetail.getProduct().getSupplier().getRuc());
+        parameters.put("supplierContacto",incomeDetail.getProduct().getSupplier().getContacto());
+        parameters.put("tipoPago","Transferencia");
+        parameters.put("userNombre",income.getUser().getNombre());
+        parameters.put("userAuth", income.getUserAuth().getNombre());
+        parameters.put("incomeSubtotal", subtotal);
+        parameters.put("incomeIGV", igv);
+        parameters.put("incomeTotal", total);
+
+        JRBeanCollectionDataSource OrderDataSource=new JRBeanCollectionDataSource(incomeOrder);
+        parameters.put("OrderCompraWrapper",OrderDataSource);
+        try{
+            JasperReport report= JasperCompileManager.compileReport(AlmacenConstants.RUTA_ORDEN_COMPRA_ORDEN);
+            JasperPrint print= JasperFillManager.fillReport(report, parameters, new JREmptyDataSource());
+            JasperExportManager.exportReportToPdfFile(print,AlmacenConstants.RUTA_ORDEN_COMPRA_PDF+"Orden"+income.getId()+".pdf");
+            return "Orden"+income.getId()+" GENERADA CON ÉXITO";
+        }catch (Exception e){
+            e.printStackTrace();
+            return "ERROR DURANTE LA GENERACIÓN DE ORDEN DE COMPRA: "+e.getMessage();
+        }
     }
 
     private boolean validateIncomeMap(Map<String, String> requestMap, boolean validateId) {

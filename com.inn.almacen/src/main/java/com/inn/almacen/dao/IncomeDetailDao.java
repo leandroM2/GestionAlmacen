@@ -10,4 +10,6 @@ public interface IncomeDetailDao extends JpaRepository<IncomeDetail, Integer>{
     IncomeDetail getById(@Param("id") Integer id);
     List<IncomeDetailWrapper> getAllIncomeDetail();
     List<KardexDetailWrapper> getAllByFk(@Param("income_fk") Integer income_fk);
+    List<KardexDetailWrapper> getAllOrderByFk(@Param("income_fk") Integer income_fk);
+    IncomeDetail getByFk(@Param("id") Integer id, @Param("income_fk") Integer income_fk);
 }

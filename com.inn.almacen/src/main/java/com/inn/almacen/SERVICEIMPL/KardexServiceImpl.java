@@ -145,6 +145,27 @@ public class KardexServiceImpl implements KardexService {
         return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @Override
+    public ResponseEntity<String> generateFile(String kardexId){
+        try {
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
+                Integer id=extractNumbers(kardexId);
+                if(extractLetters(kardexId).equalsIgnoreCase("E")){
+                    return AlmacenUtils.getResponseComplex(incomeService.generateOrdenCompra(id));
+                }else if(extractLetters(kardexId).equalsIgnoreCase("S")){
+
+                }
+                return AlmacenUtils.getResponseEntity("Id de kardex no corresponde a entrada o salida. "+extractLetters(kardexId), HttpStatus.OK);
+            }else{
+                return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
+                }
+
+            }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 
     private List<KardexWrapper> KardexIncome(){
         List<IncomeWrapper> Inheader=incomeDao.getAllIncome();
@@ -213,8 +234,12 @@ public class KardexServiceImpl implements KardexService {
         return KW;
     }
 
-    private static Integer extractNumbers(String input) {
-        return Integer.parseInt(input.replaceAll("[^0-9]", ""));
+    private static Integer extractNumbers(String kardexId) {
+        return Integer.parseInt(kardexId.replaceAll("[^0-9]", ""));
+    }
+
+    private static String extractLetters(String kardexId){
+        return kardexId.replaceAll("[^a-zA-Z]", "");
     }
 
     private boolean validateKardexMap(Map<String, String> requestMap) {
