@@ -50,6 +50,7 @@
     <parameter name="incomeSubtotal" class="java.lang.String"/>
     <parameter name="incomeIGV" class="java.lang.String"/>
     <parameter name="incomeTotal" class="java.lang.String"/>
+    <parameter name="REPORT_DIR" class="java.lang.String"/>
     <queryString>
         <![CDATA[]]>
     </queryString>
@@ -59,7 +60,7 @@
     <title>
         <band height="141" splitType="Stretch">
             <rectangle>
-                <reportElement x="0" y="0" width="555" height="50" backcolor="#4D4494" uuid="da88e6fa-d2c1-494d-bc6d-31df8373a84f"/>
+                <reportElement x="0" y="0" width="555" height="50" backcolor="#063A76" uuid="da88e6fa-d2c1-494d-bc6d-31df8373a84f"/>
             </rectangle>
             <staticText>
                 <reportElement x="330" y="10" width="213" height="30" forecolor="#FFFFFF" uuid="a7c3c1ca-03dd-4b9f-b443-e12be12af822"/>
@@ -104,27 +105,27 @@
             </frame>
             <image>
                 <reportElement x="40" y="58" width="79" height="71" uuid="672e4210-f21f-4dd9-8086-9f6ffd4845fe"/>
-                <imageExpression><![CDATA["F:/Repositorio/com.inn.almacen/src/main/resources/templates/img/Logotype.png"]]></imageExpression>
+                <imageExpression><![CDATA[$P{REPORT_DIR}+"img/Logotype.png"]]></imageExpression>
             </image>
         </band>
     </title>
     <pageHeader>
         <band height="161" splitType="Stretch">
             <rectangle>
-                <reportElement mode="Opaque" x="280" y="0" width="269" height="29" backcolor="#4D4494" uuid="b3ff19de-3185-4fcd-a634-23ea4f1eb4e6"/>
+                <reportElement mode="Opaque" x="280" y="0" width="269" height="29" backcolor="#063A76" uuid="b3ff19de-3185-4fcd-a634-23ea4f1eb4e6"/>
             </rectangle>
             <rectangle>
-                <reportElement mode="Opaque" x="0" y="0" width="160" height="29" backcolor="#4D4494" uuid="a2473bff-6a92-44c2-a441-23267dbdeb13"/>
+                <reportElement mode="Opaque" x="0" y="0" width="160" height="29" backcolor="#063A76" uuid="a2473bff-6a92-44c2-a441-23267dbdeb13"/>
             </rectangle>
             <staticText>
-                <reportElement x="280" y="-1" width="268" height="30" forecolor="#FFFFFF" uuid="211bddf1-3441-486e-9e6d-6902746c9ce5"/>
+                <reportElement x="280" y="0" width="268" height="29" forecolor="#FFFFFF" uuid="211bddf1-3441-486e-9e6d-6902746c9ce5"/>
                 <textElement textAlignment="Left" verticalAlignment="Middle">
                     <font size="20" isBold="true"/>
                 </textElement>
                 <text><![CDATA[DIRECCIÓN DE ENTREGA]]></text>
             </staticText>
             <staticText>
-                <reportElement x="0" y="0" width="159" height="30" forecolor="#FFFFFF" uuid="33c28ae5-ba04-47f4-aedc-152142d53092"/>
+                <reportElement x="0" y="0" width="159" height="29" forecolor="#FFFFFF" backcolor="#063A76" uuid="33c28ae5-ba04-47f4-aedc-152142d53092"/>
                 <textElement textAlignment="Left" verticalAlignment="Middle">
                     <font size="20" isBold="true"/>
                 </textElement>
@@ -205,9 +206,9 @@
                 <text><![CDATA[PROVINCIA]]></text>
             </staticText>
             <line>
-                <reportElement x="-1" y="43" width="555" height="1" uuid="d6bac01c-fa95-4be8-af15-0d83a628c2d6"/>
+                <reportElement style="Table_TH" mode="Opaque" x="-1" y="43" width="555" height="1" backcolor="#063A76" uuid="d6bac01c-fa95-4be8-af15-0d83a628c2d6"/>
                 <graphicElement>
-                    <pen lineWidth="4.0" lineStyle="Solid" lineColor="#4D4494"/>
+                    <pen lineWidth="4.0" lineStyle="Solid" lineColor="#063A76"/>
                 </graphicElement>
             </line>
             <textField>
@@ -250,7 +251,7 @@
                         <property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
                         <jr:columnHeader style="Table_CH" height="30" rowSpan="1">
                             <staticText>
-                                <reportElement style="Table_TH" x="0" y="0" width="40" height="30" forecolor="#FFFFFF" backcolor="#4D4494" uuid="0b097be6-8014-4920-a9c1-cfa561c7fb45"/>
+                                <reportElement style="Table_TH" x="0" y="0" width="40" height="30" forecolor="#FFFFFF" backcolor="#063A76" uuid="0b097be6-8014-4920-a9c1-cfa561c7fb45"/>
                                 <textElement textAlignment="Center" verticalAlignment="Middle">
                                     <font size="12" isBold="true"/>
                                 </textElement>
@@ -271,7 +272,7 @@
                         <property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
                         <jr:columnHeader style="Table_CH" height="30" rowSpan="1">
                             <staticText>
-                                <reportElement style="Table_TH" x="0" y="0" width="230" height="30" forecolor="#FFFFFF" backcolor="#4D4494" uuid="e5ee5567-2a45-45cc-af29-870ec2c9d3da"/>
+                                <reportElement style="Table_TH" x="0" y="0" width="230" height="30" forecolor="#FFFFFF" backcolor="#063A76" uuid="e5ee5567-2a45-45cc-af29-870ec2c9d3da"/>
                                 <textElement textAlignment="Center" verticalAlignment="Middle">
                                     <font size="12" isBold="true"/>
                                 </textElement>
@@ -292,7 +293,7 @@
                         <property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
                         <jr:columnHeader style="Table_CH" height="30" rowSpan="1">
                             <staticText>
-                                <reportElement style="Table_TH" x="0" y="0" width="80" height="30" forecolor="#FFFFFF" backcolor="#4D4494" uuid="c5288871-9209-44bb-b2bd-939671a67f0f"/>
+                                <reportElement style="Table_TH" x="0" y="0" width="80" height="30" forecolor="#FFFFFF" backcolor="#063A76" uuid="c5288871-9209-44bb-b2bd-939671a67f0f"/>
                                 <textElement textAlignment="Center" verticalAlignment="Middle">
                                     <font size="12" isBold="true"/>
                                 </textElement>
@@ -313,7 +314,7 @@
                         <property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
                         <jr:columnHeader style="Table_CH" height="30" rowSpan="1">
                             <staticText>
-                                <reportElement style="Table_TH" x="0" y="0" width="100" height="30" forecolor="#FFFFFF" backcolor="#4D4494" uuid="2e05afd8-604b-41bd-88b0-384a9b226982"/>
+                                <reportElement style="Table_TH" x="0" y="0" width="100" height="30" forecolor="#FFFFFF" backcolor="#063A76" uuid="2e05afd8-604b-41bd-88b0-384a9b226982"/>
                                 <textElement textAlignment="Center" verticalAlignment="Middle">
                                     <font size="12" isBold="true"/>
                                 </textElement>
@@ -334,7 +335,7 @@
                         <property name="com.jaspersoft.studio.components.table.model.column.name" value="Column5"/>
                         <jr:columnHeader style="Table_CH" height="30" rowSpan="1">
                             <staticText>
-                                <reportElement style="Table_TH" x="0" y="0" width="104" height="30" forecolor="#FFFFFF" backcolor="#4D4494" uuid="93b20462-87dc-4fc1-aadf-7d9eb5e1693d"/>
+                                <reportElement style="Table_TH" x="0" y="0" width="104" height="30" forecolor="#FFFFFF" backcolor="#063A76" uuid="93b20462-87dc-4fc1-aadf-7d9eb5e1693d"/>
                                 <textElement textAlignment="Center" verticalAlignment="Middle">
                                     <font size="12" isBold="true"/>
                                 </textElement>

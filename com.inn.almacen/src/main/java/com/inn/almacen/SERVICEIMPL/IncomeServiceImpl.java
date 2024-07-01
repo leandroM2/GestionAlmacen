@@ -15,6 +15,10 @@ import com.inn.almacen.constens.AlmacenConstants;
 import com.inn.almacen.dao.IncomeDao;
 import com.inn.almacen.dao.IncomeDetailDao;
 import com.inn.almacen.dao.ProductDao;
+import com.lowagie.text.Document;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfDocument;
+import com.lowagie.text.pdf.PdfWriter;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
@@ -24,6 +28,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Paths;
 import java.sql.Date;
 import java.util.*;
 
@@ -207,14 +214,15 @@ public class IncomeServiceImpl implements IncomeService {
             incomeOrder.add(new OrderCompraWrapper(String.valueOf(KDW.getProductId()),
                     String.valueOf(KDW.getProducto()),
                     String.valueOf(KDW.getCantidad()),
-                    String.valueOf(Float.parseFloat(String.format("%.2f", KDW.getPrecioVenta()))),
-                    String.valueOf(Float.parseFloat(String.format("%.2f", KDW.getTotal())))));
+                    String.valueOf(Float.parseFloat(String.format(Locale.US,"%.2f", KDW.getPrecioVenta()))),
+                    String.valueOf(Float.parseFloat(String.format(Locale.US,"%.2f", KDW.getTotal())))));
         }
-        subtotal=Float.parseFloat(String.format("%.2f", subtotal));
-        Float igv=Float.parseFloat(String.format("%.2f", subtotal*0.18f));
-        Float total=Float.parseFloat(String.format("%.2f", subtotal+igv));
+        String st=String.format(Locale.US,"%.2f", subtotal);
+        Float igv=Float.parseFloat(String.format(Locale.US,"%.2f", subtotal*0.18f));
+        Float total=Float.parseFloat(String.format(Locale.US,"%.2f", subtotal+igv));
 
         Map<String, Object> parameters=new HashMap<>();
+        parameters.put("REPORT_DIR", Paths.get("src", "main", "resources", "templates") + File.separator);
         parameters.put("incomeId", kardexId("", income.getId()));
         parameters.put("incomeFecha",String.valueOf(income.getFecha()));
         parameters.put("supplierRazonSocial",String.valueOf(incomeDetail.getProduct().getSupplier().getRazonSocial()));
@@ -223,25 +231,47 @@ public class IncomeServiceImpl implements IncomeService {
         parameters.put("tipoPago",income.getTipoPago());
         parameters.put("userNombre",String.valueOf(income.getUser().getNombre()));
         parameters.put("userAuth", String.valueOf(income.getUserAuth().getNombre()));
-        parameters.put("incomeSubtotal", String.valueOf(subtotal));
+        parameters.put("incomeSubtotal", st);
         parameters.put("incomeIGV", String.valueOf(igv));
         parameters.put("incomeTotal", String.valueOf(total));
 
         JRBeanCollectionDataSource OrderDataSource=new JRBeanCollectionDataSource(incomeOrder);
         parameters.put("OrderCompraWrapper",OrderDataSource);
         try{
-            String ruta=AlmacenConstants.RUTA_ORDEN_COMPRA_PDF+kardexId("S",income.getId())+".pdf";
-            JasperReport report= JasperCompileManager.compileReport(AlmacenConstants.RUTA_ORDEN_COMPRA);
+            String incomeId=kardexId("E",income.getId());
+            String ruta = Paths.get(Paths.get("data", "orders").toString(), incomeId + ".pdf").toString();
+            createEmptyPDF(ruta);
+            JasperReport report= JasperCompileManager.compileReport(Paths.get(Paths.get("src", "main", "resources", "templates", "report").toString(),"orden.jrxml").toString());
             JasperPrint print= JasperFillManager.fillReport(report, parameters, new JREmptyDataSource());
             JasperExportManager.exportReportToPdfFile(print,ruta);
             Map<String, String> arch=new HashMap<>();
-            arch.put("id",kardexId("S",income.getId()));
+            arch.put("id",incomeId);
             arch.put("ruta",ruta);
             archivesService.addArchive(arch);
-            return "ORDEN "+kardexId("S",income.getId())+ " GENERADA CON ÉXITO";
+            return "ORDEN "+incomeId+" GENERADA CON ÉXITO";
         }catch (Exception e){
             e.printStackTrace();
             return "ERROR DURANTE LA GENERACIÓN DE ORDEN DE COMPRA: "+e.getMessage();
+        }
+    }
+
+    private void createEmptyPDF(String ruta){
+        File file = new File(ruta);
+        try {
+            if (file.getParentFile().mkdirs()) log.info("Directorios existen");
+            if (file.createNewFile()) log.info("Archivo creado: " + file.getName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Document document = new Document();
+        try {
+            PdfWriter.getInstance(document, new FileOutputStream(file));
+            document.open();
+            document.add(new Paragraph(" "));
+            document.close();
+            log.info("PDF limpio creado exitosamente");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
