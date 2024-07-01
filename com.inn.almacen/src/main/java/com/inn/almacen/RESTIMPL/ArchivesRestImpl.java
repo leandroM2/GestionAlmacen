@@ -6,6 +6,7 @@ import com.inn.almacen.SERVICE.ArchivesService;
 import com.inn.almacen.UTILS.AlmacenUtils;
 import com.inn.almacen.constens.AlmacenConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,5 +50,15 @@ public class ArchivesRestImpl implements ArchivesRest {
             e.printStackTrace();
         }
         return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<Resource> descargarPDF(String kardexId) {
+        try {
+            return archivesService.descargarPDF(kardexId);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

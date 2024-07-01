@@ -9,10 +9,17 @@ import com.inn.almacen.constens.AlmacenConstants;
 import com.inn.almacen.dao.ArchivesDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +52,30 @@ public class ArchivesServicesImpl implements ArchivesService {
             e.printStackTrace();
         }
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<Resource> descargarPDF(String kardexId) {
+        try {
+            log.info("Estamos entrando a descargar pdf");
+            Path rutaArchivo = Paths.get("data", "orders", kardexId + ".pdf");
+
+            if (!Files.exists(rutaArchivo)){
+                log.info("no encuentra la ruta");
+                return ResponseEntity.notFound().build();
+            }
+            byte[] contenido = Files.readAllBytes(rutaArchivo);
+            ByteArrayResource recurso = new ByteArrayResource(contenido);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + kardexId + ".pdf")
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .contentLength(contenido.length)
+                    .body(recurso);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @Override

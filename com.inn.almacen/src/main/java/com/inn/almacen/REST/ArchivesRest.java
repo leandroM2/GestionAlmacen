@@ -1,6 +1,7 @@
 package com.inn.almacen.REST;
 
 import com.inn.almacen.POJO.Archives;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,4 +19,7 @@ public interface ArchivesRest {
                                                   String filterValue);
     @PostMapping(path = "/get/{id}")
     ResponseEntity<List<Archives>> getById(@PathVariable String id);
+
+    @GetMapping("/descargar/{kardexId}")
+    ResponseEntity<Resource> descargarPDF(@PathVariable String kardexId);
 }
