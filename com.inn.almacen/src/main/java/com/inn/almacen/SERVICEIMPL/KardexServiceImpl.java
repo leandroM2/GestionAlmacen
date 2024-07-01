@@ -212,7 +212,7 @@ public class KardexServiceImpl implements KardexService {
             String ini="E";
             String KID=kardexId(ini, rawId);
             InDetail=incomeDetailDao.getAllByFk(IW.getId());
-            KW.add(new KardexWrapper(KID, IW.getFecha(), IW.getEstado(),"Entrada","-",KID,InDetail));
+            KW.add(new KardexWrapper(KID, IW.getFecha(), IW.getTipoPago(), IW.getEstado(),"Entrada","-",KID,InDetail));
         }
         return KW;
     }
@@ -226,7 +226,7 @@ public class KardexServiceImpl implements KardexService {
             String ini="S";
             String KID=kardexId(ini, rawId);
             OutDetail=outcomeDetailDao.getAllByFk(OW.getId());
-            KW.add(new KardexWrapper(KID, OW.getFecha(), OW.getEstado(),"Salida",OW.getClientRazonSocial(),KID,OutDetail));
+            KW.add(new KardexWrapper(KID, OW.getFecha(), OW.getTipoPago(), OW.getEstado(),"Salida",OW.getClientRazonSocial(),KID,OutDetail));
         }
         return KW;
     }
@@ -253,7 +253,7 @@ public class KardexServiceImpl implements KardexService {
         String KID=kardexId(ini, rawId);
         OutDetail=outcomeDetailDao.getAllByFk(outcome.getId());
         log.info("Dentro de kardexoutcomebyid "+OutDetail);
-        KW.add(new KardexWrapper(KID, outcome.getFecha(), outcome.getEstado(),"Salida",outcome.getClient().getRazonSocial(),KID,OutDetail));
+        KW.add(new KardexWrapper(KID, outcome.getFecha(), outcome.getTipoPago(), outcome.getEstado(),"Salida",outcome.getClient().getRazonSocial(),KID,OutDetail));
         return KW;
     }
 
@@ -266,7 +266,7 @@ public class KardexServiceImpl implements KardexService {
         String KID=kardexId(ini, rawId);
         InDetail=incomeDetailDao.getAllByFk(income.getId());
         log.info("Dentro de kardexincomebyid "+InDetail);
-        KW.add(new KardexWrapper(KID, income.getFecha(), income.getEstado(),"Entrada","-",KID,InDetail));
+        KW.add(new KardexWrapper(KID, income.getFecha(), income.getTipoPago(), income.getEstado(),"Entrada","-",KID,InDetail));
         return KW;
     }
 
@@ -279,7 +279,7 @@ public class KardexServiceImpl implements KardexService {
     }
 
     private boolean validateKardexMap(Map<String, String> requestMap) {
-        if (!requestMap.containsKey("fecha") || !requestMap.containsKey("tipo")) {
+        if (!requestMap.containsKey("fecha") || (!requestMap.containsKey("tipoPago")) || !requestMap.containsKey("tipo")) {
             return false;
         }
         if (Integer.parseInt(requestMap.get("tipo"))==1) {

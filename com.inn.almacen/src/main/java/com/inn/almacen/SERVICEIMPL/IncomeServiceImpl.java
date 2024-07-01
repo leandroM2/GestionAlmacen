@@ -55,7 +55,7 @@ public class IncomeServiceImpl implements IncomeService {
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 if(validateIncomeMap(requestMap, false)){
                     incomeDao.save(getIncomeFromMap(requestMap, false));
-                    return AlmacenUtils.getResponseEntity("Solicitud de entrada iniciada. Inserte los productos.", HttpStatus.CONTINUE);
+                    return AlmacenUtils.getResponseEntity("Solicitud de entrada iniciada. Inserte los productos.", HttpStatus.OK);
                 }
                 return AlmacenUtils.getResponseEntity(AlmacenConstants.DATA_INVALIDA, HttpStatus.BAD_REQUEST);
             }else{
@@ -139,7 +139,7 @@ public class IncomeServiceImpl implements IncomeService {
                 if(!optional.isEmpty()){
                     Income income=incomeDao.getById(id);
                     List<IncomeWrapper> myList = new ArrayList<>();
-                    myList.add(new IncomeWrapper(income.getId(), income.getFecha(), income.getEstado(),
+                    myList.add(new IncomeWrapper(income.getId(), income.getFecha(), income.getTipoPago(), income.getEstado(),
                             income.getUser().getId(), income.getUser().getNombre(),
                             income.getUserAuth().getId(), income.getUserAuth().getNombre()));
                     return new ResponseEntity<>(myList,HttpStatus.OK);
@@ -220,7 +220,7 @@ public class IncomeServiceImpl implements IncomeService {
         parameters.put("supplierRazonSocial",String.valueOf(incomeDetail.getProduct().getSupplier().getRazonSocial()));
         parameters.put("supplierRuc",String.valueOf(incomeDetail.getProduct().getSupplier().getRuc()));
         parameters.put("supplierContacto",String.valueOf(incomeDetail.getProduct().getSupplier().getContacto()));
-        parameters.put("tipoPago","Transferencia");
+        parameters.put("tipoPago",income.getTipoPago());
         parameters.put("userNombre",String.valueOf(income.getUser().getNombre()));
         parameters.put("userAuth", String.valueOf(income.getUserAuth().getNombre()));
         parameters.put("incomeSubtotal", String.valueOf(subtotal));
@@ -246,7 +246,7 @@ public class IncomeServiceImpl implements IncomeService {
     }
 
     private boolean validateIncomeMap(Map<String, String> requestMap, boolean validateId) {
-        if(requestMap.containsKey("fecha")){
+        if(requestMap.containsKey("fecha") && requestMap.containsKey("tipoPago")){
             if(requestMap.containsKey("id") && validateId){
                 return true;
             }else if (!validateId){
@@ -268,6 +268,7 @@ public class IncomeServiceImpl implements IncomeService {
         user.setId(userId);
         if(esAdd) income.setId(Integer.parseInt(requestMap.get("id")));
         income.setFecha(Date.valueOf(requestMap.get("fecha")));
+        income.setTipoPago(requestMap.get("tipoPago"));
         income.setEstado(requestMap.containsKey("estado") ? Boolean.parseBoolean(requestMap.get("estado")) : false);
         income.setUser(user);
         income.setUserAuth(userAuth);

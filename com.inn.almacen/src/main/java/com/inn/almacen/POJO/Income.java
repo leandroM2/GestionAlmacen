@@ -8,8 +8,8 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Date;
 
-@NamedQuery(name = "Income.getById", query = "select new com.inn.almacen.WRAPPER.IncomeWrapper(i.id, i.fecha, i.estado, i.user.id, i.user.nombre,  i.userAuth.id, i.userAuth.nombre) from Income i where i.id=:id")
-@NamedQuery(name = "Income.getAllIncome", query = "select new com.inn.almacen.WRAPPER.IncomeWrapper(i.id, i.fecha, i.estado, i.user.id, i.user.nombre,  i.userAuth.id, i.userAuth.nombre) from Income i")
+@NamedQuery(name = "Income.getById", query = "select new com.inn.almacen.WRAPPER.IncomeWrapper(i.id, i.fecha, i.tipoPago, i.estado, i.user.id, i.user.nombre,  i.userAuth.id, i.userAuth.nombre) from Income i where i.id=:id")
+@NamedQuery(name = "Income.getAllIncome", query = "select new com.inn.almacen.WRAPPER.IncomeWrapper(i.id, i.fecha, i.tipoPago, i.estado, i.user.id, i.user.nombre,  i.userAuth.id, i.userAuth.nombre) from Income i")
 
 @Data
 @Entity
@@ -26,6 +26,9 @@ public class Income implements Serializable {
 
     @Column(name="fecha")
     private Date fecha;
+
+    @Column(name="tipoPago")
+    private String tipoPago;
 
     @Column(name = "estado")
     private Boolean estado;
