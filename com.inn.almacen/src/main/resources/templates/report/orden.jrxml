@@ -32,24 +32,24 @@
         <queryString>
             <![CDATA[]]>
         </queryString>
-        <field name="productId" class="java.lang.Integer"/>
+        <field name="productId" class="java.lang.String"/>
         <field name="producto" class="java.lang.String"/>
-        <field name="cantidad" class="java.lang.Integer"/>
-        <field name="precioVenta" class="java.lang.Float"/>
-        <field name="total" class="java.lang.Float"/>
+        <field name="cantidad" class="java.lang.String"/>
+        <field name="precioVenta" class="java.lang.String"/>
+        <field name="total" class="java.lang.String"/>
     </subDataset>
-    <parameter name="incomeId" class="java.lang.Integer"/>
-    <parameter name="incomeFecha" class="java.sql.Date"/>
+    <parameter name="incomeId" class="java.lang.String"/>
+    <parameter name="incomeFecha" class="java.lang.String"/>
     <parameter name="supplierRazonSocial" class="java.lang.String"/>
-    <parameter name="supplierRuc" class="java.lang.Long"/>
-    <parameter name="supplierContacto" class="java.lang.Integer"/>
+    <parameter name="supplierRuc" class="java.lang.String"/>
+    <parameter name="supplierContacto" class="java.lang.String"/>
     <parameter name="tipoPago" class="java.lang.String"/>
     <parameter name="userNombre" class="java.lang.String"/>
     <parameter name="OrderCompraWrapper" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
     <parameter name="userAuth" class="java.lang.String"/>
-    <parameter name="incomeSubtotal" class="java.lang.Float"/>
-    <parameter name="incomeIGV" class="java.lang.Float"/>
-    <parameter name="incomeTotal" class="java.lang.Float"/>
+    <parameter name="incomeSubtotal" class="java.lang.String"/>
+    <parameter name="incomeIGV" class="java.lang.String"/>
+    <parameter name="incomeTotal" class="java.lang.String"/>
     <queryString>
         <![CDATA[]]>
     </queryString>

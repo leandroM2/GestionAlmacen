@@ -49,7 +49,7 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
                         outcomeDetailDao.save(getOutcomeDetailFromMap(requestMap, false));
                         return AlmacenUtils.getResponseEntity("Producto de salida correctamente registrado.", HttpStatus.OK);
                     }else{
-                        return AlmacenUtils.getResponseEntity("Advertencia: stock quedará por debajo de los mínimos recomendados (200 u).", HttpStatus.OK);
+                        return AlmacenUtils.getResponseEntity("Advertencia: stock quedará por debajo de los mínimos recomendados (200 u).", HttpStatus.BAD_REQUEST);
                     }
                 }
                 return AlmacenUtils.getResponseEntity(AlmacenConstants.DATA_INVALIDA, HttpStatus.BAD_REQUEST);

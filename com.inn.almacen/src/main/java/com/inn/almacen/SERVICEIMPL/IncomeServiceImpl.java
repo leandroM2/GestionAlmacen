@@ -55,7 +55,7 @@ public class IncomeServiceImpl implements IncomeService {
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 if(validateIncomeMap(requestMap, false)){
                     incomeDao.save(getIncomeFromMap(requestMap, false));
-                    return AlmacenUtils.getResponseEntity("Solicitud de entrada iniciada. Inserte los productos.", HttpStatus.OK);
+                    return AlmacenUtils.getResponseEntity("Solicitud de entrada iniciada. Inserte los productos.", HttpStatus.CONTINUE);
                 }
                 return AlmacenUtils.getResponseEntity(AlmacenConstants.DATA_INVALIDA, HttpStatus.BAD_REQUEST);
             }else{
@@ -204,31 +204,33 @@ public class IncomeServiceImpl implements IncomeService {
 
         for (KardexDetailWrapper KDW: incomeDetailWrappers){
             subtotal=subtotal+KDW.getTotal();
-            incomeOrder.add(new OrderCompraWrapper(KDW.getProductId(), KDW.getProducto(), KDW.getCantidad(),
-                    Float.parseFloat(String.format("%.2f", KDW.getPrecioVenta())),
-                    Float.parseFloat(String.format("%.2f", KDW.getTotal()))));
+            incomeOrder.add(new OrderCompraWrapper(String.valueOf(KDW.getProductId()),
+                    String.valueOf(KDW.getProducto()),
+                    String.valueOf(KDW.getCantidad()),
+                    String.valueOf(Float.parseFloat(String.format("%.2f", KDW.getPrecioVenta()))),
+                    String.valueOf(Float.parseFloat(String.format("%.2f", KDW.getTotal())))));
         }
         subtotal=Float.parseFloat(String.format("%.2f", subtotal));
         Float igv=Float.parseFloat(String.format("%.2f", subtotal*0.18f));
         Float total=Float.parseFloat(String.format("%.2f", subtotal+igv));
 
         Map<String, Object> parameters=new HashMap<>();
-        parameters.put("incomeId",income.getId());
-        parameters.put("incomeFecha",income.getFecha());
-        parameters.put("supplierRazonSocial",incomeDetail.getProduct().getSupplier().getRazonSocial());
-        parameters.put("supplierRuc",incomeDetail.getProduct().getSupplier().getRuc());
-        parameters.put("supplierContacto",incomeDetail.getProduct().getSupplier().getContacto());
+        parameters.put("incomeId", kardexId("", income.getId()));
+        parameters.put("incomeFecha",String.valueOf(income.getFecha()));
+        parameters.put("supplierRazonSocial",String.valueOf(incomeDetail.getProduct().getSupplier().getRazonSocial()));
+        parameters.put("supplierRuc",String.valueOf(incomeDetail.getProduct().getSupplier().getRuc()));
+        parameters.put("supplierContacto",String.valueOf(incomeDetail.getProduct().getSupplier().getContacto()));
         parameters.put("tipoPago","Transferencia");
-        parameters.put("userNombre",income.getUser().getNombre());
-        parameters.put("userAuth", income.getUserAuth().getNombre());
-        parameters.put("incomeSubtotal", subtotal);
-        parameters.put("incomeIGV", igv);
-        parameters.put("incomeTotal", total);
+        parameters.put("userNombre",String.valueOf(income.getUser().getNombre()));
+        parameters.put("userAuth", String.valueOf(income.getUserAuth().getNombre()));
+        parameters.put("incomeSubtotal", String.valueOf(subtotal));
+        parameters.put("incomeIGV", String.valueOf(igv));
+        parameters.put("incomeTotal", String.valueOf(total));
 
         JRBeanCollectionDataSource OrderDataSource=new JRBeanCollectionDataSource(incomeOrder);
         parameters.put("OrderCompraWrapper",OrderDataSource);
         try{
-            String ruta=AlmacenConstants.RUTA_ORDEN_COMPRA_PDF+"ORDEN"+kardexId("S",income.getId())+".pdf";
+            String ruta=AlmacenConstants.RUTA_ORDEN_COMPRA_PDF+kardexId("S",income.getId())+".pdf";
             JasperReport report= JasperCompileManager.compileReport(AlmacenConstants.RUTA_ORDEN_COMPRA);
             JasperPrint print= JasperFillManager.fillReport(report, parameters, new JREmptyDataSource());
             JasperExportManager.exportReportToPdfFile(print,ruta);
@@ -236,7 +238,7 @@ public class IncomeServiceImpl implements IncomeService {
             arch.put("id",kardexId("S",income.getId()));
             arch.put("ruta",ruta);
             archivesService.addArchive(arch);
-            return "ORDEN"+kardexId("S",income.getId())+ " GENERADA CON ÉXITO";
+            return "ORDEN "+kardexId("S",income.getId())+ " GENERADA CON ÉXITO";
         }catch (Exception e){
             e.printStackTrace();
             return "ERROR DURANTE LA GENERACIÓN DE ORDEN DE COMPRA: "+e.getMessage();

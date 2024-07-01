@@ -7,13 +7,13 @@ import lombok.Data;
 @AllArgsConstructor
 public class OrderCompraWrapper {
 
-    private Integer productId;
+    private String productId;
 
     private String producto;
 
-    private Integer cantidad;
+    private String cantidad;
 
-    private Float precioVenta;
+    private String precioVenta;
 
-    private Float total;
+    private String total;
 }

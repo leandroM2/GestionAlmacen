@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -48,6 +49,10 @@ public class KardexServiceImpl implements KardexService {
 
     @Autowired
     IncomeService incomeService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @Override
     public ResponseEntity<String> addNewKardexEntry(Map<String, String> requestMap) {
         log.info("Entrando a new kardex");
@@ -147,23 +152,36 @@ public class KardexServiceImpl implements KardexService {
 
     @Override
     public ResponseEntity<String> generateFile(String kardexId){
+
         try {
-            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
-                Integer id=extractNumbers(kardexId);
-                if(extractLetters(kardexId).equalsIgnoreCase("E")){
-                    return AlmacenUtils.getResponseComplex(incomeService.generateOrdenCompra(id));
-                }else if(extractLetters(kardexId).equalsIgnoreCase("S")){
-
+            if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()) {
+                Integer id = extractNumbers(kardexId);
+                if (!validateDetails(id)) {
+                    return AlmacenUtils.getResponseEntity("Debe existir al menos un producto para generar orden de compra", HttpStatus.BAD_REQUEST);
                 }
-                return AlmacenUtils.getResponseEntity("Id de kardex no corresponde a entrada o salida. "+extractLetters(kardexId), HttpStatus.OK);
-            }else{
+                switch (extractLetters(kardexId).toUpperCase()) {
+                    case "E":
+                        return AlmacenUtils.getResponseComplex(incomeService.generateOrdenCompra(id));
+                    case "S":
+                        // Add logic for "S" case if needed
+                        break;
+                    default:
+                        return AlmacenUtils.getResponseEntity("Id de kardex no corresponde a entrada o salida. ", HttpStatus.OK);
+                }
+            } else {
                 return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
-                }
-
-            }catch (Exception e){
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private Boolean validateDetails(Integer id) {
+        String sql = "SELECT count(*) FROM income_detail WHERE income_fk = ?";
+        Integer det = jdbcTemplate.queryForObject(sql, new Integer[]{id}, Integer.class);
+        boolean val=det>0 ? true :  false;
+        return val;
     }
 
     @Override
