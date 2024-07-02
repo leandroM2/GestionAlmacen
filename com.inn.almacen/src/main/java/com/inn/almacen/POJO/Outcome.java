@@ -8,8 +8,8 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Date;
 
-@NamedQuery(name = "Outcome.getById", query = "select new com.inn.almacen.WRAPPER.OutcomeWrapper(o.id, o.fecha, o.tipoPago, o.estado, o.client.id, o.client.razonSocial, o.client.ruc, o.client.correo, o.client.contacto, o.client.direccion, o.user.id, o.user.nombre, o.userAuth.id, o.userAuth.nombre) from Outcome o where o.id=:id")
-@NamedQuery(name = "Outcome.getAllOutcome", query = "select new com.inn.almacen.WRAPPER.OutcomeWrapper(o.id, o.fecha, o.tipoPago, o.estado, o.client.id, o.client.razonSocial, o.client.ruc, o.client.correo, o.client.contacto, o.client.direccion, o.user.id, o.user.nombre, o.userAuth.id, o.userAuth.nombre) from Outcome o")
+@NamedQuery(name = "Outcome.getById", query = "select new com.inn.almacen.WRAPPER.OutcomeWrapper(o.id, o.fecha, o.tipoPago, o.factura, o.estado, o.client.id, o.client.razonSocial, o.client.ruc, o.client.correo, o.client.contacto, o.client.direccion, o.user.id, o.user.nombre, o.userAuth.id, o.userAuth.nombre) from Outcome o where o.id=:id")
+@NamedQuery(name = "Outcome.getAllOutcome", query = "select new com.inn.almacen.WRAPPER.OutcomeWrapper(o.id, o.fecha, o.tipoPago, o.factura, o.estado, o.client.id, o.client.razonSocial, o.client.ruc, o.client.correo, o.client.contacto, o.client.direccion, o.user.id, o.user.nombre, o.userAuth.id, o.userAuth.nombre) from Outcome o")
 
 @Data
 @Entity
@@ -27,11 +27,14 @@ public class Outcome implements Serializable {
     @Column(name="fecha")
     private Date fecha;
 
-    @Column(name = "estado")
-    private Boolean estado;
-
     @Column(name = "tipoPago")
     private String tipoPago;
+
+    @Column(name="factura")
+    private String factura;
+
+    @Column(name = "estado")
+    private Boolean estado;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_fk", nullable = false)

@@ -147,7 +147,7 @@ public class OutcomeServiceImpl implements OutcomeService {
                 if(!optional.isEmpty()){
                     Outcome outcome=outcomeDao.getById(id);
                     List<OutcomeWrapper> myList = new ArrayList<>();
-                    myList.add(new OutcomeWrapper(outcome.getId(), outcome.getFecha(),outcome.getTipoPago(), outcome.getEstado() , outcome.getClient().getId(),
+                    myList.add(new OutcomeWrapper(outcome.getId(), outcome.getFecha(),outcome.getTipoPago(), outcome.getFactura(), outcome.getEstado() , outcome.getClient().getId(),
                             outcome.getClient().getRazonSocial(), outcome.getClient().getRuc(), outcome.getClient().getCorreo(),
                             outcome.getClient().getContacto(), outcome.getClient().getDireccion(), outcome.getUser().getId(),
                             outcome.getUser().getNombre(), outcome.getUserAuth().getId(), outcome.getUserAuth().getNombre()));
@@ -209,7 +209,7 @@ public class OutcomeServiceImpl implements OutcomeService {
         parameters.put("REPORT_DIR", Paths.get("src", "main", "resources", "templates") + File.separator);
         parameters.put("outcomeId",kardexId("",outcome.getId()));
         parameters.put("outcomeFecha",String.valueOf(outcome.getFecha()));
-        parameters.put("outcomeFactura","00001");
+        parameters.put("outcomeFactura",outcome.getFactura());
         parameters.put("outcomeUser",outcome.getUser().getNombre());
         parameters.put("outcomeUserAuth",outcome.getUserAuth().getNombre());
         parameters.put("clientRazonSocial",outcome.getClient().getRazonSocial());
@@ -290,7 +290,8 @@ public class OutcomeServiceImpl implements OutcomeService {
     }
 
     private boolean validateOutcomeMap(Map<String, String> requestMap, boolean validateId) {
-        if(requestMap.containsKey("fecha") && requestMap.containsKey("clientId") & requestMap.containsKey("tipoPago")){
+        if(requestMap.containsKey("fecha") && requestMap.containsKey("clientId")
+                && requestMap.containsKey("tipoPago") && requestMap.containsKey("factura")){
             if(requestMap.containsKey("id") && validateId){
                 return true;
             }else if (!validateId){
@@ -316,6 +317,7 @@ public class OutcomeServiceImpl implements OutcomeService {
 
         outcome.setFecha(Date.valueOf(requestMap.get("fecha")));
         outcome.setTipoPago(requestMap.get("tipoPago"));
+        outcome.setFactura(requestMap.get("factura"));
         outcome.setEstado(requestMap.containsKey("estado") ? Boolean.parseBoolean(requestMap.get("estado")) : false);
         outcome.setClient(client);
         outcome.setUser(user);
