@@ -18,4 +18,6 @@ public interface OutcomeService {
     ResponseEntity<List<OutcomeWrapper>> getById(Integer id);
 
     ResponseEntity<String> authorizeOutcome(Integer id);
+
+    ResponseEntity<String> generateGuiaRemision(Integer id);
 }

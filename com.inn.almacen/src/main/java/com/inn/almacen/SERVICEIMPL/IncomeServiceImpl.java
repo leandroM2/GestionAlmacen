@@ -17,7 +17,6 @@ import com.inn.almacen.dao.IncomeDetailDao;
 import com.inn.almacen.dao.ProductDao;
 import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;
-import com.lowagie.text.pdf.PdfDocument;
 import com.lowagie.text.pdf.PdfWriter;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.*;

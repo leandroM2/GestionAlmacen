@@ -2,26 +2,36 @@ package com.inn.almacen.SERVICEIMPL;
 
 import com.inn.almacen.JWT.JwtFilter;
 import com.inn.almacen.POJO.*;
+import com.inn.almacen.SERVICE.ArchivesService;
 import com.inn.almacen.SERVICE.OutcomeService;
 
 import com.inn.almacen.UTILS.AlmacenUtils;
+import com.inn.almacen.WRAPPER.KardexDetailWrapper;
 import com.inn.almacen.WRAPPER.OutcomeWrapper;
+import com.inn.almacen.WRAPPER.RemisionWrapper;
 import com.inn.almacen.constens.AlmacenConstants;
 import com.inn.almacen.dao.OutcomeDao;
 import com.inn.almacen.dao.OutcomeDetailDao;
 import com.inn.almacen.dao.ProductDao;
+import com.lowagie.text.Document;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfWriter;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Paths;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
+
 @Slf4j
 @Service
 public class OutcomeServiceImpl implements OutcomeService {
@@ -39,6 +49,9 @@ public class OutcomeServiceImpl implements OutcomeService {
 
     @Autowired
     ProductDao productDao;
+
+    @Autowired
+    ArchivesService archivesService;
 
     @Override
     public ResponseEntity<String> addNewOutcome(Map<String, String> requestMap) {
@@ -165,6 +178,92 @@ public class OutcomeServiceImpl implements OutcomeService {
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @Override
+    public ResponseEntity<String> generateGuiaRemision(Integer id) {
+        try {
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
+                Optional optional=outcomeDao.findById(id);
+                if (!optional.isEmpty()){
+                    Outcome outcome=outcomeDao.getById(id);
+                    String msg=createJGuia(outcome);
+                    return AlmacenUtils.getResponseEntity(msg,HttpStatus.OK);
+                }
+                return AlmacenUtils.getResponseEntity("ID DE SALIDA NO EXISTE.", HttpStatus.OK);
+            }else{
+                return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
+            }
+            }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private String createJGuia(Outcome outcome) {
+        List<RemisionWrapper> outcomeRemi=new ArrayList<>();
+        Map<String, Object> parameters=new HashMap<>();
+        parameters.put("REPORT_DIR", Paths.get("src", "main", "resources", "templates") + File.separator);
+        parameters.put("outcomeId",kardexId("",outcome.getId()));
+        parameters.put("outcomeFecha",String.valueOf(outcome.getFecha()));
+        parameters.put("outcomeFactura","00001");
+        parameters.put("outcomeUser",outcome.getUser().getNombre());
+        parameters.put("outcomeUserAuth",outcome.getUserAuth().getNombre());
+        parameters.put("clientRazonSocial",outcome.getClient().getRazonSocial());
+        parameters.put("clientRuc",String.valueOf(outcome.getClient().getRuc()));
+        parameters.put("clientContacto",String.valueOf(outcome.getClient().getContacto()));
+        if(outcome.getEstado()){
+            LocalDate currentDate = LocalDate.now();
+            parameters.put("fechaRecojo",String.valueOf(currentDate));
+        }else{
+            parameters.put("fechaRecojo","--/--/--");
+        }
+
+        List<KardexDetailWrapper> outcomeDetailWrappers=outcomeDetailDao.getAllByFk(outcome.getId());
+
+        for (KardexDetailWrapper KDW: outcomeDetailWrappers) {
+            outcomeRemi.add(new RemisionWrapper(String.valueOf(KDW.getCantidad()),
+                    "PARES",
+                    String.valueOf(KDW.getProducto())));
+        }
+        JRBeanCollectionDataSource OrderDataSource=new JRBeanCollectionDataSource(outcomeRemi);
+        parameters.put("remisionWrapper",OrderDataSource);
+        try {
+            String outcomeId=kardexId("S",outcome.getId());
+            String ruta = Paths.get(Paths.get("data", "orders").toString(), outcomeId + ".pdf").toString();
+            createEmptyPDF(ruta);
+            JasperReport report= JasperCompileManager.compileReport(Paths.get(Paths.get("src", "main", "resources", "templates", "report").toString(),"remision.jrxml").toString());
+            JasperPrint print= JasperFillManager.fillReport(report, parameters, new JREmptyDataSource());
+            JasperExportManager.exportReportToPdfFile(print,ruta);
+            Map<String, String> arch=new HashMap<>();
+            arch.put("id",outcomeId);
+            arch.put("ruta",ruta);
+            archivesService.addArchive(arch);
+            return "GUÍA "+outcomeId+" GENERADA CON ÉXITO";
+        }catch (Exception e){
+            e.printStackTrace();
+            return "ERROR DURANTE LA GENERACIÓN DE ORDEN DE COMPRA: "+e.getMessage();
+        }
+    }
+
+    private void createEmptyPDF(String ruta){
+        File file = new File(ruta);
+        try {
+            if (file.getParentFile().mkdirs()) log.info("Directorios existen");
+            if (file.createNewFile()) log.info("Archivo creado: " + file.getName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Document document = new Document();
+        try {
+            PdfWriter.getInstance(document, new FileOutputStream(file));
+            document.open();
+            document.add(new Paragraph(" "));
+            document.close();
+            log.info("PDF limpio creado exitosamente");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private boolean validateOutcomeMap(Map<String, String> requestMap, boolean validateId) {
         if(requestMap.containsKey("fecha") && requestMap.containsKey("clientId") & requestMap.containsKey("tipoPago")){
             if(requestMap.containsKey("id") && validateId){
@@ -198,6 +297,19 @@ public class OutcomeServiceImpl implements OutcomeService {
         outcome.setUserAuth(userAuth);
 
         return outcome;
+    }
+
+    private String kardexId(String ini, Integer rawId){
+        StringBuilder id = new StringBuilder(ini);
+        Integer auxId=rawId;
+        if(auxId==0) auxId++;
+        double cont=Math.floor(Math.log10(Math.abs(auxId)) + 1);
+        cont=5-cont;
+        for (Integer i = 0; i<cont; i++){
+            id.append("0");
+        }
+        id.append(rawId);
+        return id.toString();
     }
 
     private void updateState(String user, Integer outcomeId){

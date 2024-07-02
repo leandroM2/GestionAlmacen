@@ -156,15 +156,15 @@ public class KardexServiceImpl implements KardexService {
         try {
             if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()) {
                 Integer id = extractNumbers(kardexId);
-                if (!validateDetails(id)) {
-                    return AlmacenUtils.getResponseEntity("Debe existir al menos un producto para generar orden de compra", HttpStatus.BAD_REQUEST);
+                String let=extractLetters(kardexId).toUpperCase();
+                if (!validateDetails(id, let)) {
+                    return AlmacenUtils.getResponseEntity("Debe existir al menos un producto para generar documento", HttpStatus.BAD_REQUEST);
                 }
-                switch (extractLetters(kardexId).toUpperCase()) {
+                switch (let) {
                     case "E":
                         return AlmacenUtils.getResponseComplex(incomeService.generateOrdenCompra(id));
                     case "S":
-                        // Add logic for "S" case if needed
-                        break;
+                        return AlmacenUtils.getResponseComplex(outcomeService.generateGuiaRemision(id));
                     default:
                         return AlmacenUtils.getResponseEntity("Id de kardex no corresponde a entrada o salida. ", HttpStatus.OK);
                 }
@@ -177,10 +177,23 @@ public class KardexServiceImpl implements KardexService {
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    private Boolean validateDetails(Integer id) {
-        String sql = "SELECT count(*) FROM income_detail WHERE income_fk = ?";
-        Integer det = jdbcTemplate.queryForObject(sql, new Integer[]{id}, Integer.class);
-        boolean val=det>0 ? true :  false;
+    private Boolean validateDetails(Integer id, String let) {
+        String sql;
+        Integer det;
+        Boolean val;
+        switch (let) {
+            case "E":
+                sql = "SELECT count(*) FROM income_detail WHERE income_fk = ?";
+                break;
+            case "S":
+                sql = "SELECT count(*) FROM outcome_detail WHERE outcome_fk = ?";
+                break;
+            default:
+                return false;
+
+        }
+        det = jdbcTemplate.queryForObject(sql, new Integer[]{id}, Integer.class);
+        val=det>0 ? true :  false;
         return val;
     }
 
@@ -196,6 +209,7 @@ public class KardexServiceImpl implements KardexService {
                     }
                 return AlmacenUtils.getResponseEntity("ID de kardex no se corresponde con entrada o salida.", HttpStatus.OK);
                 }
+            return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
             }catch (Exception e){
             e.printStackTrace();
         }

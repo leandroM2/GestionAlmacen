@@ -89,7 +89,7 @@ public class ProductServiceImpl implements ProductService {
     public ResponseEntity<List<ProductWrapper>> getById(Integer id) {
         log.info("Dentro de get product by id");
         try {
-            if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
+            if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 Optional optional=productDao.findById(id);
                 if(!optional.isEmpty()){
                     Product product=productDao.getById(id);
