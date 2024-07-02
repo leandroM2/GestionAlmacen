@@ -1,8 +1,8 @@
 package com.inn.almacen.SERVICE;
 
-import com.inn.almacen.POJO.User;
 import com.inn.almacen.WRAPPER.UserWrapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -20,5 +20,9 @@ public interface UserService {
     ResponseEntity<List<UserWrapper>> getById(Integer id);
 
     ResponseEntity<String> iniciarSesion(Map<String,String> requestMap);
+
+    ResponseEntity<String> uploadSign(MultipartFile sign);
+
+    ResponseEntity<String> deleteFile(String nombre);
 
 }

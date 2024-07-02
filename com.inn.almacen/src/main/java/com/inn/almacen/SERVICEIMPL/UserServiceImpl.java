@@ -18,8 +18,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.rowset.serial.SerialBlob;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.Blob;
 import java.util.*;
 
@@ -94,6 +100,45 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public ResponseEntity<String> uploadSign(MultipartFile sign) {
+        try {
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
+                if (sign.isEmpty()) return AlmacenUtils.getResponseEntity("EL ARCHIVO DE FIRMA SE ENCUENTRA VACÍO.", HttpStatus.BAD_REQUEST);
+                if (!sign.getContentType().equals("image/png")) return AlmacenUtils.getResponseEntity("SOLO SE PERMITEN ARCHIVOS EN FORMATO PNG.", HttpStatus.BAD_REQUEST);
+
+                String ruta=Paths.get("src", "main", "resources", "templates","auths") + File.separator;
+                String fileName = renombrar(sign.getOriginalFilename());
+                Path filePath = Paths.get(ruta, fileName);
+
+                if (Files.exists(filePath) && !jwtFilter.isSuperAdmin()) return AlmacenUtils.getResponseEntity("USUARIO "+jwtFilter.getCurrentUser()+" NO CUENTA CON PERMISOS PARA ACTUALIZAR SU FIRMA. CONTACTAR AL ADMINISTRADOR.", HttpStatus.CONFLICT);
+                Files.copy(sign.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                return AlmacenUtils.getResponseEntity("ARCHIVO SUBIDO CORRECTAMENTE.", HttpStatus.OK);
+            }else{
+                return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> deleteFile(String nombre) {
+        try {
+            if(!jwtFilter.isSuperAdmin()) return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
+            nombre=nombre+".png";
+            String ruta=Paths.get("src", "main", "resources", "templates","auths") + File.separator;
+            Path filePath = Paths.get(ruta, nombre);
+            if (Files.notExists(filePath)) return AlmacenUtils.getResponseEntity("FIRMA NO ENCONTRADA", HttpStatus.NOT_FOUND);
+            Files.delete(filePath);
+            return ResponseEntity.ok("FIRMA ELIMINADA CORRECTAMENTE: " +nombre);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
     public ResponseEntity<List<UserWrapper>> getAllUser() {
         log.info("Dentro de get all user");
         try {
@@ -113,8 +158,8 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<String> updateUser(Map<String, String> requestMap) {
         log.info("Dentro de update user");
         try {
-            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
-                if(valdateUserMap(requestMap, true)){
+            if(jwtFilter.isSuperAdmin()){
+                if(validateUserMap(requestMap, true)){
                     Optional optional=userDao.findById(Integer.parseInt(requestMap.get("id")));
                     if(!optional.isEmpty()){
                         userDao.save(getUserFromMap(requestMap, true));
@@ -133,23 +178,11 @@ public class UserServiceImpl implements UserService {
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    private boolean valdateUserMap(Map<String, String> requestMap, boolean validateId) {
-        if(requestMap.containsKey("nombre") && requestMap.containsKey("email")
-                && requestMap.containsKey("contrasena")){
-            if(requestMap.containsKey("id") && validateId){
-                return true;
-            } else if (!validateId) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Override
     public ResponseEntity<String> deleteUser(Integer id) {
         log.info("Dentro de delete user");
         try {
-            if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
+            if (jwtFilter.isSuperAdmin()){
                 Optional optional=userDao.findById(id);
                 if(!optional.isEmpty()){
                     User user=userDao.findByRol(id);
@@ -190,6 +223,25 @@ public class UserServiceImpl implements UserService {
             e.printStackTrace();
         }
         return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private String renombrar(String original) {
+        String extension = original.substring(original.lastIndexOf('.'));
+        User u=userDao.findByEmailId(jwtFilter.getCurrentUser());
+        String nuevo = u.getNombre() + extension;
+        return nuevo;
+    }
+
+    private boolean validateUserMap(Map<String, String> requestMap, boolean validateId) {
+        if(requestMap.containsKey("nombre") && requestMap.containsKey("email")
+                && requestMap.containsKey("contrasena")){
+            if(requestMap.containsKey("id") && validateId){
+                return true;
+            } else if (!validateId) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean validateAdd(Map<String,String> requestMap){
