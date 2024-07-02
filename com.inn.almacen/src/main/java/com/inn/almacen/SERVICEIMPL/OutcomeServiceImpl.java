@@ -13,6 +13,7 @@ import com.inn.almacen.constens.AlmacenConstants;
 import com.inn.almacen.dao.OutcomeDao;
 import com.inn.almacen.dao.OutcomeDetailDao;
 import com.inn.almacen.dao.ProductDao;
+import com.inn.almacen.dao.UserDao;
 import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfWriter;
@@ -52,6 +53,9 @@ public class OutcomeServiceImpl implements OutcomeService {
 
     @Autowired
     ArchivesService archivesService;
+
+    @Autowired
+    UserDao userDao;
 
     @Override
     public ResponseEntity<String> addNewOutcome(Map<String, String> requestMap) {
@@ -163,12 +167,13 @@ public class OutcomeServiceImpl implements OutcomeService {
         try {
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 Optional optional=outcomeDao.findById(id);
-                if(!optional.isEmpty()){
+                if(!optional.isEmpty() && validateDetails(id)){
                     String user=jwtFilter.getCurrentUser();
                     updateState(user, id);
+                    updateInstance(user, id);
                     return AlmacenUtils.getResponseEntity("Salidas autorizadas por el supervisor "+user, HttpStatus.OK );
                 }
-                return AlmacenUtils.getResponseEntity("Id de salida no existe.", HttpStatus.OK);
+                return AlmacenUtils.getResponseEntity("Id de salida no existe o no cuenta con productos registrados.", HttpStatus.OK);
             }else{
                 return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
             }
@@ -210,9 +215,12 @@ public class OutcomeServiceImpl implements OutcomeService {
         parameters.put("clientRazonSocial",outcome.getClient().getRazonSocial());
         parameters.put("clientRuc",String.valueOf(outcome.getClient().getRuc()));
         parameters.put("clientContacto",String.valueOf(outcome.getClient().getContacto()));
+        String doc="remision.jrxml";
         if(outcome.getEstado()){
             LocalDate currentDate = LocalDate.now();
             parameters.put("fechaRecojo",String.valueOf(currentDate));
+            parameters.put("REPORT_AUTH",Paths.get("src","main","resources","templates","auths",outcome.getUserAuth().getNombre()+".png") + File.separator);
+            doc="remisionAuth.jrxml";
         }else{
             parameters.put("fechaRecojo","--/--/--");
         }
@@ -230,7 +238,7 @@ public class OutcomeServiceImpl implements OutcomeService {
             String outcomeId=kardexId("S",outcome.getId());
             String ruta = Paths.get(Paths.get("data", "orders").toString(), outcomeId + ".pdf").toString();
             createEmptyPDF(ruta);
-            JasperReport report= JasperCompileManager.compileReport(Paths.get(Paths.get("src", "main", "resources", "templates", "report").toString(),"remision.jrxml").toString());
+            JasperReport report= JasperCompileManager.compileReport(Paths.get(Paths.get("src", "main", "resources", "templates", "report").toString(),doc).toString());
             JasperPrint print= JasperFillManager.fillReport(report, parameters, new JREmptyDataSource());
             JasperExportManager.exportReportToPdfFile(print,ruta);
             Map<String, String> arch=new HashMap<>();
@@ -262,6 +270,23 @@ public class OutcomeServiceImpl implements OutcomeService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private Boolean validateDetails(Integer id) {
+        String sql="SELECT count(*) FROM outcome_detail WHERE outcome_fk = ?";
+        Integer det= jdbcTemplate.queryForObject(sql, new Integer[]{id}, Integer.class);
+        Boolean val=det>0 ? true :  false;
+        return val;
+    }
+
+    private void updateInstance(String user, Integer id){
+        Outcome outcome=outcomeDao.getById(id);
+        String sql = "SELECT id FROM user WHERE email = ?";
+        Integer userId = jdbcTemplate.queryForObject(sql, new String[]{user}, Integer.class);
+        User u=userDao.findByRol(userId);
+        outcome.setEstado(true);
+        outcome.setUserAuth(u);
+        createJGuia(outcome);
     }
 
     private boolean validateOutcomeMap(Map<String, String> requestMap, boolean validateId) {

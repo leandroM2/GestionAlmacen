@@ -15,6 +15,7 @@ import com.inn.almacen.constens.AlmacenConstants;
 import com.inn.almacen.dao.IncomeDao;
 import com.inn.almacen.dao.IncomeDetailDao;
 import com.inn.almacen.dao.ProductDao;
+import com.inn.almacen.dao.UserDao;
 import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfWriter;
@@ -51,6 +52,9 @@ public class IncomeServiceImpl implements IncomeService {
 
     @Autowired
     JwtFilter jwtFilter;
+
+    @Autowired
+    UserDao userDao;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -165,12 +169,13 @@ public class IncomeServiceImpl implements IncomeService {
         try{
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 Optional optional=incomeDao.findById(id);
-                if(!optional.isEmpty()){
+                if(!optional.isEmpty() && validateDetails(id)){
                     String user=jwtFilter.getCurrentUser();
                     updateState(user, id);
+                    updateInstance(user, id);
                     return AlmacenUtils.getResponseEntity("Entradas autorizadas por el supervisor "+user, HttpStatus.OK );
                 }
-                return AlmacenUtils.getResponseEntity("Id de entrada no existe.", HttpStatus.OK);
+                return AlmacenUtils.getResponseEntity("Id de entrada no existe o no cuenta con productos registrados.", HttpStatus.OK);
             }else{
                 return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
             }
@@ -198,6 +203,23 @@ public class IncomeServiceImpl implements IncomeService {
             e.printStackTrace();
         }
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private Boolean validateDetails(Integer id) {
+        String sql="SELECT count(*) FROM income_detail WHERE income_fk = ?";
+        Integer det= jdbcTemplate.queryForObject(sql, new Integer[]{id}, Integer.class);
+        Boolean val=det>0 ? true :  false;
+        return val;
+    }
+
+    private void updateInstance(String user, Integer id){
+        Income income=incomeDao.getById(id);
+        String sql = "SELECT id FROM user WHERE email = ?";
+        Integer userId = jdbcTemplate.queryForObject(sql, new String[]{user}, Integer.class);
+        User u=userDao.findByRol(userId);
+        income.setEstado(true);
+        income.setUserAuth(u);
+        createJOrden(income);
     }
 
     private String createJOrden(Income income){
@@ -236,11 +258,19 @@ public class IncomeServiceImpl implements IncomeService {
 
         JRBeanCollectionDataSource OrderDataSource=new JRBeanCollectionDataSource(incomeOrder);
         parameters.put("OrderCompraWrapper",OrderDataSource);
+
         try{
             String incomeId=kardexId("E",income.getId());
+            String doc="orden.jrxml";
+            log.info("AQUI ESTAMOS "+income.getEstado());
+            if(income.getEstado()){
+                parameters.put("REPORT_AUTH",Paths.get("src","main","resources","templates","auths",income.getUserAuth().getNombre()+".png") + File.separator);
+                doc="ordenAuth.jrxml";
+            }
+
             String ruta = Paths.get(Paths.get("data", "orders").toString(), incomeId + ".pdf").toString();
             createEmptyPDF(ruta);
-            JasperReport report= JasperCompileManager.compileReport(Paths.get(Paths.get("src", "main", "resources", "templates", "report").toString(),"orden.jrxml").toString());
+            JasperReport report= JasperCompileManager.compileReport(Paths.get(Paths.get("src", "main", "resources", "templates", "report").toString(),doc).toString());
             JasperPrint print= JasperFillManager.fillReport(report, parameters, new JREmptyDataSource());
             JasperExportManager.exportReportToPdfFile(print,ruta);
             Map<String, String> arch=new HashMap<>();
@@ -312,7 +342,6 @@ public class IncomeServiceImpl implements IncomeService {
 
         sql = "UPDATE income SET estado = true, autorizador_fk=? WHERE id = ?";
         jdbcTemplate.update(sql, userId, incomeId);
-
         sql = "SELECT id FROM income_detail WHERE income_fk=?";
 
         // Obtener una lista de Strings
