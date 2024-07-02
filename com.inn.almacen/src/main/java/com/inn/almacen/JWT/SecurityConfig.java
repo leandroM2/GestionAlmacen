@@ -1,6 +1,5 @@
 package com.inn.almacen.JWT;
 
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,7 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/user/iniciarSesion","/user/add")
+                .antMatchers("/user/iniciarSesion")//,"/user/add"
                 .permitAll()
                 .anyRequest()
                 .authenticated()

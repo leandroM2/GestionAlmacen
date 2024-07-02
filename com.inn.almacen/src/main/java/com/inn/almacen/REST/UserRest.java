@@ -36,4 +36,7 @@ public interface UserRest {
     @PostMapping(path = "delfile/{nombre}")
     public ResponseEntity<String> deleteFile(@PathVariable String nombre);
 
+    @PostMapping(path = "auth/{id}")
+    ResponseEntity<String> authorizeUser(@PathVariable Integer id);
+
 }

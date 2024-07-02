@@ -62,6 +62,16 @@ public class UserRestImpl implements UserRest {
     }
 
     @Override
+    public ResponseEntity<String> authorizeUser(Integer id) {
+        try {
+            return  userService.authorizeUser(id);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
     public ResponseEntity<List<UserWrapper>> getAllUser() {
         try {
             return userService.getAllUser();

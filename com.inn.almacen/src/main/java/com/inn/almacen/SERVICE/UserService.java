@@ -25,4 +25,6 @@ public interface UserService {
 
     ResponseEntity<String> deleteFile(String nombre);
 
+    ResponseEntity<String> authorizeUser(Integer id);
+
 }

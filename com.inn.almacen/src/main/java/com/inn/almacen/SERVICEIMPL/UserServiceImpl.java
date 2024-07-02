@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -50,10 +51,14 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     Jasypt jasypt;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     @Override
     public ResponseEntity<String> addNewUser(Map<String, String> requestMap) {
         log.info("Dentro del registro");
         try {
+            if(jwtFilter.isSuperAdmin() || jwtFilter.isAdmin()){
                 if(validateAdd(requestMap)){
                     User user=userDao.findByEmailId(requestMap.get("email"));
                     if(Objects.isNull(user)){
@@ -65,6 +70,8 @@ public class UserServiceImpl implements UserService {
                 }else{
                     return AlmacenUtils.getResponseEntity(AlmacenConstants.DATA_INVALIDA, HttpStatus.BAD_REQUEST);
                 }
+            }
+            return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -139,6 +146,52 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public ResponseEntity<String> authorizeUser(Integer id) {
+        try {
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
+                User myUser=userDao.findByEmailId(jwtFilter.getCurrentUser());
+                User userUpd=userDao.findByRol(id);
+                if(!validateStatus(myUser, userUpd)) return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
+                updateState(id);
+                return AlmacenUtils.getResponseEntity("Usuario "+userUpd.getNombre()+" ha sido autorizado.", HttpStatus.OK);
+            }
+            return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
+            }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    public Boolean validateStatus(User myUser, User userUpd){
+        Integer myRol=switchcase(myUser.getRol());
+        Integer updRol=switchcase(userUpd.getRol());
+        Boolean status=(myRol>updRol) ? true : false;
+        return status;
+    }
+
+    public Integer switchcase(String rol){
+        Integer val=0;
+        switch (rol.toUpperCase()){
+            case "USER":
+                val=1;
+                break;
+            case "ADMIN":
+                val=2;
+                break;
+            case "SUPERADMIN":
+                val=3;
+                break;
+        }
+            return val;
+    }
+
+    private void updateState(Integer userId){
+        String sql = "UPDATE user SET estado = true WHERE id = ?";
+        jdbcTemplate.update(sql, userId);
+    }
+
+
+    @Override
     public ResponseEntity<List<UserWrapper>> getAllUser() {
         log.info("Dentro de get all user");
         try {
@@ -158,7 +211,7 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<String> updateUser(Map<String, String> requestMap) {
         log.info("Dentro de update user");
         try {
-            if(jwtFilter.isSuperAdmin()){
+            if(jwtFilter.isSuperAdmin() || jwtFilter.isAdmin()){
                 if(validateUserMap(requestMap, true)){
                     Optional optional=userDao.findById(Integer.parseInt(requestMap.get("id")));
                     if(!optional.isEmpty()){
