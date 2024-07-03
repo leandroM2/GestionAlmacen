@@ -33,10 +33,16 @@ public interface UserRest {
     @PostMapping(path = "/upload")
     public ResponseEntity<String> uploadSign(@RequestParam("file") MultipartFile sign);
 
-    @PostMapping(path = "delfile/{nombre}")
+    @PostMapping(path = "/delfile/{nombre}")
     public ResponseEntity<String> deleteFile(@PathVariable String nombre);
 
-    @PostMapping(path = "auth/{id}")
+    @PostMapping(path = "/auth/{id}")
     ResponseEntity<String> authorizeUser(@PathVariable Integer id);
+
+    @GetMapping(path = "/checktoken")
+    ResponseEntity<String> checktoken();
+
+    @PostMapping(path = "/cambiarContrasena")
+    ResponseEntity<String> cambiarContrasena(@RequestBody Map<String, String> requestMap);
 
 }

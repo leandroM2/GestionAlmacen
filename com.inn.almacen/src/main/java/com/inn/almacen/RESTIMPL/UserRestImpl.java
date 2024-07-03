@@ -72,6 +72,27 @@ public class UserRestImpl implements UserRest {
     }
 
     @Override
+    public ResponseEntity<String> checktoken() {
+        try {
+            return userService.checktoken();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> cambiarContrasena(Map<String, String> requestMap) {
+        try {
+            return userService.cambiarContrasena(requestMap);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+
+    }
+
+    @Override
     public ResponseEntity<List<UserWrapper>> getAllUser() {
         try {
             return userService.getAllUser();

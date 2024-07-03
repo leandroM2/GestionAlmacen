@@ -27,4 +27,8 @@ public interface UserService {
 
     ResponseEntity<String> authorizeUser(Integer id);
 
+    ResponseEntity<String> checktoken();
+
+    ResponseEntity<String> cambiarContrasena(Map<String, String> requestMap);
+
 }

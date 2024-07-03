@@ -162,6 +162,34 @@ public class UserServiceImpl implements UserService {
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @Override
+    public ResponseEntity<String> checktoken() {
+        return AlmacenUtils.getResponseEntity("true", HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<String> cambiarContrasena(Map<String, String> requestMap) {
+        try {
+            User u=userDao.findByEmail(jwtFilter.getCurrentUser());
+            if(!u.equals("null")){
+                if(jasypt.decrypting(u.getContrasena()).equals(requestMap.get("oldPassword"))){
+                    String password=requestMap.get("newPassword");
+                        password=jasypt.encrypting(password);
+                        byte[] byteData = password.getBytes("UTF-8");
+                        Blob blob=new SerialBlob(byteData);
+                        u.setContrasena(blob);
+                        userDao.save(u);
+                    return AlmacenUtils.getResponseEntity("Contraseña actualizada correctamente.",HttpStatus.OK);
+                }
+                return AlmacenUtils.getResponseEntity("Contraseña o correo incorrecto.", HttpStatus.BAD_REQUEST);
+            }
+            return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     public Boolean validateStatus(User myUser, User userUpd){
         Integer myRol=switchcase(myUser.getRol());
         Integer updRol=switchcase(userUpd.getRol());
