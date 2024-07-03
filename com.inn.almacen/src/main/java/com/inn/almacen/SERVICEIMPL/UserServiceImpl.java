@@ -267,6 +267,18 @@ public class UserServiceImpl implements UserService {
                 Optional optional=userDao.findById(id);
                 if(!optional.isEmpty()){
                     User user=userDao.findByRol(id);
+                    if(user.getRol().equalsIgnoreCase("user") || user.getRol().equalsIgnoreCase("admin")){
+                        userDao.deleteById(id);
+                        return AlmacenUtils.getResponseEntity("Usuario eliminado correctamente.", HttpStatus.OK);
+                    }else{
+                        return AlmacenUtils.getResponseEntity("No tiene permisos suficientes para eliminar este registro.", HttpStatus.OK);
+                    }
+                }
+                return AlmacenUtils.getResponseEntity("Id de usuario no existe.", HttpStatus.OK);
+            } else if (jwtFilter.isAdmin()) {
+                Optional optional=userDao.findById(id);
+                if(!optional.isEmpty()){
+                    User user=userDao.findByRol(id);
                     if(user.getRol().equalsIgnoreCase("user")){
                         userDao.deleteById(id);
                         return AlmacenUtils.getResponseEntity("Usuario eliminado correctamente.", HttpStatus.OK);
