@@ -12,6 +12,8 @@ public interface KardexService {
 
     ResponseEntity<List<KardexWrapper>> getAllKardex();
 
+    ResponseEntity<List<KardexWrapper>> getKardexByDate();
+
     ResponseEntity<List<KardexWrapper>> getAllKardexIncome();
 
     ResponseEntity<List<KardexWrapper>> getAllKardexOutcome();

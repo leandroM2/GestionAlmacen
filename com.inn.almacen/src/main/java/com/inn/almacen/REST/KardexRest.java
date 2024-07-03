@@ -16,6 +16,9 @@ public interface KardexRest {
     @GetMapping(path = "/get")
     ResponseEntity<List<KardexWrapper>> getAllKardex();
 
+    @GetMapping(path = "/getDate")
+    ResponseEntity<List<KardexWrapper>> getKardexByDate();
+
     @GetMapping(path = "/get/{id}")
     ResponseEntity<List<KardexWrapper>> getById(@PathVariable String id);
 

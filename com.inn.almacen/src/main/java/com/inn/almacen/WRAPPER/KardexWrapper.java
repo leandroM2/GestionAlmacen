@@ -12,6 +12,8 @@ public class KardexWrapper {
 
     private Date fecha;
 
+    private Long time;
+
     private String tipoPago;
 
     private String factura;
@@ -26,10 +28,11 @@ public class KardexWrapper {
 
     private List<KardexDetailWrapper> detalles;
 
-    public KardexWrapper(String id, java.util.Date fecha, String tipoPago, String factura, Boolean estado, String tipoMov,
+    public KardexWrapper(String id, java.util.Date fecha, Long time, String tipoPago, String factura, Boolean estado, String tipoMov,
                          String persona, String archivesId, List<KardexDetailWrapper> detalles) {
         this.id = id;
         this.fecha = (Date) fecha;
+        this.time=time;
         this.tipoPago=tipoPago;
         this.factura=factura;
         this.estado = estado;

@@ -20,10 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -88,6 +85,38 @@ public class KardexServiceImpl implements KardexService {
             }else{
                 return new ResponseEntity<>(new ArrayList<>(), HttpStatus.UNAUTHORIZED);
             }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<KardexWrapper>> getKardexByDate(){
+        try {
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
+                List<KardexWrapper> kardexI=this.KardexIncome();
+                List<KardexWrapper> kardexO=this.KardexOutcome();
+                List<KardexWrapper> kardexFull=new ArrayList<>();
+                kardexFull.addAll(kardexI);
+                kardexFull.addAll(kardexO);
+                /*Collections.sort(kardexFull, Comparator.comparing(KardexWrapper::getFecha).reversed().
+                        thenComparing(KardexWrapper::getId));*/
+                Collections.sort(kardexFull, Comparator.comparing(KardexWrapper::getFecha).reversed().
+                        thenComparing(KardexWrapper::getTime));
+                /*kardexFull.sort(Comparator.comparing(KardexWrapper::getFecha)
+                        .reversed()
+                        .thenComparing(Comparator.comparing(KardexWrapper::getId, (id1, id2) -> {
+                            // Extraer números del ID y comparar
+                            int num1 = Integer.parseInt(id1.replaceAll("[^0-9]", ""));
+                            int num2 = Integer.parseInt(id2.replaceAll("[^0-9]", ""));
+                            return Integer.compare(num2, num1); // Comparar en orden descendente
+                        }))
+                );*/
+
+                return new ResponseEntity<>(kardexFull, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.UNAUTHORIZED);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -226,7 +255,7 @@ public class KardexServiceImpl implements KardexService {
             String ini="E";
             String KID=kardexId(ini, rawId);
             InDetail=incomeDetailDao.getAllByFk(IW.getId());
-            KW.add(new KardexWrapper(KID, IW.getFecha(), IW.getTipoPago(),"-" ,IW.getEstado(),"Entrada","-",KID,InDetail));
+            KW.add(new KardexWrapper(KID, IW.getFecha() , IW.getFecha().getTime(), IW.getTipoPago(),"-" ,IW.getEstado(),"Entrada","-",KID,InDetail));
         }
         return KW;
     }
@@ -240,7 +269,7 @@ public class KardexServiceImpl implements KardexService {
             String ini="S";
             String KID=kardexId(ini, rawId);
             OutDetail=outcomeDetailDao.getAllByFk(OW.getId());
-            KW.add(new KardexWrapper(KID, OW.getFecha(), OW.getTipoPago(), OW.getFactura() ,OW.getEstado(),"Salida",OW.getClientRazonSocial(),KID,OutDetail));
+            KW.add(new KardexWrapper(KID, OW.getFecha(), OW.getFecha().getTime(), OW.getTipoPago(), OW.getFactura() ,OW.getEstado(),"Salida",OW.getClientRazonSocial(),KID,OutDetail));
         }
         return KW;
     }
@@ -267,7 +296,7 @@ public class KardexServiceImpl implements KardexService {
         String KID=kardexId(ini, rawId);
         OutDetail=outcomeDetailDao.getAllByFk(outcome.getId());
         log.info("Dentro de kardexoutcomebyid "+OutDetail);
-        KW.add(new KardexWrapper(KID, outcome.getFecha(), outcome.getTipoPago(), outcome.getFactura(), outcome.getEstado(),"Salida",outcome.getClient().getRazonSocial(),KID,OutDetail));
+        KW.add(new KardexWrapper(KID, outcome.getFecha(), outcome.getFecha().getTime(), outcome.getTipoPago(), outcome.getFactura(), outcome.getEstado(),"Salida",outcome.getClient().getRazonSocial(),KID,OutDetail));
         return KW;
     }
 
@@ -280,7 +309,7 @@ public class KardexServiceImpl implements KardexService {
         String KID=kardexId(ini, rawId);
         InDetail=incomeDetailDao.getAllByFk(income.getId());
         log.info("Dentro de kardexincomebyid "+InDetail);
-        KW.add(new KardexWrapper(KID, income.getFecha(), income.getTipoPago(), "-", income.getEstado(),"Entrada","-",KID,InDetail));
+        KW.add(new KardexWrapper(KID, income.getFecha(), income.getFecha().getTime(), income.getTipoPago(), "-", income.getEstado(),"Entrada","-",KID,InDetail));
         return KW;
     }
 

@@ -41,6 +41,16 @@ public class KardexRestImpl implements KardexRest {
     }
 
     @Override
+    public ResponseEntity<List<KardexWrapper>> getKardexByDate() {
+        try {
+            return kardexService.getKardexByDate();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
     public ResponseEntity<List<KardexWrapper>> getById(String id) {
         try {
             return kardexService.getById(id);
