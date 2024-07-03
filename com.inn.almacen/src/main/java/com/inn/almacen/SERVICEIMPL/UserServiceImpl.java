@@ -138,7 +138,7 @@ public class UserServiceImpl implements UserService {
             Path filePath = Paths.get(ruta, nombre);
             if (Files.notExists(filePath)) return AlmacenUtils.getResponseEntity("FIRMA NO ENCONTRADA", HttpStatus.NOT_FOUND);
             Files.delete(filePath);
-            return ResponseEntity.ok("FIRMA ELIMINADA CORRECTAMENTE: " +nombre);
+            return AlmacenUtils.getResponseEntity("FIRMA ELIMINADA CORRECTAMENTE: " +nombre, HttpStatus.OK);
         }catch (Exception e){
             e.printStackTrace();
         }
