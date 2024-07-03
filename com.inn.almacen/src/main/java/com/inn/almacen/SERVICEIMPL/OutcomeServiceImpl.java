@@ -291,7 +291,7 @@ public class OutcomeServiceImpl implements OutcomeService {
 
     private boolean validateOutcomeMap(Map<String, String> requestMap, boolean validateId) {
         if(requestMap.containsKey("fecha") && requestMap.containsKey("clientId")
-                && requestMap.containsKey("tipoPago") && requestMap.containsKey("factura")){
+                && requestMap.containsKey("tipoPago")){
             if(requestMap.containsKey("id") && validateId){
                 return true;
             }else if (!validateId){
@@ -311,19 +311,48 @@ public class OutcomeServiceImpl implements OutcomeService {
         String name=jwtFilter.getCurrentUser();
         String sql = "SELECT id FROM user WHERE email = ?";
         Integer userId = jdbcTemplate.queryForObject(sql, new String[]{name}, Integer.class);
+        sql="SELECT COUNT(*) FROM outcome";
+        Integer tot= jdbcTemplate.queryForObject(sql, Integer.class);
         user.setId(userId);
         if(esAdd) outcome.setId(Integer.parseInt(requestMap.get("id")));
         client.setId(Integer.parseInt(requestMap.get("clientId")));
 
         outcome.setFecha(Date.valueOf(requestMap.get("fecha")));
         outcome.setTipoPago(requestMap.get("tipoPago"));
-        outcome.setFactura(requestMap.get("factura"));
+        outcome.setFactura(factura(requestMap.get("fecha"), tot+1));
         outcome.setEstado(requestMap.containsKey("estado") ? Boolean.parseBoolean(requestMap.get("estado")) : false);
         outcome.setClient(client);
         outcome.setUser(user);
         outcome.setUserAuth(userAuth);
 
         return outcome;
+    }
+
+    private String factura(String fecha, Integer rawId){
+        String formattedDate = fecha.replace("-", "");
+        StringBuilder id = new StringBuilder("DNX" +formattedDate);
+        Integer auxId=rawId;
+        if(auxId==0) auxId++;
+        double cont=Math.floor(Math.log10(Math.abs(auxId)) + 1);
+        cont=5-cont;
+        for (Integer i = 0; i<cont; i++){
+            id.append("0");
+        }
+        id.append(rawId);
+        return id.toString();
+    }
+
+    private String factid(String ini, Integer rawId){
+        StringBuilder id = new StringBuilder(ini);
+        Integer auxId=rawId;
+        if(auxId==0) auxId++;
+        double cont=Math.floor(Math.log10(Math.abs(auxId)) + 1);
+        cont=5-cont;
+        for (Integer i = 0; i<cont; i++){
+            id.append("0");
+        }
+        id.append(rawId);
+        return id.toString();
     }
 
     private String kardexId(String ini, Integer rawId){

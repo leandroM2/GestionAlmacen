@@ -109,7 +109,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<String> uploadSign(MultipartFile sign) {
         try {
-            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 if (sign.isEmpty()) return AlmacenUtils.getResponseEntity("EL ARCHIVO DE FIRMA SE ENCUENTRA VACÍO.", HttpStatus.BAD_REQUEST);
                 if (!sign.getContentType().equals("image/png")) return AlmacenUtils.getResponseEntity("SOLO SE PERMITEN ARCHIVOS EN FORMATO PNG.", HttpStatus.BAD_REQUEST);
 
