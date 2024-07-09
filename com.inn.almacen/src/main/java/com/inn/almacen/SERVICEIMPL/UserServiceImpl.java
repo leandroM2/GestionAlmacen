@@ -218,6 +218,10 @@ public class UserServiceImpl implements UserService {
         jdbcTemplate.update(sql, userId);
     }
 
+    private void unauthUser(Integer userId){
+        String sql = "UPDATE user SET estado = false WHERE id = ?";
+        jdbcTemplate.update(sql, userId);
+    }
 
     @Override
     public ResponseEntity<List<UserWrapper>> getAllUser() {
@@ -268,8 +272,9 @@ public class UserServiceImpl implements UserService {
                 if(!optional.isEmpty()){
                     User user=userDao.findByRol(id);
                     if(user.getRol().equalsIgnoreCase("user") || user.getRol().equalsIgnoreCase("admin")){
-                        userDao.deleteById(id);
-                        return AlmacenUtils.getResponseEntity("Usuario eliminado correctamente.", HttpStatus.OK);
+                        //userDao.deleteById(id);
+                        unauthUser(id);
+                        return AlmacenUtils.getResponseEntity("Usuario deshabilitado correctamente.", HttpStatus.OK);
                     }else{
                         return AlmacenUtils.getResponseEntity("No tiene permisos suficientes para eliminar este registro.", HttpStatus.OK);
                     }
@@ -280,8 +285,9 @@ public class UserServiceImpl implements UserService {
                 if(!optional.isEmpty()){
                     User user=userDao.findByRol(id);
                     if(user.getRol().equalsIgnoreCase("user")){
-                        userDao.deleteById(id);
-                        return AlmacenUtils.getResponseEntity("Usuario eliminado correctamente.", HttpStatus.OK);
+                        //userDao.deleteById(id);
+                        unauthUser(id);
+                        return AlmacenUtils.getResponseEntity("Usuario deshabilitado correctamente.", HttpStatus.OK);
                     }else{
                         return AlmacenUtils.getResponseEntity("No tiene permisos suficientes para eliminar este registro.", HttpStatus.OK);
                     }
