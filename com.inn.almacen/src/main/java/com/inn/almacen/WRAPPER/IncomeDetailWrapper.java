@@ -13,6 +13,8 @@ public class IncomeDetailWrapper {
 
     private Float precioVentaUnit;
 
+    private Float oldPrecioVenta;
+
     private Integer saldo;
 
     private Integer incomeId;
@@ -53,7 +55,7 @@ public class IncomeDetailWrapper {
 
     private Integer productSupplierContacto;
 
-    public IncomeDetailWrapper(Integer id, Integer cantidad, Float precioVentaUnit, Integer saldo, Integer incomeId,
+    public IncomeDetailWrapper(Integer id, Integer cantidad, Float precioVentaUnit, Float oldPrecioVenta, Integer saldo, Integer incomeId,
                                java.util.Date incomeFecha, Boolean incomeEstado, Integer incomeUserId,
                                String incomeUserNombre, Integer incomeUserAuthId,
                                String incomeUserAuthNombre, Integer productId, String productNombre,
@@ -64,6 +66,7 @@ public class IncomeDetailWrapper {
         this.id = id;
         this.cantidad = cantidad;
         this.precioVentaUnit = precioVentaUnit;
+        this.oldPrecioVenta=oldPrecioVenta;
         this.saldo=saldo;
         this.incomeId = incomeId;
         this.incomeFecha = (Date) incomeFecha;

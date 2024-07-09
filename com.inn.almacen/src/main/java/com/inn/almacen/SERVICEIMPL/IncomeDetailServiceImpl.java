@@ -133,7 +133,7 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
                     incomeDetail=incomeDetailDao.getById(id);
                     List<IncomeDetailWrapper> myList = new ArrayList<>();
                     myList.add(new IncomeDetailWrapper(incomeDetail.getId(),incomeDetail.getCantidad(),
-                            incomeDetail.getPrecioVentaUnit(), incomeDetail.getSaldo(), incomeDetail.getIncome().getId(),
+                            incomeDetail.getPrecioVentaUnit(), incomeDetail.getOldPrecioVenta(), incomeDetail.getSaldo(), incomeDetail.getIncome().getId(),
                             incomeDetail.getIncome().getFecha(), incomeDetail.getIncome().getEstado(),
                             incomeDetail.getIncome().getUser().getId(), incomeDetail.getIncome().getUser().getNombre(),
                             incomeDetail.getIncome().getUserAuth().getId(), incomeDetail.getIncome().getUserAuth().getNombre(),
@@ -177,6 +177,7 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
         incomeDetail.setIncome(income);
         incomeDetail.setProduct(product);
         incomeDetail.setPrecioVentaUnit(Float.parseFloat(requestMap.get("precioVentaUnit")));
+        incomeDetail.setOldPrecioVenta(product.getPrecio());
         incomeDetail.setSaldo(product.getStock());
         Integer cant=Integer.parseInt(requestMap.get("cantidad"));
         incomeDetail.setCantidad(cant);
