@@ -100,19 +100,8 @@ public class KardexServiceImpl implements KardexService {
                 List<KardexWrapper> kardexFull=new ArrayList<>();
                 kardexFull.addAll(kardexI);
                 kardexFull.addAll(kardexO);
-                /*Collections.sort(kardexFull, Comparator.comparing(KardexWrapper::getFecha).reversed().
-                        thenComparing(KardexWrapper::getId));*/
                 Collections.sort(kardexFull, Comparator.comparing(KardexWrapper::getFecha).reversed().
                         thenComparing(KardexWrapper::getTime));
-                /*kardexFull.sort(Comparator.comparing(KardexWrapper::getFecha)
-                        .reversed()
-                        .thenComparing(Comparator.comparing(KardexWrapper::getId, (id1, id2) -> {
-                            // Extraer números del ID y comparar
-                            int num1 = Integer.parseInt(id1.replaceAll("[^0-9]", ""));
-                            int num2 = Integer.parseInt(id2.replaceAll("[^0-9]", ""));
-                            return Integer.compare(num2, num1); // Comparar en orden descendente
-                        }))
-                );*/
 
                 return new ResponseEntity<>(kardexFull, HttpStatus.OK);
             }

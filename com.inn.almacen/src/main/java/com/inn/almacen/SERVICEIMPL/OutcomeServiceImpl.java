@@ -28,6 +28,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -169,6 +171,10 @@ public class OutcomeServiceImpl implements OutcomeService {
                 Optional optional=outcomeDao.findById(id);
                 if(!optional.isEmpty() && validateDetails(id)){
                     String user=jwtFilter.getCurrentUser();
+                    User u=userDao.findByEmailId(user);
+                    if(validateSign(u.getNombre())){
+                        return AlmacenUtils.getResponseEntity("USUARIO "+jwtFilter.getCurrentUser()+" NO CUENTA CON FIRMA DENTRO DEL SISTEMA.", HttpStatus.CONFLICT);
+                    }
                     updateState(user, id);
                     updateInstance(user, id);
                     return AlmacenUtils.getResponseEntity("Salidas autorizadas por el supervisor "+user, HttpStatus.OK );
@@ -181,6 +187,16 @@ public class OutcomeServiceImpl implements OutcomeService {
             e.printStackTrace();
         }
         return AlmacenUtils.getResponseEntity(AlmacenConstants.ALGO_SALIO_MAL, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private Boolean validateSign(String fileName){
+        String ruta=Paths.get("src", "main", "resources", "templates","auths") + File.separator;
+        fileName=fileName+".png";
+        Path filePath = Paths.get(ruta, fileName);
+        if (!Files.exists(filePath)){
+            return true;
+        }
+        return false;
     }
 
     @Override
