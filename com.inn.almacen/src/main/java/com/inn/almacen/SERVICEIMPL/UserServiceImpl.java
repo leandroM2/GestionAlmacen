@@ -148,6 +148,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<String> authorizeUser(Integer id) {
         try {
+            log.info("ID: "+id);
+            if(id.equals(0)){
+                log.info("Es igual a 0");
+                return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
+            }
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 User myUser=userDao.findByEmailId(jwtFilter.getCurrentUser());
                 User userUpd=userDao.findByRol(id);
