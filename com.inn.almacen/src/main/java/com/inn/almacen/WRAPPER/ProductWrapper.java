@@ -30,6 +30,18 @@ public class ProductWrapper {
 
     private Integer supplierContacto;
 
+    private Integer brandId;
+
+    private String brandName;
+
+    private Integer locationId;
+
+    private String locationFloor;
+
+    private Integer prodId;
+
+    private String prodPrice;
+
     public ProductWrapper(Integer id, String nombre, String color, Float precio,
                           Integer stock, Boolean estado, Integer categoryId, String categoryNombre,
                           Integer supplierId, String supplierRazonSocial, Long supplierRuc, Integer supplierContacto) {

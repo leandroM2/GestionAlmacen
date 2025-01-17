@@ -7,6 +7,13 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.sql.Blob;
 
+//@NamedQuery(name="Prices.getById",query = "select p.prodId, CAST(AES_DECRYPT(p.prodPrice,:prodKey) AS CHAR(100) ) " +
+//        "AS prodPrice from Prices p where p.prodId=:prodId")
+
+//@NamedQuery(name="Prices.getAllPrices",query = "select p.prodId, CAST(AES_DECRYPT(p.prodPrice,:prodKey) AS CHAR(100) )" +
+//        "AS prodPrice from Prices p")
+@NamedQuery(name="Prices.getById",query = "select p from Prices p where p.prodId=:prodId")
+@NamedQuery(name="Prices.getAllPrices",query = "select p from Prices p")
 @Data
 @Entity
 @DynamicUpdate

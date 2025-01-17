@@ -7,6 +7,10 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.io.Serializable;
 
+@NamedQuery(name="Location.getById",query = "select l from Location l where l.locationId=:locationId")
+
+@NamedQuery(name="Location.getAllLocation",query = "select l from Location l")
+
 @Data
 @Entity
 @DynamicUpdate
