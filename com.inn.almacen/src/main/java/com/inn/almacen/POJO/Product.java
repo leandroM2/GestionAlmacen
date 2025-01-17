@@ -21,7 +21,7 @@ public class Product implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Column(name="prodId")
     private Integer id;
 
     @Column(name="prodDesc")
@@ -46,5 +46,17 @@ public class Product implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supplier_fk", nullable = false)
     private Supplier supplier;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_fk", nullable = false)
+    private Brand brand;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_fk", nullable = false)
+    private Location location;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "prices_fk", nullable = false)
+    private Prices prices;
 
 }

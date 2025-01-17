@@ -5,6 +5,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.sql.Blob;
 
 @Data
 @Entity
@@ -20,6 +21,9 @@ public class Prices {
     private Integer prodId;
 
     @Column(name = "prodPrice")
-    private Float prodPrice;
+    private Blob prodPrice;
+
+    @Column(name = "pricesState")
+    private Boolean pricesState;
 
 }

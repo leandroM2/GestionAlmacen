@@ -23,4 +23,7 @@ public class Location implements Serializable {
 
     @Column(name="locationFloor")
     private String locationFloor;
+
+    @Column(name = "locationState")
+    private Boolean locationState;
 }

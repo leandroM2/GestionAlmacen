@@ -9,6 +9,10 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.io.Serializable;
 
+@NamedQuery(name="Brand.getById",query = "select b from Brand b where b.brandId=:brandId")
+
+@NamedQuery(name="Brand.getAllBrand",query = "select b from Brand b")
+
 @Data
 @Entity
 @DynamicInsert
