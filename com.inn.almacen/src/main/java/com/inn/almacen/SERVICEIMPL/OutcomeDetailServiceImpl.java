@@ -142,9 +142,9 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
                             outcomeDetail.getOutcome().getClient().getContacto(), outcomeDetail.getOutcome().getClient().getDireccion(),
                             outcomeDetail.getOutcome().getUser().getId(), outcomeDetail.getOutcome().getUser().getNombre(),
                             outcomeDetail.getOutcome().getUserAuth().getId(), outcomeDetail.getOutcome().getUserAuth().getNombre(), outcomeDetail.getProduct().getId(),
-                            outcomeDetail.getProduct().getNombre(), outcomeDetail.getProduct().getColor(), outcomeDetail.getProduct().getPrecio(),
-                            outcomeDetail.getProduct().getStock(), outcomeDetail.getProduct().getEstado(), outcomeDetail.getProduct().getCategory().getId(),
-                            outcomeDetail.getProduct().getCategory().getNombre(), outcomeDetail.getProduct().getSupplier().getId(),
+                            outcomeDetail.getProduct().getProdDesc(), outcomeDetail.getProduct().getProdCode(), outcomeDetail.getProduct().getPrecio(),
+                            outcomeDetail.getProduct().getStock(), outcomeDetail.getProduct().getEstado(), outcomeDetail.getProduct().getCategory().getCatId(),
+                            outcomeDetail.getProduct().getCategory().getCatName(), outcomeDetail.getProduct().getSupplier().getId(),
                             outcomeDetail.getProduct().getSupplier().getRazonSocial(), outcomeDetail.getProduct().getSupplier().getRuc(),
                             outcomeDetail.getProduct().getSupplier().getContacto()));
                     return new ResponseEntity<>(myList,HttpStatus.OK);

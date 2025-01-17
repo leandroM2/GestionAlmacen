@@ -7,8 +7,8 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.io.Serializable;
 
-@NamedQuery(name = "Product.getById", query = "select new com.inn.almacen.WRAPPER.ProductWrapper(p.id, p.nombre, p.color, p.precio, p.stock, p.estado, p.category.id, p.category.nombre, p.supplier.id, p.supplier.razonSocial, p.supplier.ruc, p.supplier.contacto) from Product p where p.id=:id")
-@NamedQuery(name = "Product.getAllProduct", query = "select new com.inn.almacen.WRAPPER.ProductWrapper(p.id, p.nombre, p.color, p.precio, p.stock, p.estado, p.category.id, p.category.nombre, p.supplier.id, p.supplier.razonSocial, p.supplier.ruc, p.supplier.contacto) from Product p")
+@NamedQuery(name = "Product.getById", query = "select new com.inn.almacen.WRAPPER.ProductWrapper(p.id, p.prodDesc, p.prodCode, p.precio, p.stock, p.estado, p.category.catId, p.category.catName, p.supplier.id, p.supplier.razonSocial, p.supplier.ruc, p.supplier.contacto) from Product p where p.id=:id")
+@NamedQuery(name = "Product.getAllProduct", query = "select new com.inn.almacen.WRAPPER.ProductWrapper(p.id, p.prodDesc, p.prodCode, p.precio, p.stock, p.estado, p.category.catId, p.category.catName, p.supplier.id, p.supplier.razonSocial, p.supplier.ruc, p.supplier.contacto) from Product p")
 
 @Data
 @Entity
@@ -24,19 +24,19 @@ public class Product implements Serializable {
     @Column(name="id")
     private Integer id;
 
-    @Column(name="nombre")
-    private String nombre;
+    @Column(name="prodDesc")
+    private String prodDesc;
 
-    @Column(name = "color")
-    private String color;
+    @Column(name = "prodCode")
+    private String prodCode;
 
     @Column(name = "precio")
     private Float precio;
 
-    @Column(name = "stock")
+    @Column(name = "prodStock")
     private Integer stock;
 
-    @Column(name="estado")
+    @Column(name="prodState")
     private Boolean estado;
 
     @ManyToOne(fetch = FetchType.LAZY)

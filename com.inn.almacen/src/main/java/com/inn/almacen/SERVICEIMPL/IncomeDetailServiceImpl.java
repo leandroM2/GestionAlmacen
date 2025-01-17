@@ -137,9 +137,9 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
                             incomeDetail.getIncome().getFecha(), incomeDetail.getIncome().getEstado(),
                             incomeDetail.getIncome().getUser().getId(), incomeDetail.getIncome().getUser().getNombre(),
                             incomeDetail.getIncome().getUserAuth().getId(), incomeDetail.getIncome().getUserAuth().getNombre(),
-                            incomeDetail.getProduct().getId(), incomeDetail.getProduct().getNombre(), incomeDetail.getProduct().getColor(),
+                            incomeDetail.getProduct().getId(), incomeDetail.getProduct().getProdDesc(), incomeDetail.getProduct().getProdCode(),
                             incomeDetail.getProduct().getPrecio(), incomeDetail.getProduct().getStock(), incomeDetail.getProduct().getEstado(),
-                            incomeDetail.getProduct().getCategory().getId(), incomeDetail.getProduct().getCategory().getNombre(),
+                            incomeDetail.getProduct().getCategory().getCatId(), incomeDetail.getProduct().getCategory().getCatName(),
                             incomeDetail.getProduct().getSupplier().getId(), incomeDetail.getProduct().getSupplier().getRazonSocial(),
                             incomeDetail.getProduct().getSupplier().getRuc(), incomeDetail.getProduct().getSupplier().getContacto()));
                     return new ResponseEntity<>(myList,HttpStatus.OK);

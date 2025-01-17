@@ -94,9 +94,9 @@ public class ProductServiceImpl implements ProductService {
                 if(!optional.isEmpty()){
                     Product product=productDao.getById(id);
                     List<ProductWrapper> myList = new ArrayList<>();
-                    myList.add(new ProductWrapper(product.getId(), product.getNombre(), product.getColor(),
-                            product.getPrecio(), product.getStock(), product.getEstado(), product.getCategory().getId(),
-                            product.getCategory().getNombre(), product.getSupplier().getId(),
+                    myList.add(new ProductWrapper(product.getId(), product.getProdDesc(), product.getProdCode(),
+                            product.getPrecio(), product.getStock(), product.getEstado(), product.getCategory().getCatId(),
+                            product.getCategory().getCatName(), product.getSupplier().getId(),
                             product.getSupplier().getRazonSocial(), product.getSupplier().getRuc(),
                             product.getSupplier().getContacto()));
                     return new ResponseEntity<>(myList,HttpStatus.OK);
@@ -143,7 +143,7 @@ public class ProductServiceImpl implements ProductService {
 
     private Product getProductFromMap(Map<String, String> requestMap, boolean esAdd) {
         Category category=new Category();
-        category.setId(Integer.parseInt(requestMap.get("categoryId")));
+        category.setCatId(Integer.parseInt(requestMap.get("categoryId")));
 
         Supplier supplier=new Supplier();
         supplier.setId(Integer.parseInt(requestMap.get("supplierId")));
@@ -157,10 +157,10 @@ public class ProductServiceImpl implements ProductService {
 
         product.setCategory(category);
         product.setSupplier(supplier);
-        product.setNombre(requestMap.get("nombre"));
+        product.setProdDesc(requestMap.get("nombre"));
         product.setPrecio(Float.parseFloat(requestMap.get("precio")));
         product.setStock(Integer.parseInt(requestMap.get("stock")));
-        product.setColor(requestMap.get("color"));
+        product.setProdCode(requestMap.get("color"));
         return product;
     }
 }

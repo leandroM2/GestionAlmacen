@@ -142,9 +142,9 @@ public class CategoryServiceImpl implements CategoryService {
     private Category getCategoryFromMap(Map<String,String> requestMap, Boolean esAdd){
         Category category= new Category();
         if(esAdd){
-            category.setId(Integer.parseInt(requestMap.get("id")));
+            category.setCatId(Integer.parseInt(requestMap.get("id")));
         }
-        category.setNombre(requestMap.get("nombre"));
+        category.setCatName(requestMap.get("nombre"));
         return category;
     }
 
