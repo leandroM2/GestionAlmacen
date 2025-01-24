@@ -2,21 +2,21 @@ package com.inn.almacen.WRAPPER;
 
 import lombok.Data;
 
+import java.sql.Blob;
+
 
 @Data
 public class ProductWrapper {
 
-    private Integer id;
+    private String id;
 
-    private String nombre;
+    private String prodDesc;
 
-    private String color;
+    private String prodCode;
 
-    private Float precio;
+    private Integer prodStock;
 
-    private Integer stock;
-
-    private Boolean estado;
+    private Boolean prodState;
 
     private Integer categoryId;
 
@@ -38,26 +38,57 @@ public class ProductWrapper {
 
     private String locationFloor;
 
-    private Integer prodId;
+    private String prodId;
+
+    private Blob prodPrices;
 
     private String prodPrice;
 
-    public ProductWrapper(Integer id, String nombre, String color, Float precio,
-                          Integer stock, Boolean estado, Integer categoryId, String categoryNombre,
-                          Integer supplierId, String supplierRazonSocial, Long supplierRuc, Integer supplierContacto) {
-        this.id=id;
-        this.nombre=nombre;
-        this.color=color;
-        this.precio=precio;
-        this.stock=stock;
-        this.estado=estado;
-        this.categoryId=categoryId;
-        this.categoryNombre=categoryNombre;
-        this.supplierId=supplierId;
-        this.supplierRazonSocial=supplierRazonSocial;
-        this.supplierRuc=supplierRuc;
-        this.supplierContacto=supplierContacto;
+    public ProductWrapper(String id, String prodDesc, String prodCode, Integer prodStock, Boolean prodState,
+                          Integer categoryId, String categoryNombre, Integer supplierId, String supplierRazonSocial,
+                          Long supplierRuc, Integer supplierContacto, Integer brandId, String brandName,
+                          Integer locationId, String locationFloor, String prodId, String prodPrice) {
+        this.id = id;
+        this.prodDesc = prodDesc;
+        this.prodCode = prodCode;
+        this.prodStock = prodStock;
+        this.prodState = prodState;
+        this.categoryId = categoryId;
+        this.categoryNombre = categoryNombre;
+        this.supplierId = supplierId;
+        this.supplierRazonSocial = supplierRazonSocial;
+        this.supplierRuc = supplierRuc;
+        this.supplierContacto = supplierContacto;
+        this.brandId = brandId;
+        this.brandName = brandName;
+        this.locationId = locationId;
+        this.locationFloor = locationFloor;
+        this.prodId = prodId;
+        this.prodPrice = prodPrice;
+    }
 
+
+    public ProductWrapper(String id, String prodDesc, String prodCode, Integer prodStock, Boolean prodState,
+                          Integer categoryId, String categoryNombre, Integer supplierId, String supplierRazonSocial,
+                          Long supplierRuc, Integer supplierContacto, Integer brandId, String brandName,
+                          Integer locationId, String locationFloor, String prodId, Blob prodPrices) {
+        this.id = id;
+        this.prodDesc = prodDesc;
+        this.prodCode = prodCode;
+        this.prodStock = prodStock;
+        this.prodState = prodState;
+        this.categoryId = categoryId;
+        this.categoryNombre = categoryNombre;
+        this.supplierId = supplierId;
+        this.supplierRazonSocial = supplierRazonSocial;
+        this.supplierRuc = supplierRuc;
+        this.supplierContacto = supplierContacto;
+        this.brandId = brandId;
+        this.brandName = brandName;
+        this.locationId = locationId;
+        this.locationFloor = locationFloor;
+        this.prodId = prodId;
+        this.prodPrices = prodPrices;
     }
 
 }

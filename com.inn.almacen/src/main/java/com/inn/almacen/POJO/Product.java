@@ -8,19 +8,25 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @NamedQuery(name = "Product.getById",
-        query = "select new com.inn.almacen.WRAPPER.ProductWrapper" +
-                "(p.id, p.prodDesc, p.prodCode, p.precio, p.stock, p.estado, " +
-                "p.category.catId, p.category.catName, " +
-                "p.supplier.id, p.supplier.razonSocial, p.supplier.ruc, p.supplier.contacto)" +
-                "" +
-                " from Product p where p.id=:id")
+        query = "select p from Product p where p.prodId=:prodId")
+
+@NamedQuery(name = "Product.getByIdView",
+        query = "select new com.inn.almacen.WRAPPER.ProductView" +
+                "(p.prodId, p.prodDesc, p.prodCode, p.prodStock, " +
+                "p.prodState, p.category.catId, p.supplier.id," +
+                " p.type.typeId, p.location.locationId)  " +
+                " from Product p where p.prodId=:prodId")
 
 @NamedQuery(name = "Product.getAllProduct",
-        query = "select new com.inn.almacen.WRAPPER.ProductWrapper" +
-                "(p.id, p.prodDesc, p.prodCode, p.precio, p.stock, p.estado, " +
-                "p.category.catId, p.category.catName, " +
-                "p.supplier.id, p.supplier.razonSocial, p.supplier.ruc, p.supplier.contacto)" +
-                " from Product p")
+        query = "select new com.inn.almacen.WRAPPER.ProductView" +
+                "(p.prodId, p.prodDesc, p.prodCode, p.prodStock, " +
+                "p.prodState, p.category.catId, p.supplier.id," +
+                " p.type.typeId, p.location.locationId)  " +
+                "from Product p")
+
+@NamedQuery(name="Product.getCountCorr",
+        query = "select COUNT(p) from Product p where " +
+                "p.prodId like CONCAT(:prodId,'%')")
 
 @Data
 @Entity
@@ -32,9 +38,8 @@ public class Product implements Serializable {
     public static final Long serialVersionUid= 123456L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="prodId")
-    private Integer id;
+    private String prodId;
 
     @Column(name="prodDesc")
     private String prodDesc;
@@ -42,14 +47,11 @@ public class Product implements Serializable {
     @Column(name = "prodCode")
     private String prodCode;
 
-    @Column(name = "precio")
-    private Float precio;
-
     @Column(name = "prodStock")
-    private Integer stock;
+    private Integer prodStock;
 
     @Column(name="prodState")
-    private Boolean estado;
+    private Boolean prodState;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_fk", nullable = false)
@@ -60,8 +62,8 @@ public class Product implements Serializable {
     private Supplier supplier;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "brand_fk", nullable = false)
-    private Brand brand;
+    @JoinColumn(name = "type_fk", nullable = false)
+    private Type type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_fk", nullable = false)

@@ -1,6 +1,5 @@
 package com.inn.almacen.RESTIMPL;
 
-import com.inn.almacen.POJO.Brand;
 import com.inn.almacen.POJO.Location;
 import com.inn.almacen.REST.LocationRest;
 import com.inn.almacen.SERVICE.LocationService;

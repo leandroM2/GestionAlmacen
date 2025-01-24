@@ -248,7 +248,7 @@ public class IncomeServiceImpl implements IncomeService {
 
         for (KardexDetailWrapper KDW: incomeDetailWrappers){
             subtotal=subtotal+KDW.getTotal();
-            incomeOrder.add(new OrderCompraWrapper(String.valueOf(KDW.getProductId()),
+            incomeOrder.add(new OrderCompraWrapper(String.valueOf(KDW.getProdId()),
                     String.valueOf(KDW.getProducto()),
                     String.valueOf(KDW.getCantidad()),
                     String.valueOf(Float.parseFloat(String.format(Locale.US,"%.2f", KDW.getPrecioVenta()))),
@@ -367,19 +367,19 @@ public class IncomeServiceImpl implements IncomeService {
         Integer i=0;
         while(i<ids.size()){;
             IncomeDetail incomeDetail=incomeDetailDao.getById(ids.get(i));
-            updateProduct(incomeDetail.getProduct().getId(), incomeDetail.getId(), incomeDetail.getCantidad(), incomeDetail.getPrecioVentaUnit());
+            updateProduct(incomeDetail.getProduct().getProdId(), incomeDetail.getId(), incomeDetail.getCantidad(), incomeDetail.getPrecioVentaUnit());
             i++;
         }
     }
 
-    private void updateProduct(Integer productId, Integer incomeDetailId, Integer cant, Float precioVentaUnit){
+    private void updateProduct(String productId, Integer incomeDetailId, Integer cant, Float precioVentaUnit){
         log.info("Hemos llegado hasta actualizacion de stock y precio producto.");
         String sql;
         Product product=productDao.getById(productId);
             log.info("Estamos insertando y precios a Income detail.");
-            Integer stock=product.getStock();
+            Integer stock=product.getProdStock();
             stock=stock+cant;
-            Float precio=product.getPrecio();
+            Float precio=0.0f;//product.getPrecio();
             precio=Math.round(((precio+precioVentaUnit)/2) * 100.0f) / 100.0f;
             sql = "UPDATE product SET stock = ?, precio=? WHERE id = ?";
             jdbcTemplate.update(sql, stock, precio, productId);

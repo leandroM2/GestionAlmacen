@@ -7,4 +7,6 @@ public class AlmacenConstants {
     public static final String DATA_INVALIDA="DATA NO ES VÁLIDA.";
 
     public static final String ACCESO_NO_AUTORIZADO="USUARIO NO CUENTA CON LOS PERMISOS NECESARIOS.";
+
+    public static final String CORRELATIVO_DESBORDADO="CORRELATIVOS DESBORDADOS PARA ESTA COMBINACIÓN DE CÓDIGO";
 }

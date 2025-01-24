@@ -7,9 +7,9 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.io.Serializable;
 
-@NamedQuery(name="Supplier.getById",query = "select s from Supplier s where s.id in (select p.supplier from Product p where p.estado=1) and s.id=:id")
+@NamedQuery(name="Supplier.getById",query = "select s from Supplier s where s.id in (select p.supplier from Product p where p.prodState=1) and s.id=:id")
 
-@NamedQuery(name="Supplier.getAllSupplier",query = "select s from Supplier s where s.id in (select p.supplier from Product p where p.estado=1)")
+@NamedQuery(name="Supplier.getAllSupplier",query = "select s from Supplier s where s.id in (select p.supplier from Product p where p.prodState=1)")
 
 
 @Data

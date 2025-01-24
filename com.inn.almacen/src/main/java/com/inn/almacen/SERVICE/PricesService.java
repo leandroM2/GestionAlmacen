@@ -14,7 +14,7 @@ public interface PricesService {
 
     ResponseEntity<String> updatePrices(Map<String, String> requestMap);
 
-    ResponseEntity<String> deletePrices(Integer brandId);
+    ResponseEntity<String> deletePrices(String prodId);
 
-    ResponseEntity<List<PricesWrapper>> getById(Integer brandId);
+    ResponseEntity<List<PricesWrapper>> getById(String prodId);
 }

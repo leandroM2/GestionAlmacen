@@ -19,9 +19,8 @@ public class Prices {
     public static final Long serialVersionUid= 123456L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="prodId")
-    private Integer prodId;
+    private String prodId;
 
     @Column(name = "prodPrice")
     private Blob prodPrice;

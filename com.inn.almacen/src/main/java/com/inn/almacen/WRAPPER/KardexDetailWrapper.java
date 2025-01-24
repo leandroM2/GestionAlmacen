@@ -7,7 +7,7 @@ public class KardexDetailWrapper {
 
     private Integer id;
 
-    private Integer productId;
+    private String prodId;
 
     private String producto;
 
@@ -21,18 +21,18 @@ public class KardexDetailWrapper {
 
     private Float total;
 
-    public KardexDetailWrapper(Integer id, String producto, Integer cantidad, Float precioVenta, Float oldPrecioVenta, Integer saldo, Float total) {
+    public KardexDetailWrapper(Integer id, String producto, Integer cantidad, Float precioVenta, /*Float oldPrecioVenta,*/ Integer saldo, Float total) {
         this.id = id;
         this.producto = producto;
         this.cantidad = cantidad;
         this.precioVenta = precioVenta;
-        this.oldPrecioVenta=oldPrecioVenta;
+        //this.oldPrecioVenta=oldPrecioVenta;
         this.saldo=saldo;
         this.total=total;
     }
 
-    public KardexDetailWrapper(Integer productId, String producto, Integer cantidad, Float precioVenta, Float total){
-        this.productId=productId;
+    public KardexDetailWrapper(String prodId, String producto, Integer cantidad, Float precioVenta, Float total){
+        this.prodId = prodId;
         this.producto=producto;
         this.cantidad=cantidad;
         this.precioVenta=precioVenta;

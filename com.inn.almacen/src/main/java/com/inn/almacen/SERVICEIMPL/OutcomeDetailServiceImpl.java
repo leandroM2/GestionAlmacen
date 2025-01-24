@@ -112,7 +112,7 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
                 Optional optional=outcomeDetailDao.findById(id);
                 OutcomeDetail outcomeDetail=outcomeDetailDao.getById(id);
                 if(!optional.isEmpty()){
-                    String msg=restoreProduct(outcomeDetail.getCantidad(), outcomeDetail.getProduct().getId(), outcomeDetail.getOutcome().getId());
+                    String msg=restoreProduct(outcomeDetail.getCantidad(), outcomeDetail.getProduct().getProdId(), outcomeDetail.getOutcome().getId());
                     outcomeDetailDao.deleteById(id);
                     return AlmacenUtils.getResponseEntity("Salida de producto eliminado correctamente. "+msg, HttpStatus.OK );
                 }
@@ -141,9 +141,9 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
                             outcomeDetail.getOutcome().getClient().getRuc(), outcomeDetail.getOutcome().getClient().getCorreo(),
                             outcomeDetail.getOutcome().getClient().getContacto(), outcomeDetail.getOutcome().getClient().getDireccion(),
                             outcomeDetail.getOutcome().getUser().getId(), outcomeDetail.getOutcome().getUser().getNombre(),
-                            outcomeDetail.getOutcome().getUserAuth().getId(), outcomeDetail.getOutcome().getUserAuth().getNombre(), outcomeDetail.getProduct().getId(),
-                            outcomeDetail.getProduct().getProdDesc(), outcomeDetail.getProduct().getProdCode(), outcomeDetail.getProduct().getPrecio(),
-                            outcomeDetail.getProduct().getStock(), outcomeDetail.getProduct().getEstado(), outcomeDetail.getProduct().getCategory().getCatId(),
+                            outcomeDetail.getOutcome().getUserAuth().getId(), outcomeDetail.getOutcome().getUserAuth().getNombre(), outcomeDetail.getProduct().getProdId(),
+                            outcomeDetail.getProduct().getProdDesc(), outcomeDetail.getProduct().getProdCode(), /*outcomeDetail.getProduct().getPrecio(),*/
+                            outcomeDetail.getProduct().getProdStock(), outcomeDetail.getProduct().getProdState(), outcomeDetail.getProduct().getCategory().getCatId(),
                             outcomeDetail.getProduct().getCategory().getCatName(), outcomeDetail.getProduct().getSupplier().getId(),
                             outcomeDetail.getProduct().getSupplier().getRazonSocial(), outcomeDetail.getProduct().getSupplier().getRuc(),
                             outcomeDetail.getProduct().getSupplier().getContacto()));
@@ -182,12 +182,12 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
         outcomeDetail.setOutcome(outcome);
         outcomeDetail.setProduct(product);
         Integer cant=Integer.parseInt(requestMap.get("cantidad"));
-        outcomeDetail.setSaldo(product.getStock());
+        outcomeDetail.setSaldo(product.getProdStock());
         outcomeDetail.setCantidad(cant);
-        outcomeDetail.setPrecioDeVenta(product.getPrecio());
+        //outcomeDetail.setPrecioDeVenta(product.getPrecio());
         Boolean state=validateState(Integer.parseInt(requestMap.get("outcomeId")));
         if(state){
-            Integer stock=updateProduct(product.getId(), cant, outcomeDetail.getId(), esAdd);
+            Integer stock=updateProduct(product.getProdId(), cant, outcomeDetail.getId(), esAdd);
             outcomeDetail.setSaldo(stock);
         }
         return outcomeDetail;
@@ -200,10 +200,10 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
         return state;
     }
 
-    private Integer updateProduct(Integer id, Integer cant, Integer incomeId, boolean esAdd){
+    private Integer updateProduct(String id, Integer cant, Integer incomeId, boolean esAdd){
         log.info("Hemos llegado hasta actualizacion de stock producto.");
         String sql = "SELECT stock FROM product WHERE id = ?";
-        Integer stock = jdbcTemplate.queryForObject(sql, new Integer[]{id}, Integer.class);
+        Integer stock = jdbcTemplate.queryForObject(sql, new String[]{id}, Integer.class);
         if(esAdd){
             sql = "SELECT cantidad FROM outcome_detail WHERE id = ?";
             Integer oldCant = jdbcTemplate.queryForObject(sql, new Integer[]{incomeId}, Integer.class);
@@ -230,13 +230,13 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
         return stock;
     }
 
-    private String restoreProduct(Integer cant, Integer productId, Integer outcomeId){
+    private String restoreProduct(Integer cant, String productId, Integer outcomeId){
         log.info("Se retirará el stock actualizado en producto si registro fue autorizado");
         String msg;
         Outcome outcome=outcomeDao.getById(outcomeId);
         if(outcome.getEstado()){
             String sql = "SELECT stock from product WHERE id = ?";
-            Integer stock = jdbcTemplate.queryForObject(sql, new Integer[]{productId}, Integer.class);
+            Integer stock = jdbcTemplate.queryForObject(sql, new String[]{productId}, Integer.class);
             stock=stock+cant;
             sql = "UPDATE product SET stock = ? WHERE id = ?";
             jdbcTemplate.update(sql, stock, productId);
@@ -250,7 +250,7 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
     private Boolean validateStock(Integer productId, Integer cant){
         Product product;
         product=productDao.getById(productId);
-        Integer dif=product.getStock()-cant;
+        Integer dif=product.getProdStock()-cant;
         Boolean bool=(dif>200) ? true : false;
         return bool;
     }

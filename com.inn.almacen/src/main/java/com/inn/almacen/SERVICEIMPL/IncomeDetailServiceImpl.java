@@ -108,7 +108,7 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
                 Optional optional=incomeDetailDao.findById(id);
                 IncomeDetail incomeDetail=incomeDetailDao.getById(id);
                 if(!optional.isEmpty()){
-                    String msg=restoreProduct(incomeDetail.getCantidad(), incomeDetail.getProduct().getId(), incomeDetail.getIncome().getId());
+                    String msg=restoreProduct(incomeDetail.getCantidad(), incomeDetail.getProduct().getProdId(), incomeDetail.getIncome().getId());
                     incomeDetailDao.deleteById(id);
                     return AlmacenUtils.getResponseEntity("Ingreso de producto eliminado correctamente. "+msg, HttpStatus.OK );
                 }
@@ -137,8 +137,8 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
                             incomeDetail.getIncome().getFecha(), incomeDetail.getIncome().getEstado(),
                             incomeDetail.getIncome().getUser().getId(), incomeDetail.getIncome().getUser().getNombre(),
                             incomeDetail.getIncome().getUserAuth().getId(), incomeDetail.getIncome().getUserAuth().getNombre(),
-                            incomeDetail.getProduct().getId(), incomeDetail.getProduct().getProdDesc(), incomeDetail.getProduct().getProdCode(),
-                            incomeDetail.getProduct().getPrecio(), incomeDetail.getProduct().getStock(), incomeDetail.getProduct().getEstado(),
+                            incomeDetail.getProduct().getProdId(), incomeDetail.getProduct().getProdDesc(), incomeDetail.getProduct().getProdCode(),
+                            /*incomeDetail.getProduct().getPrecio(),*/ incomeDetail.getProduct().getProdStock(), incomeDetail.getProduct().getProdState(),
                             incomeDetail.getProduct().getCategory().getCatId(), incomeDetail.getProduct().getCategory().getCatName(),
                             incomeDetail.getProduct().getSupplier().getId(), incomeDetail.getProduct().getSupplier().getRazonSocial(),
                             incomeDetail.getProduct().getSupplier().getRuc(), incomeDetail.getProduct().getSupplier().getContacto()));
@@ -177,13 +177,13 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
         incomeDetail.setIncome(income);
         incomeDetail.setProduct(product);
         incomeDetail.setPrecioVentaUnit(Float.parseFloat(requestMap.get("precioVentaUnit")));
-        incomeDetail.setOldPrecioVenta(product.getPrecio());
-        incomeDetail.setSaldo(product.getStock());
+        //incomeDetail.setOldPrecioVenta(product.getPrecio());
+        incomeDetail.setSaldo(product.getProdStock());
         Integer cant=Integer.parseInt(requestMap.get("cantidad"));
         incomeDetail.setCantidad(cant);
         Boolean state=validateState(Integer.parseInt(requestMap.get("incomeId")));
         if(state){
-            Integer stock=updateProduct(product.getId(), cant, incomeDetail.getId(), esAdd);
+            Integer stock=updateProduct(product.getProdId(), cant, incomeDetail.getId(), esAdd);
             incomeDetail.setSaldo(stock);
         }
         return incomeDetail;
@@ -196,10 +196,10 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
         return state;
     }
 
-    private Integer updateProduct(Integer id, Integer cant, Integer incomeId, boolean esAdd){
+    private Integer updateProduct(String id, Integer cant, Integer incomeId, boolean esAdd){
         log.info("Hemos llegado hasta actualizacion de stock producto.");
         String sql = "SELECT stock FROM product WHERE id = ?";
-        Integer stock = jdbcTemplate.queryForObject(sql, new Integer[]{id}, Integer.class);
+        Integer stock = jdbcTemplate.queryForObject(sql, new String[]{id}, Integer.class);
         if(esAdd){
             sql = "SELECT cantidad FROM income_detail WHERE id = ?";
             Integer oldCant = jdbcTemplate.queryForObject(sql, new Integer[]{incomeId}, Integer.class);
@@ -226,13 +226,13 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
         return stock;
     }
 
-    private String restoreProduct(Integer cant, Integer productId, Integer incomeId){
+    private String restoreProduct(Integer cant, String productId, Integer incomeId){
         log.info("Se retirará el stock actualizado en producto si registro fue autorizado");
         String msg;
         Income income=incomeDao.getById(incomeId);
         if(income.getEstado()){
             String sql = "SELECT stock from product WHERE id = ?";
-            Integer stock = jdbcTemplate.queryForObject(sql, new Integer[]{productId}, Integer.class);
+            Integer stock = jdbcTemplate.queryForObject(sql, new String[]{productId}, Integer.class);
             stock=stock-cant;
             sql = "UPDATE product SET stock = ? WHERE id = ?";
             jdbcTemplate.update(sql, stock, productId);

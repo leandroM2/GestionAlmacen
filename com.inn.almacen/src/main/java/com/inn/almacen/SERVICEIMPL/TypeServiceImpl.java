@@ -2,11 +2,11 @@ package com.inn.almacen.SERVICEIMPL;
 
 import com.google.common.base.Strings;
 import com.inn.almacen.JWT.JwtFilter;
-import com.inn.almacen.POJO.Brand;
-import com.inn.almacen.SERVICE.BrandService;
+import com.inn.almacen.POJO.Type;
+import com.inn.almacen.SERVICE.TypeService;
 import com.inn.almacen.UTILS.AlmacenUtils;
 import com.inn.almacen.constens.AlmacenConstants;
-import com.inn.almacen.dao.BrandDao;
+import com.inn.almacen.dao.TypeDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,23 +20,23 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-public class BrandServiceImpl implements BrandService {
+public class TypeServiceImpl implements TypeService {
 
     @Autowired
-    BrandDao brandDao;
+    TypeDao typeDao;
 
     @Autowired
     JwtFilter jwtFilter;
 
     @Override
-    public ResponseEntity<String> addNewBrand(Map<String, String> requestMap) {
-        log.info("Dentro de Add New Brand");
+    public ResponseEntity<String> addNewType(Map<String, String> requestMap) {
+        log.info("Dentro de Add New Type");
         try {
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 if(validateBrandMap(requestMap,false)){
-                    brandDao.save(getBrandFromMap(requestMap,false));
+                    typeDao.save(getBrandFromMap(requestMap,false));
                     return AlmacenUtils.getResponseEntity
-                            ("Nueva marca agregada con exito.", HttpStatus.OK);
+                            ("Nueva tipo agregada con exito.", HttpStatus.OK);
 
                 }
             }else{
@@ -49,31 +49,31 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
-    public ResponseEntity<List<Brand>> getAllBrand(String filterValue) {
-        log.info("Dentro de Get All Brand");
+    public ResponseEntity<List<Type>> getAllType(String filterValue) {
+        log.info("Dentro de Get All Type");
         try {
             if(!Strings.isNullOrEmpty(filterValue) && filterValue.equalsIgnoreCase("true")){
-                return new ResponseEntity<List<Brand>>(brandDao.getAllBrand(),HttpStatus.OK);
+                return new ResponseEntity<List<Type>>(typeDao.getAllType(),HttpStatus.OK);
             }
-            return new ResponseEntity<>(brandDao.findAll(), HttpStatus.OK);
+            return new ResponseEntity<>(typeDao.findAll(), HttpStatus.OK);
 
         }catch (Exception e){
             e.printStackTrace();
         }
-        return new ResponseEntity<List<Brand>>(new ArrayList(),HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<List<Type>>(new ArrayList(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
-    public ResponseEntity<String> updateBrand(Map<String, String> requestMap) {
+    public ResponseEntity<String> updateType(Map<String, String> requestMap) {
         try {
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 if(validateBrandMap(requestMap, true)){
-                    Optional optional = brandDao.findById(Integer.parseInt(requestMap.get("brandId")));
+                    Optional optional = typeDao.findById(Integer.parseInt(requestMap.get("typeId")));
                     if(!optional.isEmpty()){
-                        brandDao.save(getBrandFromMap(requestMap, true));
-                        return AlmacenUtils.getResponseEntity("Marca actualizada correctamente.", HttpStatus.OK);
+                        typeDao.save(getBrandFromMap(requestMap, true));
+                        return AlmacenUtils.getResponseEntity("Tipo actualizada correctamente.", HttpStatus.OK);
                     }else{
-                        return AlmacenUtils.getResponseEntity("Id de Marca no existe.", HttpStatus.OK);
+                        return AlmacenUtils.getResponseEntity("Id de tipo no existe.", HttpStatus.OK);
                     }
                 }
                 return AlmacenUtils.getResponseEntity(AlmacenConstants.DATA_INVALIDA, HttpStatus.BAD_REQUEST);
@@ -87,16 +87,16 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
-    public ResponseEntity<String> deleteBrand(Integer brandId) {
-        log.info("Dentro de delete Brand");
+    public ResponseEntity<String> deleteType(Integer typeId) {
+        log.info("Dentro de delete Type");
         try {
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
-                Optional optional=brandDao.findById(brandId);
+                Optional optional= typeDao.findById(typeId);
                 if(!optional.isEmpty()){
-                    brandDao.save(stateById(brandId));
-                    return AlmacenUtils.getResponseEntity("Estado de marca actualizado correctamente", HttpStatus.OK);
+                    typeDao.save(stateById(typeId));
+                    return AlmacenUtils.getResponseEntity("Estado de tipo actualizado correctamente", HttpStatus.OK);
                 }
-                return AlmacenUtils.getResponseEntity("Id de Marca no existe.", HttpStatus.OK);
+                return AlmacenUtils.getResponseEntity("Id de tipo no existe.", HttpStatus.OK);
             }else{
                 return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
             }
@@ -108,14 +108,14 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
-    public ResponseEntity<List<Brand>> getById(Integer brandId) {
-        log.info("Dentro de get Brand by id");
+    public ResponseEntity<List<Type>> getById(Integer typeId) {
+        log.info("Dentro de get Type by id");
         try {
             if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
-                Optional optional=brandDao.findById(brandId);
+                Optional optional= typeDao.findById(typeId);
                 if(!optional.isEmpty()){
-                    List<Brand> myList = new ArrayList<>();
-                    myList.add(brandDao.getById(brandId));
+                    List<Type> myList = new ArrayList<>();
+                    myList.add(typeDao.getById(typeId));
                     return new ResponseEntity<>(myList,HttpStatus.OK);
                 }
                 return new ResponseEntity<>(new ArrayList<>(),HttpStatus.OK);
@@ -129,8 +129,8 @@ public class BrandServiceImpl implements BrandService {
     }
 
     private boolean validateBrandMap(Map<String, String> requestMap, boolean validateId) {
-        if(requestMap.containsKey("brandName")){
-            if(requestMap.containsKey("brandId") && validateId){
+        if(requestMap.containsKey("typeName")){
+            if(requestMap.containsKey("typeId") && validateId){
                 return true;
             }else if(!validateId){
                 return true;
@@ -139,21 +139,21 @@ public class BrandServiceImpl implements BrandService {
         return false;
     }
 
-    private Brand getBrandFromMap(Map<String, String> requestMap, boolean isUpd) {
-        Brand brand=new Brand();
+    private Type getBrandFromMap(Map<String, String> requestMap, boolean isUpd) {
+        Type type =new Type();
         if(isUpd){
-            brand.setBrandId(Integer.parseInt(requestMap.get("brandId")));
+            type.setTypeId(Integer.parseInt(requestMap.get("typeId")));
         }
-        brand.setBrandName(requestMap.get("brandName"));
-        brand.setBrandState(true);
-        return brand;
+        type.setTypeName(requestMap.get("typeName").toUpperCase());
+        type.setTypeState(true);
+        return type;
     }
 
 
-    private Brand stateById(Integer brandId) {
-        Brand brand;
-        brand=brandDao.getById(brandId);
-        brand.setBrandState(!brand.getBrandState());
-        return brand;
+    private Type stateById(Integer typeId) {
+        Type type;
+        type = typeDao.getById(typeId);
+        type.setTypeState(!type.getTypeState());
+        return type;
     }
 }

@@ -52,9 +52,9 @@ public class ProductRestImpl implements ProductRest {
     }
 
     @Override
-    public ResponseEntity<String> deleteProduct(Integer id) {
+    public ResponseEntity<String> deleteProduct(String prodId) {
         try {
-            return productService.deleteProduct(id);
+            return productService.deleteProduct(prodId);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -62,9 +62,9 @@ public class ProductRestImpl implements ProductRest {
     }
 
     @Override
-    public ResponseEntity<List<ProductWrapper>> getById(Integer id) {
+    public ResponseEntity<List<ProductWrapper>> getById(String prodId) {
         try {
-            return productService.getById(id);
+            return productService.getById(prodId);
 
         }catch (Exception e){
             e.printStackTrace();

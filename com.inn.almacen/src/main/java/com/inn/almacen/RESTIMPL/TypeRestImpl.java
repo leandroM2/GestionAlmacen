@@ -1,8 +1,8 @@
 package com.inn.almacen.RESTIMPL;
 
-import com.inn.almacen.POJO.Brand;
-import com.inn.almacen.REST.BrandRest;
-import com.inn.almacen.SERVICE.BrandService;
+import com.inn.almacen.POJO.Type;
+import com.inn.almacen.REST.TypeRest;
+import com.inn.almacen.SERVICE.TypeService;
 import com.inn.almacen.UTILS.AlmacenUtils;
 import com.inn.almacen.constens.AlmacenConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +15,15 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-public class BrandRestImpl implements BrandRest {
+public class TypeRestImpl implements TypeRest {
 
     @Autowired
-    BrandService brandService;
+    TypeService typeService;
 
     @Override
-    public ResponseEntity<String> addNewBrand(Map<String, String> requestMap) {
+    public ResponseEntity<String> addNewType(Map<String, String> requestMap) {
         try {
-            return brandService.addNewBrand(requestMap);
+            return typeService.addNewType(requestMap);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -31,9 +31,9 @@ public class BrandRestImpl implements BrandRest {
     }
 
     @Override
-    public ResponseEntity<List<Brand>> getAllBrand(String filterValue) {
+    public ResponseEntity<List<Type>> getAllType(String filterValue) {
         try {
-            return brandService.getAllBrand(filterValue);
+            return typeService.getAllType(filterValue);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -41,9 +41,9 @@ public class BrandRestImpl implements BrandRest {
     }
 
     @Override
-    public ResponseEntity<String> updateBrand(Map<String, String> requestMap) {
+    public ResponseEntity<String> updateType(Map<String, String> requestMap) {
         try {
-            return brandService.updateBrand(requestMap);
+            return typeService.updateType(requestMap);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -51,9 +51,9 @@ public class BrandRestImpl implements BrandRest {
     }
 
     @Override
-    public ResponseEntity<String> deleteBrand(Integer brandId) {
+    public ResponseEntity<String> deleteType(Integer typeId) {
         try {
-            return brandService.deleteBrand(brandId);
+            return typeService.deleteType(typeId);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -61,13 +61,13 @@ public class BrandRestImpl implements BrandRest {
     }
 
     @Override
-    public ResponseEntity<List<Brand>> getById(Integer brandId) {
+    public ResponseEntity<List<Type>> getById(Integer typeId) {
         try {
-            return brandService.getById(brandId);
+            return typeService.getById(typeId);
 
         }catch (Exception e){
             e.printStackTrace();
         }
-        return new ResponseEntity<List<Brand>>( new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<List<Type>>( new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

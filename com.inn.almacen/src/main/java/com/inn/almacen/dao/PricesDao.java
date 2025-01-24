@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface PricesDao extends JpaRepository<Prices, Integer> {
 
-    Prices getById(@Param("prodId") Integer prodId);
+    Prices getById(@Param("prodId") String prodId);
 
     List<Prices> getAllPrices();
 

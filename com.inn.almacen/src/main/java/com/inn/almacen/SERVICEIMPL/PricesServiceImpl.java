@@ -4,11 +4,9 @@ import com.google.common.base.Strings;
 import com.inn.almacen.JWT.Jasypt;
 import com.inn.almacen.JWT.JwtFilter;
 import com.inn.almacen.POJO.Prices;
-import com.inn.almacen.POJO.User;
 import com.inn.almacen.SERVICE.PricesService;
 import com.inn.almacen.UTILS.AlmacenUtils;
 import com.inn.almacen.WRAPPER.PricesWrapper;
-import com.inn.almacen.WRAPPER.UserWrapper;
 import com.inn.almacen.constens.AlmacenConstants;
 import com.inn.almacen.dao.PricesDao;
 import lombok.extern.slf4j.Slf4j;
@@ -42,8 +40,8 @@ public class PricesServiceImpl implements PricesService {
         log.info("Dentro de Add New Prices");
         try {
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
-                if(validatePricesMap(requestMap,false)){
-                    pricesDao.save(getPricesFromMap(requestMap,false));
+                if(validatePricesMap(requestMap)){
+                    pricesDao.save(getPricesFromMap(requestMap));
                     return AlmacenUtils.getResponseEntity
                             ("Nueva precio agregado con exito.", HttpStatus.OK);
                 }
@@ -75,10 +73,10 @@ public class PricesServiceImpl implements PricesService {
     public ResponseEntity<String> updatePrices(Map<String, String> requestMap) {
         try {
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
-                if(validatePricesMap(requestMap, true)){
-                    Optional optional = pricesDao.findById(Integer.parseInt(requestMap.get("prodId")));
-                    if(!optional.isEmpty()){
-                        pricesDao.save(getPricesFromMap(requestMap, true));
+                if(validatePricesMap(requestMap)){
+                    Prices pp = pricesDao.getById(requestMap.get("prodId"));
+                    if(!pp.getProdId().isEmpty()){
+                        pricesDao.save(getPricesFromMap(requestMap));
                         return AlmacenUtils.getResponseEntity("Precio actualizado correctamente.", HttpStatus.OK);
                     }else{
                         return AlmacenUtils.getResponseEntity("Id de Producto no existe.", HttpStatus.OK);
@@ -95,12 +93,12 @@ public class PricesServiceImpl implements PricesService {
     }
 
     @Override
-    public ResponseEntity<String> deletePrices(Integer prodId) {
-        log.info("Dentro de delete Brand");
+    public ResponseEntity<String> deletePrices(String prodId) {
+        log.info("Dentro de delete Type");
         try {
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
-                Optional optional=pricesDao.findById(prodId);
-                if(!optional.isEmpty()){
+                Prices pp=pricesDao.getById(prodId);
+                if(!pp.getProdId().isEmpty()){
                     pricesDao.save(stateById(prodId));
                     return AlmacenUtils.getResponseEntity("Estado de marca actualizado correctamente", HttpStatus.OK);
                 }
@@ -116,12 +114,12 @@ public class PricesServiceImpl implements PricesService {
     }
 
     @Override
-    public ResponseEntity<List<PricesWrapper>> getById(Integer prodId) {
+    public ResponseEntity<List<PricesWrapper>> getById(String prodId) {
         log.info("Dentro de get price by id");
         try {
             if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
-                Optional optional=pricesDao.findById(prodId);
-                if(!optional.isEmpty()){
+                Prices pp=pricesDao.getById(prodId);
+                if(!pp.getProdId().isEmpty()){
                     Prices prices=pricesDao.getById(prodId);
                     List<PricesWrapper> myList = new ArrayList<>();
                     myList.add(new PricesWrapper(prices.getProdId(),Float.valueOf(jasypt.decrypting(prices.getProdPrice())), prices.getPricesState()));
@@ -137,24 +135,21 @@ public class PricesServiceImpl implements PricesService {
         return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    private boolean validatePricesMap(Map<String, String> requestMap, boolean validateId) {
-        if(requestMap.containsKey("prodPrice")){
-            if(requestMap.containsKey("prodId") && validateId){
-                return true;
-            }else if(!validateId){
-                return true;
-            }
+    private boolean validatePricesMap(Map<String, String> requestMap) {
+        if(requestMap.containsKey("prodPrice") && requestMap.containsKey("prodId")){
+            return true;
+        }else{
+            return false;
         }
-        return false;
     }
 
-    private Prices getPricesFromMap(Map<String, String> requestMap, boolean isUpd) {
+    private Prices getPricesFromMap(Map<String, String> requestMap) {
         Prices prices=new Prices();
         String unitPrice;
-        if(isUpd){
-            prices.setProdId(Integer.parseInt(requestMap.get("prodId")));
-        }
+
+        prices.setProdId(requestMap.get("prodId"));
         prices.setPricesState(true);
+
         unitPrice=requestMap.get("prodPrice");
         try{
             unitPrice=jasypt.encrypting(unitPrice);
@@ -167,7 +162,7 @@ public class PricesServiceImpl implements PricesService {
         return prices;
     }
 
-    private Prices stateById(Integer prodId) {
+    private Prices stateById(String prodId) {
         Prices prices;
         prices=pricesDao.getById(prodId);
         prices.setPricesState(!prices.getPricesState());

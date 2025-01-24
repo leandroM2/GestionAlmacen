@@ -41,13 +41,11 @@ public class OutcomeDetailWrapper {
 
     private String outcomeUserAuthNombre;
 
-    private Integer productId;
+    private String productId;
 
     private String productNombre;
 
     private String productColor;
-
-    private Float productPrecio;
 
     private Integer productStock;
 
@@ -69,8 +67,8 @@ public class OutcomeDetailWrapper {
                                 Boolean outcomeEstado, Integer outcomeClientId, String outcomeClientRazonSocial, Long outcomeClientRuc,
                                 String outcomeClientCorreo, Integer outcomeClientContacto, String outcomeClientDireccion,
                                 Integer outcomeUserId, String outcomeUserNombre, Integer outcomeUserAuthId,
-                                String outcomeUserAuthNombre, Integer productId, String productNombre,
-                                String productColor, Float productPrecio, Integer productStock, Boolean productEstado,
+                                String outcomeUserAuthNombre, String productId, String productNombre,
+                                String productColor, Integer productStock, Boolean productEstado,
                                 Integer productCategoryId, String productCategoryNombre, Integer productSupplierId,
                                 String productSupplierRazonSocial, Long productSupplierRuc,
                                 Integer productSupplierContacto) {
@@ -94,7 +92,6 @@ public class OutcomeDetailWrapper {
         this.productId = productId;
         this.productNombre = productNombre;
         this.productColor = productColor;
-        this.productPrecio = productPrecio;
         this.productStock = productStock;
         this.productEstado = productEstado;
         this.productCategoryId = productCategoryId;

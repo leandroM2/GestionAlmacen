@@ -402,17 +402,17 @@ public class OutcomeServiceImpl implements OutcomeService {
         Integer i=0;
         while(i<ids.size()){;
             OutcomeDetail outcomeDetail=outcomeDetailDao.getById(ids.get(i));
-            updateProduct(outcomeDetail.getProduct().getId(), outcomeDetail.getId(), outcomeDetail.getCantidad());
+            updateProduct(outcomeDetail.getProduct().getProdId(), outcomeDetail.getId(), outcomeDetail.getCantidad());
             i++;
         }
     }
 
-    private void updateProduct(Integer productId, Integer outcomeDetailId, Integer cant){
+    private void updateProduct(String productId, Integer outcomeDetailId, Integer cant){
         log.info("Hemos llegado hasta actualizacion de stock y precio producto.");
         String sql;
         Product product=productDao.getById(productId);
         log.info("Estamos insertando y precios a Outcome detail.");
-        Integer stock=product.getStock();
+        Integer stock=product.getProdStock();
         stock=stock-cant;
         sql = "UPDATE product SET stock = ? WHERE id = ?";
         jdbcTemplate.update(sql, stock, productId);
