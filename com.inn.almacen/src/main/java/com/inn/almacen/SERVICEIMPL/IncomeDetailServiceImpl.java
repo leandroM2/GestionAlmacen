@@ -1,16 +1,13 @@
 package com.inn.almacen.SERVICEIMPL;
 
+import com.inn.almacen.JWT.Jasypt;
 import com.inn.almacen.JWT.JwtFilter;
-import com.inn.almacen.POJO.Income;
-import com.inn.almacen.POJO.IncomeDetail;
-import com.inn.almacen.POJO.Product;
+import com.inn.almacen.POJO.*;
 import com.inn.almacen.SERVICE.IncomeDetailService;
 import com.inn.almacen.UTILS.AlmacenUtils;
-import com.inn.almacen.WRAPPER.IncomeDetailWrapper;
+import com.inn.almacen.WRAPPER.*;
 import com.inn.almacen.constens.AlmacenConstants;
-import com.inn.almacen.dao.IncomeDao;
-import com.inn.almacen.dao.IncomeDetailDao;
-import com.inn.almacen.dao.ProductDao;
+import com.inn.almacen.dao.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,10 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+
 @Slf4j
 @Service
 public class IncomeDetailServiceImpl implements IncomeDetailService {
@@ -39,6 +34,27 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     JwtFilter jwtFilter;
+
+    @Autowired
+    Jasypt jasypt;
+
+    @Autowired
+    CategoryDao cd;
+
+    @Autowired
+    SupplierDao sd;
+
+    @Autowired
+    LocationDao ld;
+
+    @Autowired
+    TypeDao td;
+
+    @Autowired
+    PricesDao pd;
+
+    @Autowired
+    UserDao ud;
 
     @Override
     public ResponseEntity<String> addNewIncomeDetail(Map<String, String> requestMap) {
@@ -62,9 +78,12 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
 
     @Override
     public ResponseEntity<List<IncomeDetailWrapper>> getAllIncomeDetail() {
+    //public ResponseEntity<List<IncomeDetailView>> getAllIncomeDetail() {
         try {
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
-                return new ResponseEntity<>(incomeDetailDao.getAllIncomeDetail(), HttpStatus.OK);
+                List<IncomeDetailView> idv=incomeDetailDao.getAllIncomeDetail();
+                return new ResponseEntity<>(incomeDetailBuilder(idv), HttpStatus.OK);
+                //return new ResponseEntity<>(incomeDetailDao.getAllIncomeDetail(), HttpStatus.OK);
             }else{
                 return new ResponseEntity<>(new ArrayList<>(), HttpStatus.UNAUTHORIZED);
             }
@@ -138,10 +157,12 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
                             incomeDetail.getIncome().getUser().getId(), incomeDetail.getIncome().getUser().getNombre(),
                             incomeDetail.getIncome().getUserAuth().getId(), incomeDetail.getIncome().getUserAuth().getNombre(),
                             incomeDetail.getProduct().getProdId(), incomeDetail.getProduct().getProdDesc(), incomeDetail.getProduct().getProdCode(),
-                            /*incomeDetail.getProduct().getPrecio(),*/ incomeDetail.getProduct().getProdStock(), incomeDetail.getProduct().getProdState(),
+                            incomeDetail.getProduct().getProdStock(), incomeDetail.getProduct().getProdState(),
                             incomeDetail.getProduct().getCategory().getCatId(), incomeDetail.getProduct().getCategory().getCatName(),
                             incomeDetail.getProduct().getSupplier().getId(), incomeDetail.getProduct().getSupplier().getRazonSocial(),
-                            incomeDetail.getProduct().getSupplier().getRuc(), incomeDetail.getProduct().getSupplier().getContacto()));
+                            incomeDetail.getProduct().getSupplier().getRuc(), incomeDetail.getProduct().getSupplier().getContacto(),
+                            incomeDetail.getProduct().getType().getTypeId(), incomeDetail.getProduct().getType().getTypeName(),
+                            incomeDetail.getProduct().getLocation().getLocationId(), incomeDetail.getProduct().getLocation().getLocationFloor()));
                     return new ResponseEntity<>(myList,HttpStatus.OK);
                 }
                 return new ResponseEntity<>(new ArrayList<>(),HttpStatus.OK);
@@ -170,14 +191,14 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
         Income income=new Income();
         income.setId(Integer.parseInt(requestMap.get("incomeId")));
 
-        Product product=productDao.getById(Integer.parseInt(requestMap.get("productId")));
+        Product product=productDao.getById(requestMap.get("productId"));
 
         IncomeDetail incomeDetail=new IncomeDetail();
         if(esAdd) incomeDetail.setId(Integer.parseInt(requestMap.get("id")));
         incomeDetail.setIncome(income);
         incomeDetail.setProduct(product);
         incomeDetail.setPrecioVentaUnit(Float.parseFloat(requestMap.get("precioVentaUnit")));
-        //incomeDetail.setOldPrecioVenta(product.getPrecio());
+        incomeDetail.setOldPrecioVenta(Float.valueOf(jasypt.decrypting(product.getPrices().getProdPrice())));
         incomeDetail.setSaldo(product.getProdStock());
         Integer cant=Integer.parseInt(requestMap.get("cantidad"));
         incomeDetail.setCantidad(cant);
@@ -241,5 +262,32 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
             msg="Stock de productos no fueron modificados debido a que el registro nunca fue autorizado";
         }
         return msg;
+    }
+
+    private List<IncomeDetailWrapper> incomeDetailBuilder(List<IncomeDetailView> idv){
+
+        List<IncomeDetailWrapper> idw = new ArrayList<>();
+
+        Iterator<IncomeDetailView> iterator = idv.iterator();
+        while (iterator.hasNext()) {
+            IncomeDetailView unit = iterator.next();
+            Income i=incomeDao.getById(unit.getIncomeId());
+            User u=ud.getById(i.getUser().getId());
+            User uauth=ud.getById(i.getUserAuth().getId());
+            Product prod=productDao.getById(unit.getProdId());
+            Category c=cd.getById(prod.getCategory().getCatId());
+            Supplier s=sd.getById(prod.getSupplier().getId());
+            Type t=td.getById(prod.getType().getTypeId());
+            Location l=ld.getById(prod.getLocation().getLocationId());
+            Prices p=pd.getById(unit.getProdId());
+            idw.add(new IncomeDetailWrapper
+                    (unit.getId(), unit.getCantidad(), unit.getPrecioVentaUnit(), unit.getOldPrecioVenta(),
+                    unit.getSaldo(), i.getId(), i.getFecha(), i.getEstado(), u.getId(), u.getNombre(),
+                    uauth.getId(), uauth.getNombre(), prod.getProdId(), prod.getProdDesc(), prod.getProdCode(),
+                    prod.getProdStock(), prod.getProdState(), c.getCatId(), c.getCatName(), s.getId(),
+                    s.getRazonSocial(), s.getRuc(), s.getContacto(), t.getTypeId(), t.getTypeName(), l.getLocationId(),
+                    l.getLocationFloor()));
+        }
+        return idw;
     }
 }

@@ -1,5 +1,6 @@
 package com.inn.almacen.REST;
 
+import com.inn.almacen.WRAPPER.IncomeDetailView;
 import com.inn.almacen.WRAPPER.IncomeDetailWrapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ public interface IncomeDetailRest {
 
     @GetMapping(path = "/get")
     ResponseEntity<List<IncomeDetailWrapper>> getAllIncomeDetail();
+    //ResponseEntity<List<IncomeDetailView>> getAllIncomeDetail();
 
     @PostMapping(path = "/update")
     ResponseEntity<String> updateIncomeDetail(@RequestBody Map<String, String> requestMap);

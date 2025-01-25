@@ -7,9 +7,30 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.io.Serializable;
 
-@NamedQuery(name = "OutcomeDetail.getById", query = "select new com.inn.almacen.WRAPPER.OutcomeDetailWrapper(i.id, i.cantidad, i.precioDeVenta, i.saldo, i.outcome.id, i.outcome.fecha, i.outcome.estado, i.outcome.client.id, i.outcome.client.razonSocial, i.outcome.client.ruc, i.outcome.client.correo, i.outcome.client.contacto, i.outcome.client.direccion, i.outcome.user.id, i.outcome.user.nombre, i.outcome.userAuth.id, i.outcome.userAuth.nombre, i.product.prodId, i.product.prodDesc, i.product.prodCode, i.product.prodStock, i.product.prodState, i.product.category.catId, i.product.category.catName, i.product.supplier.id, i.product.supplier.razonSocial, i.product.supplier.ruc, i.product.supplier.contacto) from OutcomeDetail i where i.id=:id")
-@NamedQuery(name = "OutcomeDetail.getAllOutcomeDetail", query = "select new com.inn.almacen.WRAPPER.OutcomeDetailWrapper(i.id, i.cantidad, i.precioDeVenta, i.saldo, i.outcome.id, i.outcome.fecha, i.outcome.estado, i.outcome.client.id, i.outcome.client.razonSocial, i.outcome.client.ruc, i.outcome.client.correo, i.outcome.client.contacto, i.outcome.client.direccion, i.outcome.user.id, i.outcome.user.nombre, i.outcome.userAuth.id, i.outcome.userAuth.nombre, i.product.prodId,  i.product.prodDesc, i.product.prodCode, i.product.prodStock, i.product.prodState, i.product.category.catId, i.product.category.catName, i.product.supplier.id, i.product.supplier.razonSocial, i.product.supplier.ruc, i.product.supplier.contacto) from OutcomeDetail i")
-@NamedQuery(name = "OutcomeDetail.getAllByFk", query = "select new com.inn.almacen.WRAPPER.KardexDetailWrapper(i.id, i.product.prodDesc, i.cantidad, i.precioDeVenta, i.saldo, i.cantidad*i.precioDeVenta) from OutcomeDetail i where i.outcome.id=:outcome_fk")
+@NamedQuery(name = "OutcomeDetail.getById",
+        query = "select o from OutcomeDetail o where o.id=:id")
+
+//@NamedQuery(name = "OutcomeDetail.getById", query = "select new com.inn.almacen.WRAPPER.OutcomeDetailWrapper(i.id, i.cantidad, i.precioDeVenta, i.saldo, i.outcome.id, i.outcome.fecha, i.outcome.estado, i.outcome.client.id, i.outcome.client.razonSocial, i.outcome.client.ruc, i.outcome.client.correo, i.outcome.client.contacto, i.outcome.client.direccion, i.outcome.user.id, i.outcome.user.nombre, i.outcome.userAuth.id, i.outcome.userAuth.nombre, i.product.prodId, i.product.prodDesc, i.product.prodCode, i.product.prodStock, i.product.prodState, i.product.category.catId, i.product.category.catName, i.product.supplier.id, i.product.supplier.razonSocial, i.product.supplier.ruc, i.product.supplier.contacto) from OutcomeDetail i where i.id=:id")
+
+@NamedQuery(name = "OutcomeDetail.getByIdView",
+        query = "select new com.inn.almacen.WRAPPER.OutcomeDetailView "+
+                "(o.id, o.cantidad, o.precioDeVenta, o.saldo, o.outcome.id, "+
+                "o.product.prodId) "+
+                "from OutcomeDetail o where o.id=:id")
+
+//@NamedQuery(name = "OutcomeDetail.getAllOutcomeDetail", query = "select new com.inn.almacen.WRAPPER.OutcomeDetailWrapper(i.id, i.cantidad, i.precioDeVenta, i.saldo, i.outcome.id, i.outcome.fecha, i.outcome.estado, i.outcome.client.id, i.outcome.client.razonSocial, i.outcome.client.ruc, i.outcome.client.correo, i.outcome.client.contacto, i.outcome.client.direccion, i.outcome.user.id, i.outcome.user.nombre, i.outcome.userAuth.id, i.outcome.userAuth.nombre, i.product.prodId,  i.product.prodDesc, i.product.prodCode, i.product.prodStock, i.product.prodState, i.product.category.catId, i.product.category.catName, i.product.supplier.id, i.product.supplier.razonSocial, i.product.supplier.ruc, i.product.supplier.contacto) from OutcomeDetail i")
+
+@NamedQuery(name = "OutcomeDetail.getAllOutcomeDetail",
+        query = "select new com.inn.almacen.WRAPPER.OutcomeDetailView "+
+                "(o.id, o.cantidad, o.precioDeVenta, o.saldo, o.outcome.id, "+
+                "o.product.prodId) "+
+                "from OutcomeDetail o")
+
+@NamedQuery(name = "OutcomeDetail.getAllByFk",
+        query = "select new com.inn.almacen.WRAPPER.KardexDetailWrapper" +
+                "(i.id, i.product.prodId, i.product.prodDesc, i.cantidad, " +
+                "i.precioDeVenta, i.saldo, i.cantidad*i.precioDeVenta) from OutcomeDetail i " +
+                "where i.outcome.id=:outcome_fk")
 
 @Data
 @Entity

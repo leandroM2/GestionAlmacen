@@ -63,22 +63,31 @@ public class OutcomeDetailWrapper {
 
     private Integer productSupplierContacto;
 
-    public OutcomeDetailWrapper(Integer id, Integer cantidad, Float precioDeVenta, Integer saldo, Integer outcomeId, java.util.Date outcomeFecha,
-                                Boolean outcomeEstado, Integer outcomeClientId, String outcomeClientRazonSocial, Long outcomeClientRuc,
-                                String outcomeClientCorreo, Integer outcomeClientContacto, String outcomeClientDireccion,
-                                Integer outcomeUserId, String outcomeUserNombre, Integer outcomeUserAuthId,
-                                String outcomeUserAuthNombre, String productId, String productNombre,
-                                String productColor, Integer productStock, Boolean productEstado,
-                                Integer productCategoryId, String productCategoryNombre, Integer productSupplierId,
-                                String productSupplierRazonSocial, Long productSupplierRuc,
-                                Integer productSupplierContacto) {
+    private Integer typeId;
+
+    private String typeName;
+
+    private Integer locationId;
+
+    private String locationName;
+
+    public OutcomeDetailWrapper(Integer id, Integer cantidad, Float precioDeVenta, Integer saldo, Integer outcomeId,
+                                Date outcomeFecha, Boolean outcomeEstado, Integer outcomeClientId,
+                                String outcomeClientRazonSocial, Long outcomeClientRuc, String outcomeClientCorreo,
+                                Integer outcomeClientContacto, String outcomeClientDireccion, Integer outcomeUserId,
+                                String outcomeUserNombre, Integer outcomeUserAuthId, String outcomeUserAuthNombre,
+                                String productId, String productNombre, String productColor, Integer productStock,
+                                Boolean productEstado, Integer productCategoryId, String productCategoryNombre,
+                                Integer productSupplierId, String productSupplierRazonSocial, Long productSupplierRuc,
+                                Integer productSupplierContacto, Integer typeId, String typeName, Integer locationId,
+                                String locationName) {
         this.id = id;
         this.cantidad = cantidad;
         this.precioDeVenta = precioDeVenta;
-        this.saldo=saldo;
+        this.saldo = saldo;
         this.outcomeId = outcomeId;
-        this.outcomeFecha = (Date) outcomeFecha;
-        this.outcomeEstado= outcomeEstado;
+        this.outcomeFecha = outcomeFecha;
+        this.outcomeEstado = outcomeEstado;
         this.outcomeClientId = outcomeClientId;
         this.outcomeClientRazonSocial = outcomeClientRazonSocial;
         this.outcomeClientRuc = outcomeClientRuc;
@@ -100,5 +109,9 @@ public class OutcomeDetailWrapper {
         this.productSupplierRazonSocial = productSupplierRazonSocial;
         this.productSupplierRuc = productSupplierRuc;
         this.productSupplierContacto = productSupplierContacto;
+        this.typeId = typeId;
+        this.typeName = typeName;
+        this.locationId = locationId;
+        this.locationName = locationName;
     }
 }

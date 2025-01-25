@@ -53,6 +53,15 @@ public class IncomeDetailWrapper {
 
     private Integer productSupplierContacto;
 
+    private Integer typeId;
+
+    private String typeName;
+
+    private Integer locationId;
+
+    private String locationFloor;
+
+
     public IncomeDetailWrapper(Integer id, Integer cantidad, Float precioVentaUnit, Float oldPrecioVenta, Integer saldo, Integer incomeId,
                                java.util.Date incomeFecha, Boolean incomeEstado, Integer incomeUserId,
                                String incomeUserNombre, Integer incomeUserAuthId,
@@ -60,7 +69,8 @@ public class IncomeDetailWrapper {
                                String productColor, Integer productStock,
                                Boolean productEstado, Integer productCategoryId, String productCategoryNombre,
                                Integer productSupplierId, String productSupplierRazonSocial,
-                               Long productSupplierRuc, Integer productSupplierContacto) {
+                               Long productSupplierRuc, Integer productSupplierContacto,
+                               Integer typeId, String typeName, Integer locationId, String locationFloor) {
         this.id = id;
         this.cantidad = cantidad;
         this.precioVentaUnit = precioVentaUnit;
@@ -84,5 +94,9 @@ public class IncomeDetailWrapper {
         this.productSupplierRazonSocial = productSupplierRazonSocial;
         this.productSupplierRuc = productSupplierRuc;
         this.productSupplierContacto = productSupplierContacto;
+        this.typeId = typeId;
+        this.typeName = typeName;
+        this.locationId = locationId;
+        this.locationFloor = locationFloor;
     }
 }

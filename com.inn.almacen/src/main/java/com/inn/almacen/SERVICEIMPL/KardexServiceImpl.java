@@ -1,18 +1,17 @@
 package com.inn.almacen.SERVICEIMPL;
 
+import com.inn.almacen.JWT.Jasypt;
 import com.inn.almacen.JWT.JwtFilter;
 import com.inn.almacen.POJO.Income;
 import com.inn.almacen.POJO.Outcome;
+import com.inn.almacen.POJO.Product;
 import com.inn.almacen.SERVICE.IncomeService;
 import com.inn.almacen.SERVICE.KardexService;
 import com.inn.almacen.SERVICE.OutcomeService;
 import com.inn.almacen.UTILS.AlmacenUtils;
 import com.inn.almacen.WRAPPER.*;
 import com.inn.almacen.constens.AlmacenConstants;
-import com.inn.almacen.dao.IncomeDao;
-import com.inn.almacen.dao.IncomeDetailDao;
-import com.inn.almacen.dao.OutcomeDao;
-import com.inn.almacen.dao.OutcomeDetailDao;
+import com.inn.almacen.dao.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,6 +48,13 @@ public class KardexServiceImpl implements KardexService {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    ProductDao productDao;
+
+    @Autowired
+    Jasypt jasypt;
+
 
     @Override
     public ResponseEntity<String> addNewKardexEntry(Map<String, String> requestMap) {
@@ -252,15 +258,30 @@ public class KardexServiceImpl implements KardexService {
     private List<KardexWrapper> KardexOutcome(){
         List<OutcomeWrapper> Outheader=outcomeDao.getAllOutcome();
         List<KardexWrapper> KW=new ArrayList<>();
-        List<KardexDetailWrapper> OutDetail;
+        List<KardexDetailWrapper> outDetail;
+        List<KardexDetailWrapper> outDetailBuilt;
         for (OutcomeWrapper OW: Outheader) {
             Integer rawId=OW.getId();
             String ini="S";
             String KID=kardexId(ini, rawId);
-            OutDetail=outcomeDetailDao.getAllByFk(OW.getId());
-            KW.add(new KardexWrapper(KID, OW.getFecha(), OW.getFecha().getTime(), OW.getTipoPago(), OW.getFactura() ,OW.getEstado(),"Salida",OW.getClientRazonSocial(),KID,OutDetail));
+            outDetail=outcomeDetailDao.getAllByFk(OW.getId());
+            outDetailBuilt=kardexDetailBuilder(outDetail);
+            KW.add(new KardexWrapper(KID, OW.getFecha(), OW.getFecha().getTime(), OW.getTipoPago(), OW.getFactura() ,OW.getEstado(),"Salida",OW.getClientRazonSocial(),KID,outDetailBuilt));
         }
         return KW;
+    }
+
+    private List<KardexDetailWrapper> kardexDetailBuilder(List<KardexDetailWrapper> kdw){
+        List<KardexDetailWrapper> listKardex=new ArrayList<>();
+
+        Iterator<KardexDetailWrapper> iterator=kdw.iterator();
+        while (iterator.hasNext()){
+            KardexDetailWrapper kardex=iterator.next();
+            Product p=productDao.getById(kardex.getProdId());
+            kardex.setOldPrecioVenta(Float.valueOf(jasypt.decrypting(p.getPrices().getProdPrice())));
+            listKardex.add(kardex);
+        }
+        return listKardex;
     }
 
     private String kardexId(String ini, Integer rawId){

@@ -1,5 +1,6 @@
 package com.inn.almacen.SERVICE;
 
+import com.inn.almacen.WRAPPER.IncomeDetailView;
 import com.inn.almacen.WRAPPER.IncomeDetailWrapper;
 import org.springframework.http.ResponseEntity;
 
@@ -11,6 +12,7 @@ public interface IncomeDetailService {
     ResponseEntity<String> addNewIncomeDetail(Map<String, String> requestMap);
 
     ResponseEntity<List<IncomeDetailWrapper>> getAllIncomeDetail();
+    //ResponseEntity<List<IncomeDetailView>> getAllIncomeDetail();
 
     ResponseEntity<String> updateIncomeDetail(Map<String, String> requestMap);
 

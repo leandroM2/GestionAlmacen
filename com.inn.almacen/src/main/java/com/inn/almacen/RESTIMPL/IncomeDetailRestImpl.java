@@ -3,6 +3,7 @@ package com.inn.almacen.RESTIMPL;
 import com.inn.almacen.REST.IncomeDetailRest;
 import com.inn.almacen.SERVICE.IncomeDetailService;
 import com.inn.almacen.UTILS.AlmacenUtils;
+import com.inn.almacen.WRAPPER.IncomeDetailView;
 import com.inn.almacen.WRAPPER.IncomeDetailWrapper;
 import com.inn.almacen.constens.AlmacenConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ public class IncomeDetailRestImpl implements IncomeDetailRest {
 
     @Override
     public ResponseEntity<List<IncomeDetailWrapper>> getAllIncomeDetail() {
+    //public ResponseEntity<List<IncomeDetailView>> getAllIncomeDetail() {
         try {
             return incomeDetailService.getAllIncomeDetail();
         }catch (Exception e){

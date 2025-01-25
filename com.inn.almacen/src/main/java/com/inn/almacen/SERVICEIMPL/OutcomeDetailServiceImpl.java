@@ -1,14 +1,14 @@
 package com.inn.almacen.SERVICEIMPL;
 
+import com.inn.almacen.JWT.Jasypt;
 import com.inn.almacen.JWT.JwtFilter;
 import com.inn.almacen.POJO.*;
 import com.inn.almacen.SERVICE.OutcomeDetailService;
 import com.inn.almacen.UTILS.AlmacenUtils;
+import com.inn.almacen.WRAPPER.OutcomeDetailView;
 import com.inn.almacen.WRAPPER.OutcomeDetailWrapper;
 import com.inn.almacen.constens.AlmacenConstants;
-import com.inn.almacen.dao.OutcomeDao;
-import com.inn.almacen.dao.OutcomeDetailDao;
-import com.inn.almacen.dao.ProductDao;
+import com.inn.almacen.dao.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,10 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+
 @Slf4j
 @Service
 public class OutcomeDetailServiceImpl implements OutcomeDetailService {
@@ -38,12 +36,35 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
     @Autowired
     JwtFilter jwtFilter;
 
+    @Autowired
+    Jasypt jasypt;
+
+    @Autowired
+    CategoryDao cd;
+
+    @Autowired
+    SupplierDao sd;
+
+    @Autowired
+    LocationDao ld;
+
+    @Autowired
+    TypeDao td;
+
+    @Autowired
+    PricesDao pd;
+
+    @Autowired
+    UserDao ud;
+
+    @Autowired
+    ClientDao clientDao;
     @Override
     public ResponseEntity<String> addNewOutcomeDetail(Map<String, String> requestMap) {
         try {
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 if(validateOutcomeDetailMap(requestMap, false)){
-                    Boolean bool=validateStock(Integer.parseInt(requestMap.get("productId")),
+                    Boolean bool=validateStock(requestMap.get("prodId"),
                             Integer.parseInt(requestMap.get("cantidad")));
                     if(bool){
                         outcomeDetailDao.save(getOutcomeDetailFromMap(requestMap, false));
@@ -68,7 +89,9 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
     public ResponseEntity<List<OutcomeDetailWrapper>> getAllOutcomeDetail() {
         try {
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
-                return new ResponseEntity<>(outcomeDetailDao.getAllOutcomeDetail(), HttpStatus.OK);
+                List<OutcomeDetailView> odv=outcomeDetailDao.getAllOutcomeDetail();
+                return new ResponseEntity<>(outcomeDetailBuilder(odv), HttpStatus.OK);
+                //return new ResponseEntity<>(outcomeDetailDao.getAllOutcomeDetail(), HttpStatus.OK);
             }else{
                 return new ResponseEntity<>(new ArrayList<>(), HttpStatus.UNAUTHORIZED);
             }
@@ -142,11 +165,13 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
                             outcomeDetail.getOutcome().getClient().getContacto(), outcomeDetail.getOutcome().getClient().getDireccion(),
                             outcomeDetail.getOutcome().getUser().getId(), outcomeDetail.getOutcome().getUser().getNombre(),
                             outcomeDetail.getOutcome().getUserAuth().getId(), outcomeDetail.getOutcome().getUserAuth().getNombre(), outcomeDetail.getProduct().getProdId(),
-                            outcomeDetail.getProduct().getProdDesc(), outcomeDetail.getProduct().getProdCode(), /*outcomeDetail.getProduct().getPrecio(),*/
+                            outcomeDetail.getProduct().getProdDesc(), outcomeDetail.getProduct().getProdCode(),
                             outcomeDetail.getProduct().getProdStock(), outcomeDetail.getProduct().getProdState(), outcomeDetail.getProduct().getCategory().getCatId(),
                             outcomeDetail.getProduct().getCategory().getCatName(), outcomeDetail.getProduct().getSupplier().getId(),
                             outcomeDetail.getProduct().getSupplier().getRazonSocial(), outcomeDetail.getProduct().getSupplier().getRuc(),
-                            outcomeDetail.getProduct().getSupplier().getContacto()));
+                            outcomeDetail.getProduct().getSupplier().getContacto(),
+                            outcomeDetail.getProduct().getType().getTypeId(), outcomeDetail.getProduct().getType().getTypeName(),
+                            outcomeDetail.getProduct().getLocation().getLocationId(), outcomeDetail.getProduct().getLocation().getLocationFloor()));
                     return new ResponseEntity<>(myList,HttpStatus.OK);
                 }
                 return new ResponseEntity<>(new ArrayList<>(),HttpStatus.OK);
@@ -161,7 +186,7 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
 
     private boolean validateOutcomeDetailMap(Map<String, String> requestMap, boolean validateId){
         if(requestMap.containsKey("cantidad") && requestMap.containsKey("outcomeId")
-                && requestMap.containsKey("productId")){
+                && requestMap.containsKey("prodId")){
             if(requestMap.containsKey("id") && validateId){
                 return true;
             }else if (!validateId){
@@ -175,7 +200,7 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
         Outcome outcome=new Outcome();
         outcome.setId(Integer.parseInt(requestMap.get("outcomeId")));
 
-        Product product=productDao.getById(Integer.parseInt(requestMap.get("productId")));
+        Product product=productDao.getById(requestMap.get("prodId"));
 
         OutcomeDetail outcomeDetail=new OutcomeDetail();
         if(esAdd) outcomeDetail.setId(Integer.parseInt(requestMap.get("id")));
@@ -184,7 +209,7 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
         Integer cant=Integer.parseInt(requestMap.get("cantidad"));
         outcomeDetail.setSaldo(product.getProdStock());
         outcomeDetail.setCantidad(cant);
-        //outcomeDetail.setPrecioDeVenta(product.getPrecio());
+        outcomeDetail.setPrecioDeVenta(Float.valueOf(jasypt.decrypting(product.getPrices().getProdPrice())));
         Boolean state=validateState(Integer.parseInt(requestMap.get("outcomeId")));
         if(state){
             Integer stock=updateProduct(product.getProdId(), cant, outcomeDetail.getId(), esAdd);
@@ -247,11 +272,43 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
         return msg;
     }
 
-    private Boolean validateStock(Integer productId, Integer cant){
+    private Boolean validateStock(String prodId, Integer cant){
         Product product;
-        product=productDao.getById(productId);
+        product=productDao.getById(prodId);
         Integer dif=product.getProdStock()-cant;
-        Boolean bool=(dif>200) ? true : false;
-        return bool;
+        Boolean bool=(dif>1) ? true : false;
+        //return bool;
+        return true;
+    }
+
+    private List<OutcomeDetailWrapper> outcomeDetailBuilder(List<OutcomeDetailView> odv){
+        List<OutcomeDetailWrapper> odw=new ArrayList<>();
+
+        Iterator<OutcomeDetailView> iterator = odv.iterator();
+        while (iterator.hasNext()) {
+            OutcomeDetailView unit = iterator.next();
+            Outcome o=outcomeDao.getById(unit.getOutcomeId());
+            Client cl=clientDao.getById(o.getClient().getId());
+            User u=ud.getById(o.getUser().getId());
+            User uauth=ud.getById(o.getUserAuth().getId());
+            Product prod=productDao.getById(unit.getProdId());
+            Category c=cd.getById(prod.getCategory().getCatId());
+            Supplier s=sd.getById(prod.getSupplier().getId());
+            Type t=td.getById(prod.getType().getTypeId());
+            Location l=ld.getById(prod.getLocation().getLocationId());
+            Prices p=pd.getById(unit.getProdId());
+            odw.add(new OutcomeDetailWrapper
+                    (unit.getId(), unit.getCantidad(), unit.getPrecioDeVenta(),
+                            unit.getSaldo(), o.getId(), o.getFecha(), o.getEstado(),
+                            cl.getId(), cl.getRazonSocial(), cl.getRuc(), cl.getCorreo(), cl.getContacto(), cl.getDireccion(),
+                            u.getId(), u.getNombre(),
+                            uauth.getId(), uauth.getNombre(),
+                            prod.getProdId(), prod.getProdDesc(), prod.getProdCode(),
+                            prod.getProdStock(), prod.getProdState(),
+                            c.getCatId(), c.getCatName(),
+                            s.getId(), s.getRazonSocial(), s.getRuc(), s.getContacto(),
+                            t.getTypeId(), t.getTypeName(), l.getLocationId(), l.getLocationFloor()));
+        }
+        return odw;
     }
 }
