@@ -169,7 +169,7 @@ public class ProductServiceImpl implements ProductService {
         Product product=new Product();
 
         Category category=new Category();
-        category.setCatId(Integer.parseInt(requestMap.get("categoryId")));
+        category.setCatId(Integer.parseInt(requestMap.get("catId")));
         product.setCategory(category);
 
         Supplier supplier=new Supplier();
@@ -200,7 +200,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         String prodId = (requestMap.get("supplierId").length()==1) ? "0"+requestMap.get("supplierId") : requestMap.get("supplierId");
-        prodId=prodId.concat((requestMap.get("categoryId").length()==1) ? "0"+requestMap.get("categoryId") : requestMap.get("categoryId"));
+        prodId=prodId.concat((requestMap.get("catId").length()==1) ? "0"+requestMap.get("catId") : requestMap.get("catId"));
         prodId=prodId.concat((requestMap.get("typeId").length()==1) ? "0"+requestMap.get("typeId") : requestMap.get("typeId"));
         Integer count=productDao.getCountCorr(prodId);
         String val=(String.valueOf(count+1));
@@ -219,7 +219,7 @@ public class ProductServiceImpl implements ProductService {
 
     private Boolean validateCorr(Map<String, String> requestMap){
         String prodId = (requestMap.get("supplierId").length()==1) ? "0"+requestMap.get("supplierId") : requestMap.get("supplierId");
-        prodId=prodId.concat((requestMap.get("categoryId").length()==1) ? "0"+requestMap.get("categoryId") : requestMap.get("categoryId"));
+        prodId=prodId.concat((requestMap.get("catId").length()==1) ? "0"+requestMap.get("catId") : requestMap.get("catId"));
         prodId=prodId.concat((requestMap.get("typeId").length()==1) ? "0"+requestMap.get("typeId") : requestMap.get("typeId"));
 
         Integer count=productDao.getCountCorr(prodId);
@@ -243,13 +243,13 @@ public class ProductServiceImpl implements ProductService {
         Iterator<ProductView> iterator = pv.iterator();
         while (iterator.hasNext()) {
             ProductView unit = iterator.next();
-            Category c=cd.getById(unit.getCategoryId());
+            Category c=cd.getById(unit.getCatId());
             Supplier s=sd.getById(unit.getSupplierId());
             Type t=td.getById(unit.getTypeId());
             Location l=ld.getById(unit.getLocationId());
             Prices p=pd.getById(unit.getId());
             pw.add(new ProductWrapper(unit.getId(), unit.getProdDesc(), unit.getProdCode(),
-                    unit.getProdStock(), unit.getProdState(), unit.getCategoryId(),
+                    unit.getProdStock(), unit.getProdState(), unit.getCatId(),
                     c.getCatName(), unit.getSupplierId(),
                     s.getRazonSocial(), s.getRuc(),
                     s.getContacto(), unit.getTypeId(),

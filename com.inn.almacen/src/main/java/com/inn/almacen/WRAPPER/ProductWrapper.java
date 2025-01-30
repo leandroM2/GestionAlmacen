@@ -18,9 +18,9 @@ public class ProductWrapper {
 
     private Boolean prodState;
 
-    private Integer categoryId;
+    private Integer catId;
 
-    private String categoryNombre;
+    private String catName;
 
     private Integer supplierId;
 
@@ -30,9 +30,9 @@ public class ProductWrapper {
 
     private Integer supplierContacto;
 
-    private Integer brandId;
+    private Integer typeId;
 
-    private String brandName;
+    private String typeName;
 
     private Integer locationId;
 
@@ -45,22 +45,22 @@ public class ProductWrapper {
     private String prodPrice;
 
     public ProductWrapper(String id, String prodDesc, String prodCode, Integer prodStock, Boolean prodState,
-                          Integer categoryId, String categoryNombre, Integer supplierId, String supplierRazonSocial,
-                          Long supplierRuc, Integer supplierContacto, Integer brandId, String brandName,
+                          Integer catId, String catName, Integer supplierId, String supplierRazonSocial,
+                          Long supplierRuc, Integer supplierContacto, Integer typeId, String typeName,
                           Integer locationId, String locationFloor, String prodId, String prodPrice) {
         this.id = id;
         this.prodDesc = prodDesc;
         this.prodCode = prodCode;
         this.prodStock = prodStock;
         this.prodState = prodState;
-        this.categoryId = categoryId;
-        this.categoryNombre = categoryNombre;
+        this.catId = catId;
+        this.catName = catName;
         this.supplierId = supplierId;
         this.supplierRazonSocial = supplierRazonSocial;
         this.supplierRuc = supplierRuc;
         this.supplierContacto = supplierContacto;
-        this.brandId = brandId;
-        this.brandName = brandName;
+        this.typeId = typeId;
+        this.typeName = typeName;
         this.locationId = locationId;
         this.locationFloor = locationFloor;
         this.prodId = prodId;
@@ -69,22 +69,22 @@ public class ProductWrapper {
 
 
     public ProductWrapper(String id, String prodDesc, String prodCode, Integer prodStock, Boolean prodState,
-                          Integer categoryId, String categoryNombre, Integer supplierId, String supplierRazonSocial,
-                          Long supplierRuc, Integer supplierContacto, Integer brandId, String brandName,
+                          Integer catId, String catName, Integer supplierId, String supplierRazonSocial,
+                          Long supplierRuc, Integer supplierContacto, Integer typeId, String typeName,
                           Integer locationId, String locationFloor, String prodId, Blob prodPrices) {
         this.id = id;
         this.prodDesc = prodDesc;
         this.prodCode = prodCode;
         this.prodStock = prodStock;
         this.prodState = prodState;
-        this.categoryId = categoryId;
-        this.categoryNombre = categoryNombre;
+        this.catId = catId;
+        this.catName = catName;
         this.supplierId = supplierId;
         this.supplierRazonSocial = supplierRazonSocial;
         this.supplierRuc = supplierRuc;
         this.supplierContacto = supplierContacto;
-        this.brandId = brandId;
-        this.brandName = brandName;
+        this.typeId = typeId;
+        this.typeName = typeName;
         this.locationId = locationId;
         this.locationFloor = locationFloor;
         this.prodId = prodId;

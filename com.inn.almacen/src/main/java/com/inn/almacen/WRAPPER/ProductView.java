@@ -14,7 +14,7 @@ public class ProductView {
 
     private Boolean prodState;
 
-    private Integer categoryId;
+    private Integer catId;
 
     private Integer supplierId;
 
@@ -23,13 +23,13 @@ public class ProductView {
     private Integer locationId;
 
     public ProductView(String id, String prodDesc, String prodCode, Integer prodStock, Boolean prodState,
-                       Integer categoryId, Integer supplierId, Integer typeId, Integer locationId) {
+                       Integer catId, Integer supplierId, Integer typeId, Integer locationId) {
         this.id = id;
         this.prodDesc = prodDesc;
         this.prodCode = prodCode;
         this.prodStock = prodStock;
         this.prodState = prodState;
-        this.categoryId = categoryId;
+        this.catId = catId;
         this.supplierId = supplierId;
         this.typeId = typeId;
         this.locationId=locationId;

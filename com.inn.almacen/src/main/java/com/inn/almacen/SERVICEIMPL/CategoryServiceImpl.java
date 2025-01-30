@@ -68,7 +68,7 @@ public class CategoryServiceImpl implements CategoryService {
         try {
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
                 if(validateCategoryMap(requestMap, true)){
-                    Optional optional = categoryDao.findById(Integer.parseInt(requestMap.get("id")));
+                    Optional optional = categoryDao.findById(Integer.parseInt(requestMap.get("catId")));
                     if(!optional.isEmpty()){
                         categoryDao.save(getCategoryFromMap(requestMap, true));
                         return AlmacenUtils.getResponseEntity("Categoría actualizada correctamente.", HttpStatus.OK);
@@ -129,8 +129,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private boolean validateCategoryMap(Map<String, String> requestMap, boolean validarId) {
-        if(requestMap.containsKey("nombre")){
-            if (requestMap.containsKey("id") && validarId){
+        if(requestMap.containsKey("catName")){
+            if (requestMap.containsKey("catId") && validarId){
                 return true;
             }else if(!validarId){
                 return true;
@@ -142,9 +142,9 @@ public class CategoryServiceImpl implements CategoryService {
     private Category getCategoryFromMap(Map<String,String> requestMap, Boolean esAdd){
         Category category= new Category();
         if(esAdd){
-            category.setCatId(Integer.parseInt(requestMap.get("id")));
+            category.setCatId(Integer.parseInt(requestMap.get("catId")));
         }
-        category.setCatName(requestMap.get("nombre"));
+        category.setCatName(requestMap.get("catName"));
         return category;
     }
 
