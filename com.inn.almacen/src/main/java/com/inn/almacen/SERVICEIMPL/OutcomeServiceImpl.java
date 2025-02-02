@@ -407,17 +407,17 @@ public class OutcomeServiceImpl implements OutcomeService {
         }
     }
 
-    private void updateProduct(String productId, Integer outcomeDetailId, Integer cant){
-        log.info("Hemos llegado hasta actualizacion de stock y precio producto.");
+    private void updateProduct(String prod_id, Integer outcomeDetailId, Integer cant){
+        log.info("Hemos llegado hasta actualizacion de prod_stock y precio producto.");
         String sql;
-        Product product=productDao.getById(productId);
+        Product product=productDao.getById(prod_id);
         log.info("Estamos insertando y precios a Outcome detail.");
-        Integer stock=product.getProdStock();
-        stock=stock-cant;
-        sql = "UPDATE product SET stock = ? WHERE id = ?";
-        jdbcTemplate.update(sql, stock, productId);
+        Integer prod_stock=product.getProdStock();
+        prod_stock=prod_stock-cant;
+        sql = "UPDATE product SET prod_stock = ? WHERE prod_id = ?";
+        jdbcTemplate.update(sql, prod_stock, prod_id);
         sql= "UPDATE outcome_detail SET saldo = ? WHERE id= ?";
-        jdbcTemplate.update(sql, stock, outcomeDetailId);
-        log.info("Valores de stock y precio de producto y outcome detail actualizado");
+        jdbcTemplate.update(sql, prod_stock, outcomeDetailId);
+        log.info("Valores de prod_stock y precio de producto y outcome detail actualizado");
     }
 }

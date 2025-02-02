@@ -1,21 +1,16 @@
 package com.inn.almacen.SERVICEIMPL;
 
 import com.inn.almacen.JWT.JwtFilter;
-import com.inn.almacen.POJO.Income;
-import com.inn.almacen.POJO.IncomeDetail;
-import com.inn.almacen.POJO.Product;
-import com.inn.almacen.POJO.User;
+import com.inn.almacen.POJO.*;
 import com.inn.almacen.SERVICE.ArchivesService;
 import com.inn.almacen.SERVICE.IncomeService;
+import com.inn.almacen.SERVICE.PricesService;
 import com.inn.almacen.UTILS.AlmacenUtils;
 import com.inn.almacen.WRAPPER.IncomeWrapper;
 import com.inn.almacen.WRAPPER.KardexDetailWrapper;
 import com.inn.almacen.WRAPPER.OrderCompraWrapper;
 import com.inn.almacen.constens.AlmacenConstants;
-import com.inn.almacen.dao.IncomeDao;
-import com.inn.almacen.dao.IncomeDetailDao;
-import com.inn.almacen.dao.ProductDao;
-import com.inn.almacen.dao.UserDao;
+import com.inn.almacen.dao.*;
 import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfWriter;
@@ -58,6 +53,10 @@ public class IncomeServiceImpl implements IncomeService {
     @Autowired
     UserDao userDao;
 
+    @Autowired
+    PricesService pricesService;
+    @Autowired
+    PricesDao pd;
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Override
@@ -372,20 +371,29 @@ public class IncomeServiceImpl implements IncomeService {
         }
     }
 
-    private void updateProduct(String productId, Integer incomeDetailId, Integer cant, Float precioVentaUnit){
-        log.info("Hemos llegado hasta actualizacion de stock y precio producto.");
-        String sql;
-        Product product=productDao.getById(productId);
-            log.info("Estamos insertando y precios a Income detail.");
-            Integer stock=product.getProdStock();
-            stock=stock+cant;
-            Float precio=0.0f;//product.getPrecio();
-            precio=Math.round(((precio+precioVentaUnit)/2) * 100.0f) / 100.0f;
-            sql = "UPDATE product SET stock = ?, precio=? WHERE id = ?";
-            jdbcTemplate.update(sql, stock, precio, productId);
-            sql="UPDATE income_detail SET saldo = ? WHERE id = ?";
-            jdbcTemplate.update(sql, stock, incomeDetailId);
-        log.info("Valores de precio y stock de producto y detalle income actualizado");
+    private void updateProduct(String prodId, Integer incomeDetailId, Integer cant, Float precioVentaUnit){
+            try {
+                log.info("Hemos llegado hasta actualizacion de stock y precio producto.");
+                Prices prices=pd.getById(prodId);
+                Map<String, String> requestMap = new HashMap<>();
+                requestMap.put("prodId",prices.getProdId());
+                requestMap.put("prodPrice",precioVentaUnit.toString());
+                ResponseEntity<String> response=pricesService.updatePrices(requestMap);
+                if (response.getStatusCode().is2xxSuccessful()){
+                    String sql;
+                    Product product=productDao.getById(prodId);
+                    Integer stock=product.getProdStock();
+                    stock=stock+cant;
+                    log.info("Estamos insertando y precios a Income detail: "+stock);
+                    sql = "UPDATE product SET prod_stock = ? WHERE prod_id = ?";
+                    jdbcTemplate.update(sql, stock, prodId);
+                    sql="UPDATE income_detail SET saldo = ? WHERE id = ?";
+                    jdbcTemplate.update(sql, stock, incomeDetailId);
+                    log.info("Valores de precio y stock de producto y detalle income actualizado");
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
     }
 
     private String kardexId(String ini, Integer rawId){

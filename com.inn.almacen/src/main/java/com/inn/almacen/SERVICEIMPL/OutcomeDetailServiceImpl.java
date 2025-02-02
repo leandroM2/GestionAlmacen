@@ -225,12 +225,12 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
         return state;
     }
 
-    private Integer updateProduct(String id, Integer cant, Integer incomeId, boolean esAdd){
-        log.info("Hemos llegado hasta actualizacion de stock producto.");
-        String sql = "SELECT stock FROM product WHERE id = ?";
-        Integer stock = jdbcTemplate.queryForObject(sql, new String[]{id}, Integer.class);
+    private Integer updateProduct(String prod_id, Integer cant, Integer incomeId, boolean esAdd){
+        log.info("Hemos llegado hasta actualizacion de prod_stock producto.");
+        String sql = "SELECT prod_stock FROM product WHERE prod_id = ?";
+        Integer prod_stock = jdbcTemplate.queryForObject(sql, new String[]{prod_id}, Integer.class);
         if(esAdd){
-            sql = "SELECT cantidad FROM outcome_detail WHERE id = ?";
+            sql = "SELECT cantidad FROM outcome_detail WHERE prod_id = ?";
             Integer oldCant = jdbcTemplate.queryForObject(sql, new Integer[]{incomeId}, Integer.class);
             if(cant!=oldCant){
                 log.info("Estamos actualizando Outcome detail.");
@@ -238,34 +238,34 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
                 boolean oper = (cant > oldCant) ? true : false;
 
                 if(oper){
-                    stock=stock-total;
+                    prod_stock=prod_stock-total;
                 }else{
-                    stock=stock+total;
+                    prod_stock=prod_stock+total;
                 }
-                sql = "UPDATE product SET stock = ? WHERE id = ?";
-                jdbcTemplate.update(sql, stock, id);
+                sql = "UPDATE product SET prod_stock = ? WHERE prod_id = ?";
+                jdbcTemplate.update(sql, prod_stock, prod_id);
             }
             log.info("Cantidades no fueron modificadas por user.");
         }else{
             log.info("Estamos insertando Outcome detail.");
-            stock=stock-cant;
-            sql = "UPDATE product SET stock = ? WHERE id = ?";
-            jdbcTemplate.update(sql, stock, id);
+            prod_stock=prod_stock-cant;
+            sql = "UPDATE product SET prod_stock = ? WHERE prod_id = ?";
+            jdbcTemplate.update(sql, prod_stock, prod_id);
         }
-        return stock;
+        return prod_stock;
     }
 
-    private String restoreProduct(Integer cant, String productId, Integer outcomeId){
+    private String restoreProduct(Integer cant, String prod_id, Integer outcomeId){
         log.info("Se retirará el stock actualizado en producto si registro fue autorizado");
         String msg;
         Outcome outcome=outcomeDao.getById(outcomeId);
         if(outcome.getEstado()){
-            String sql = "SELECT stock from product WHERE id = ?";
-            Integer stock = jdbcTemplate.queryForObject(sql, new String[]{productId}, Integer.class);
-            stock=stock+cant;
-            sql = "UPDATE product SET stock = ? WHERE id = ?";
-            jdbcTemplate.update(sql, stock, productId);
-            msg="El stock retirado ha sido reasignado al producto";
+            String sql = "SELECT prod_stock from product WHERE prod_id = ?";
+            Integer prod_stock = jdbcTemplate.queryForObject(sql, new String[]{prod_id}, Integer.class);
+            prod_stock=prod_stock+cant;
+            sql = "UPDATE product SET prod_stock = ? WHERE prod_id = ?";
+            jdbcTemplate.update(sql, prod_stock, prod_id);
+            msg="El Stock retirado ha sido reasignado al producto";
         }else{
             msg="Stock de productos no fueron modificados debido a que el registro nunca fue autorizado";
         }

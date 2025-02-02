@@ -78,12 +78,10 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
 
     @Override
     public ResponseEntity<List<IncomeDetailWrapper>> getAllIncomeDetail() {
-    //public ResponseEntity<List<IncomeDetailView>> getAllIncomeDetail() {
         try {
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 List<IncomeDetailView> idv=incomeDetailDao.getAllIncomeDetail();
                 return new ResponseEntity<>(incomeDetailBuilder(idv), HttpStatus.OK);
-                //return new ResponseEntity<>(incomeDetailDao.getAllIncomeDetail(), HttpStatus.OK);
             }else{
                 return new ResponseEntity<>(new ArrayList<>(), HttpStatus.UNAUTHORIZED);
             }
@@ -177,7 +175,7 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
 
     private boolean validateIncomeDetailMap(Map<String, String> requestMap, boolean validateId){
         if(requestMap.containsKey("cantidad") && requestMap.containsKey("precioVentaUnit")
-            && requestMap.containsKey("incomeId") && requestMap.containsKey("productId")){
+            && requestMap.containsKey("incomeId") && requestMap.containsKey("prodId")){
             if(requestMap.containsKey("id") && validateId){
                 return true;
             }else if (!validateId){
@@ -191,7 +189,7 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
         Income income=new Income();
         income.setId(Integer.parseInt(requestMap.get("incomeId")));
 
-        Product product=productDao.getById(requestMap.get("productId"));
+        Product product=productDao.getById(requestMap.get("prodId"));
 
         IncomeDetail incomeDetail=new IncomeDetail();
         if(esAdd) incomeDetail.setId(Integer.parseInt(requestMap.get("id")));
@@ -219,7 +217,7 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
 
     private Integer updateProduct(String id, Integer cant, Integer incomeId, boolean esAdd){
         log.info("Hemos llegado hasta actualizacion de stock producto.");
-        String sql = "SELECT stock FROM product WHERE id = ?";
+        String sql = "SELECT prodStock FROM product WHERE prodId = ?";
         Integer stock = jdbcTemplate.queryForObject(sql, new String[]{id}, Integer.class);
         if(esAdd){
             sql = "SELECT cantidad FROM income_detail WHERE id = ?";
@@ -234,14 +232,14 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
                 }else{
                     stock=stock-total;
                 }
-                sql = "UPDATE product SET stock = ? WHERE id = ?";
+                sql = "UPDATE product SET prodStock = ? WHERE prodId = ?";
                 jdbcTemplate.update(sql, stock, id);
             }
             log.info("Cantidades no fueron modificadas por user.");
         }else{
             log.info("Estamos insertando Income detail.");
             stock=stock+cant;
-            sql = "UPDATE product SET stock = ? WHERE id = ?";
+            sql = "UPDATE product SET prodStock = ? WHERE prodId = ?";
             jdbcTemplate.update(sql, stock, id);
         }
         return stock;
@@ -252,10 +250,10 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
         String msg;
         Income income=incomeDao.getById(incomeId);
         if(income.getEstado()){
-            String sql = "SELECT stock from product WHERE id = ?";
+            String sql = "SELECT prodStock from product WHERE prodId = ?";
             Integer stock = jdbcTemplate.queryForObject(sql, new String[]{productId}, Integer.class);
             stock=stock-cant;
-            sql = "UPDATE product SET stock = ? WHERE id = ?";
+            sql = "UPDATE product SET prodStock = ? WHERE prodId = ?";
             jdbcTemplate.update(sql, stock, productId);
             msg="El stock asignado por entrada ha sido retirado del producto";
         }else{
