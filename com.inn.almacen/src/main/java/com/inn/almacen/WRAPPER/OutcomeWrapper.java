@@ -37,7 +37,14 @@ public class OutcomeWrapper {
 
     private String userAuthNombre;
 
-    public OutcomeWrapper(Integer id, java.util.Date fecha, String tipoPago, String factura, Boolean estado, Integer clientId, String clientRazonSocial, Long clientRuc, String clientCorreo, Integer clientContacto, String clientDireccion, Integer userId, String userNombre, Integer userAuthId, String userAuthNombre) {
+    private Integer userConfirmId;
+
+    private String userConfirmName;
+
+    public OutcomeWrapper(Integer id, java.util.Date fecha, String tipoPago, String factura, Boolean estado,
+                          Integer clientId, String clientRazonSocial, Long clientRuc, String clientCorreo,
+                          Integer clientContacto, String clientDireccion, Integer userId, String userNombre,
+                          Integer userAuthId, String userAuthNombre,  Integer userConfirmId, String userConfirmName) {
         this.id = id;
         this.fecha =(Date) fecha;
         this.tipoPago = tipoPago;
@@ -53,5 +60,7 @@ public class OutcomeWrapper {
         this.userNombre = userNombre;
         this.userAuthId = userAuthId;
         this.userAuthNombre = userAuthNombre;
+        this.userConfirmId=userConfirmId;
+        this.userConfirmName=userConfirmName;
     }
 }

@@ -152,7 +152,8 @@ public class OutcomeServiceImpl implements OutcomeService {
                     myList.add(new OutcomeWrapper(outcome.getId(), outcome.getFecha(),outcome.getTipoPago(), outcome.getFactura(), outcome.getEstado() , outcome.getClient().getId(),
                             outcome.getClient().getRazonSocial(), outcome.getClient().getRuc(), outcome.getClient().getCorreo(),
                             outcome.getClient().getContacto(), outcome.getClient().getDireccion(), outcome.getUser().getId(),
-                            outcome.getUser().getNombre(), outcome.getUserAuth().getId(), outcome.getUserAuth().getNombre()));
+                            outcome.getUser().getNombre(), outcome.getUserAuth().getId(), outcome.getUserAuth().getNombre(),
+                            outcome.getUserConfirm().getId(), outcome.getUserConfirm().getNombre()));
                     return new ResponseEntity<>(myList,HttpStatus.OK);
                 }
                 return new ResponseEntity<>(new ArrayList<>(),HttpStatus.OK);
@@ -175,9 +176,21 @@ public class OutcomeServiceImpl implements OutcomeService {
                     if(validateSign(u.getNombre())){
                         return AlmacenUtils.getResponseEntity("USUARIO "+jwtFilter.getCurrentUser()+" NO CUENTA CON FIRMA DENTRO DEL SISTEMA.", HttpStatus.CONFLICT);
                     }
-                    updateState(user, id);
-                    updateInstance(user, id);
-                    return AlmacenUtils.getResponseEntity("Salidas autorizadas por el supervisor "+user, HttpStatus.OK );
+                    Character c=updateState(user, id);
+                    switch (c){
+                        case 'A': //Primera autorización
+                            return AlmacenUtils.getResponseEntity("PRIMERA AUTORIZACIÓN POR: "+u.getNombre()
+                                    +"\n ES NECESARIA UNA SEGUNDA AUTORIZACIÓN PARA APROBAR SALIDA.", HttpStatus.OK);
+                        case 'B': //Segunda autorización
+                            updateInstance(user, id);
+                            return AlmacenUtils.getResponseEntity("SEGUNDA AUTORIZACIÓN POR: "+u.getNombre()
+                                    +"\n SALIDA DE PRODUCTOS APROBADA.", HttpStatus.OK );
+                        case 'C': //Autorizaciones identicos
+                            return AlmacenUtils.getResponseEntity("ADVERTENCIA: SE REQUIERE UN USUARIO DISTINTO AL PRIMER AUTORIZADOR '"+u.getNombre()
+                                    +"' PARA APROBAR LA SALIDA DE PRODUCTOS. ", HttpStatus.OK);
+                        default:
+                            return AlmacenUtils.getResponseEntity("HA OCURRIDO UN ERROR IMPREVISTO CON AUTORIZADORES", HttpStatus.OK );
+                    }
                 }
                 return AlmacenUtils.getResponseEntity("Id de salida no existe o no cuenta con productos registrados.", HttpStatus.OK);
             }else{
@@ -300,8 +313,8 @@ public class OutcomeServiceImpl implements OutcomeService {
         String sql = "SELECT id FROM user WHERE email = ?";
         Integer userId = jdbcTemplate.queryForObject(sql, new String[]{user}, Integer.class);
         User u=userDao.findByRol(userId);
-        outcome.setEstado(true);
-        outcome.setUserAuth(u);
+        //outcome.setEstado(true);
+        //outcome.setUserAuth(u);
         createJGuia(outcome);
     }
 
@@ -323,6 +336,8 @@ public class OutcomeServiceImpl implements OutcomeService {
         User user=new User();
         User userAuth=new User();
         userAuth.setId(0);
+        User userConfirm=new User();
+        userConfirm.setId(0);
 
         String name=jwtFilter.getCurrentUser();
         String sql = "SELECT id FROM user WHERE email = ?";
@@ -340,6 +355,7 @@ public class OutcomeServiceImpl implements OutcomeService {
         outcome.setClient(client);
         outcome.setUser(user);
         outcome.setUserAuth(userAuth);
+        outcome.setUserConfirm(userConfirm);
 
         return outcome;
     }
@@ -384,26 +400,38 @@ public class OutcomeServiceImpl implements OutcomeService {
         return id.toString();
     }
 
-    private void updateState(String user, Integer outcomeId){
+    private Character updateState(String userEmail, Integer outcomeId){
         log.info("Hemos llegado hasta actualizacion de estado de salida");
         String sql;
         sql = "SELECT id FROM user WHERE email = ?";
-        Integer userId = jdbcTemplate.queryForObject(sql, new String[]{user}, Integer.class);
+        Integer userId = jdbcTemplate.queryForObject(sql, new String[]{userEmail}, Integer.class);
 
-        sql = "UPDATE outcome SET estado = true, autorizador_fk=? WHERE id = ?";
-        jdbcTemplate.update(sql, userId, outcomeId);
+        //Nuevo cod doble verificacion
+        Outcome outcome=outcomeDao.getById(outcomeId);
+        if(outcome.getUserAuth().getId().equals(0)){
+            sql = "UPDATE outcome SET autorizador_fk=? WHERE id = ?";
+            jdbcTemplate.update(sql, userId, outcomeId);
+            return 'A'; //Primera verificación
+        }else{
+            boolean eql = (outcome.getUserAuth().getId().equals(userId)) ? true : false;
+            if(!eql){
+                sql = "UPDATE outcome SET estado = true, confirm_fk=? WHERE id = ?";
+                jdbcTemplate.update(sql, userId, outcomeId);
+                sql = "SELECT id FROM outcome_detail WHERE outcome_fk=?";
+                // Obtener una lista de Strings
+                List<Integer> ids = jdbcTemplate.queryForList(sql, new Integer[]{outcomeId}, Integer.class);
 
-        sql = "SELECT id FROM outcome_detail WHERE outcome_fk=?";
-
-        // Obtener una lista de Strings
-        List<Integer> ids = jdbcTemplate.queryForList(sql, new Integer[]{outcomeId}, Integer.class);
-
-        log.info("Vamos a efectuar las actualizaciones de monto y precio en los productos");
-        Integer i=0;
-        while(i<ids.size()){;
-            OutcomeDetail outcomeDetail=outcomeDetailDao.getById(ids.get(i));
-            updateProduct(outcomeDetail.getProduct().getProdId(), outcomeDetail.getId(), outcomeDetail.getCantidad());
-            i++;
+                log.info("Vamos a efectuar las actualizaciones de monto y precio en los productos");
+                Integer i=0;
+                while(i<ids.size()){
+                    OutcomeDetail outcomeDetail=outcomeDetailDao.getById(ids.get(i));
+                    updateProduct(outcomeDetail.getProduct().getProdId(), outcomeDetail.getId(), outcomeDetail.getCantidad());
+                    i++;
+                }
+                return 'B'; //Segunda verificación
+            }
+            return 'C'; //Autorizadores idénticos
+            //Fin Nuevo cod doble verificacion
         }
     }
 

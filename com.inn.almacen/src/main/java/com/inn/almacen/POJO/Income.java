@@ -10,10 +10,10 @@ import java.sql.Date;
 
 @NamedQuery(name = "Income.getById",
         query = "select new com.inn.almacen.WRAPPER.IncomeWrapper(i.id, i.fecha, i.tipoPago, i.estado, i.user.id, " +
-                "i.user.nombre,  i.userAuth.id, i.userAuth.nombre) from Income i where i.id=:id")
+                "i.user.nombre,  i.userAuth.id, i.userAuth.nombre, i.userConfirm.id, i.userConfirm.nombre) from Income i where i.id=:id")
 @NamedQuery(name = "Income.getAllIncome",
         query = "select new com.inn.almacen.WRAPPER.IncomeWrapper(i.id, i.fecha, i.tipoPago, i.estado, i.user.id, " +
-                "i.user.nombre,  i.userAuth.id, i.userAuth.nombre) from Income i")
+                "i.user.nombre,  i.userAuth.id, i.userAuth.nombre, i.userConfirm.id, i.userConfirm.nombre) from Income i")
 
 @Data
 @Entity
@@ -44,5 +44,9 @@ public class Income implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "autorizador_fk", nullable = true)
     private User userAuth;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "confirm_fk", nullable = true)
+    private User userConfirm;
 
 }

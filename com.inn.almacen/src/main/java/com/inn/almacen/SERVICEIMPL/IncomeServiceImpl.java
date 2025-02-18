@@ -5,6 +5,7 @@ import com.inn.almacen.POJO.*;
 import com.inn.almacen.SERVICE.ArchivesService;
 import com.inn.almacen.SERVICE.IncomeService;
 import com.inn.almacen.SERVICE.PricesService;
+import com.inn.almacen.SERVICE.UserService;
 import com.inn.almacen.UTILS.AlmacenUtils;
 import com.inn.almacen.WRAPPER.IncomeWrapper;
 import com.inn.almacen.WRAPPER.KardexDetailWrapper;
@@ -57,6 +58,10 @@ public class IncomeServiceImpl implements IncomeService {
     PricesService pricesService;
     @Autowired
     PricesDao pd;
+
+    @Autowired
+    UserService userService;
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Override
@@ -152,7 +157,7 @@ public class IncomeServiceImpl implements IncomeService {
                     List<IncomeWrapper> myList = new ArrayList<>();
                     myList.add(new IncomeWrapper(income.getId(), income.getFecha(), income.getTipoPago(), income.getEstado(),
                             income.getUser().getId(), income.getUser().getNombre(),
-                            income.getUserAuth().getId(), income.getUserAuth().getNombre()));
+                            income.getUserAuth().getId(), income.getUserAuth().getNombre(), income.getUserConfirm().getId(), income.getUserConfirm().getNombre()));
                     return new ResponseEntity<>(myList,HttpStatus.OK);
                 }
                 return new ResponseEntity<>(new ArrayList<>(),HttpStatus.OK);
@@ -176,11 +181,24 @@ public class IncomeServiceImpl implements IncomeService {
                     if(validateSign(u.getNombre())){
                         return AlmacenUtils.getResponseEntity("USUARIO "+jwtFilter.getCurrentUser()+" NO CUENTA CON FIRMA DENTRO DEL SISTEMA.", HttpStatus.CONFLICT);
                     }
-                    updateState(user, id);
-                    updateInstance(user, id);
-                    return AlmacenUtils.getResponseEntity("Entradas autorizadas por el supervisor "+user, HttpStatus.OK );
+                    Character c=updateState(user, id);
+
+                    switch (c){
+                        case 'A': //Primera autorización
+                            return AlmacenUtils.getResponseEntity("PRIMERA AUTORIZACIÓN POR: "+u.getNombre()
+                                    +"\n ES NECESARIA UNA SEGUNDA AUTORIZACIÓN PARA APROBAR ENTRADA.", HttpStatus.OK);
+                        case 'B': //Segunda autorización
+                            updateInstance(user, id);
+                            return AlmacenUtils.getResponseEntity("SEGUNDA AUTORIZACIÓN POR: "+u.getNombre()
+                                    +"\n ENTRADA DE PRODUCTOS APROBADA.", HttpStatus.OK );
+                        case 'C': //Autorizaciones identicos
+                            return AlmacenUtils.getResponseEntity("ADVERTENCIA: SE REQUIERE UN USUARIO DISTINTO AL PRIMER AUTORIZADOR '"+u.getNombre()
+                                    +"' PARA APROBAR LA ENTRADA DE PRODUCTOS. ", HttpStatus.OK);
+                        default:
+                            return AlmacenUtils.getResponseEntity("HA OCURRIDO UN ERROR IMPREVISTO CON AUTORIZADORES", HttpStatus.OK );
+                    }
                 }
-                return AlmacenUtils.getResponseEntity("Id de entrada no existe o no cuenta con productos registrados.", HttpStatus.OK);
+                return AlmacenUtils.getResponseEntity("ID DE ENTRADA NO EXISTE/NO CUENTA CON PRODUCTOS REGISTRADOS.", HttpStatus.OK);
             }else{
                 return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
             }
@@ -232,8 +250,8 @@ public class IncomeServiceImpl implements IncomeService {
         String sql = "SELECT id FROM user WHERE email = ?";
         Integer userId = jdbcTemplate.queryForObject(sql, new String[]{user}, Integer.class);
         User u=userDao.findByRol(userId);
-        income.setEstado(true);
-        income.setUserAuth(u);
+        //income.setEstado(true);
+        //income.setUserAuth(u);
         createJOrden(income);
     }
 
@@ -349,25 +367,38 @@ public class IncomeServiceImpl implements IncomeService {
         return income;
     }
 
-    private void updateState(String user, Integer incomeId){
+    private Character updateState(String userEmail, Integer incomeId){
         log.info("Hemos llegado hasta actualizacion de estado de entrada");
         String sql;
         sql = "SELECT id FROM user WHERE email = ?";
-        Integer userId = jdbcTemplate.queryForObject(sql, new String[]{user}, Integer.class);
+        Integer userId = jdbcTemplate.queryForObject(sql, new String[]{userEmail}, Integer.class);
 
-        sql = "UPDATE income SET estado = true, autorizador_fk=? WHERE id = ?";
-        jdbcTemplate.update(sql, userId, incomeId);
-        sql = "SELECT id FROM income_detail WHERE income_fk=?";
+        /*Nuevo cod doble verificacion*/
+        Income income=incomeDao.getById(incomeId);
+        if(income.getUserAuth().getId().equals(0)){
+            sql = "UPDATE income SET autorizador_fk=? WHERE id = ?";
+            jdbcTemplate.update(sql, userId, incomeId);
+            return 'A'; //Primera verificación
+        }else{
+            boolean eql = (income.getUserAuth().getId().equals(userId)) ? true : false;
+            if(!eql){
+                sql = "UPDATE income SET estado = true, confirm_fk=? WHERE id = ?";
+                jdbcTemplate.update(sql, userId, incomeId);
+                sql = "SELECT id FROM income_detail WHERE income_fk=?";
+                // Obtener una lista de Strings
+                List<Integer> ids = jdbcTemplate.queryForList(sql, new Integer[]{incomeId}, Integer.class);
 
-        // Obtener una lista de Strings
-        List<Integer> ids = jdbcTemplate.queryForList(sql, new Integer[]{incomeId}, Integer.class);
-
-        log.info("Vamos a efectuar las actualizaciones de stock y precio en los productos");
-        Integer i=0;
-        while(i<ids.size()){;
-            IncomeDetail incomeDetail=incomeDetailDao.getById(ids.get(i));
-            updateProduct(incomeDetail.getProduct().getProdId(), incomeDetail.getId(), incomeDetail.getCantidad(), incomeDetail.getPrecioVentaUnit());
-            i++;
+                log.info("Vamos a efectuar las actualizaciones de stock y precio en los productos");
+                Integer i=0;
+                while(i<ids.size()){
+                    IncomeDetail incomeDetail=incomeDetailDao.getById(ids.get(i));
+                    updateProduct(incomeDetail.getProduct().getProdId(), incomeDetail.getId(), incomeDetail.getCantidad(), incomeDetail.getPrecioVentaUnit());
+                    i++;
+                }
+                return 'B'; //Segunda verificación
+            }
+            return 'C'; //Autorizadores idénticos
+            /*End NUevo cod doble verificacion*/
         }
     }
 
