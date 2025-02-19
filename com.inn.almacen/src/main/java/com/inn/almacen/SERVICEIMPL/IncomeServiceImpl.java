@@ -186,19 +186,19 @@ public class IncomeServiceImpl implements IncomeService {
                     switch (c){
                         case 'A': //Primera autorización
                             return AlmacenUtils.getResponseEntity("PRIMERA AUTORIZACIÓN POR: "+u.getNombre()
-                                    +"\n ES NECESARIA UNA SEGUNDA AUTORIZACIÓN PARA APROBAR ENTRADA.", HttpStatus.OK);
+                                    +"\\n ES NECESARIA UNA SEGUNDA AUTORIZACIÓN PARA APROBAR ENTRADA.", HttpStatus.OK);
                         case 'B': //Segunda autorización
                             updateInstance(user, id);
                             return AlmacenUtils.getResponseEntity("SEGUNDA AUTORIZACIÓN POR: "+u.getNombre()
-                                    +"\n ENTRADA DE PRODUCTOS APROBADA.", HttpStatus.OK );
+                                    +"\\n ENTRADA DE PRODUCTOS APROBADA.", HttpStatus.OK);
                         case 'C': //Autorizaciones identicos
                             return AlmacenUtils.getResponseEntity("ADVERTENCIA: SE REQUIERE UN USUARIO DISTINTO AL PRIMER AUTORIZADOR '"+u.getNombre()
-                                    +"' PARA APROBAR LA ENTRADA DE PRODUCTOS. ", HttpStatus.OK);
+                                    +"' PARA APROBAR LA ENTRADA DE PRODUCTOS. ", HttpStatus.NOT_ACCEPTABLE);
                         default:
-                            return AlmacenUtils.getResponseEntity("HA OCURRIDO UN ERROR IMPREVISTO CON AUTORIZADORES", HttpStatus.OK );
+                            return AlmacenUtils.getResponseEntity("HA OCURRIDO UN ERROR IMPREVISTO CON AUTORIZADORES", HttpStatus.INTERNAL_SERVER_ERROR );
                     }
                 }
-                return AlmacenUtils.getResponseEntity("ID DE ENTRADA NO EXISTE/NO CUENTA CON PRODUCTOS REGISTRADOS.", HttpStatus.OK);
+                return AlmacenUtils.getResponseEntity("ID DE ENTRADA NO EXISTE/NO CUENTA CON PRODUCTOS REGISTRADOS.", HttpStatus.NOT_FOUND);
             }else{
                 return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO, HttpStatus.UNAUTHORIZED);
             }
@@ -250,8 +250,6 @@ public class IncomeServiceImpl implements IncomeService {
         String sql = "SELECT id FROM user WHERE email = ?";
         Integer userId = jdbcTemplate.queryForObject(sql, new String[]{user}, Integer.class);
         User u=userDao.findByRol(userId);
-        //income.setEstado(true);
-        //income.setUserAuth(u);
         createJOrden(income);
     }
 
@@ -353,6 +351,8 @@ public class IncomeServiceImpl implements IncomeService {
         User user=new User();
         User userAuth=new User();
         userAuth.setId(0);
+        User userConfirm=new User();
+        userConfirm.setId(0);
         String name=jwtFilter.getCurrentUser();
         log.info("PRUEBA: "+name);
         String sql = "SELECT id FROM user WHERE email = ?";
@@ -364,6 +364,7 @@ public class IncomeServiceImpl implements IncomeService {
         income.setEstado(requestMap.containsKey("estado") ? Boolean.parseBoolean(requestMap.get("estado")) : false);
         income.setUser(user);
         income.setUserAuth(userAuth);
+        income.setUserConfirm(userConfirm);
         return income;
     }
 

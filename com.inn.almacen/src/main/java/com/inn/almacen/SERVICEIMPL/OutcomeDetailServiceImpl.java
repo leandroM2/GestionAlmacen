@@ -91,7 +91,6 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
                 List<OutcomeDetailView> odv=outcomeDetailDao.getAllOutcomeDetail();
                 return new ResponseEntity<>(outcomeDetailBuilder(odv), HttpStatus.OK);
-                //return new ResponseEntity<>(outcomeDetailDao.getAllOutcomeDetail(), HttpStatus.OK);
             }else{
                 return new ResponseEntity<>(new ArrayList<>(), HttpStatus.UNAUTHORIZED);
             }

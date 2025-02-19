@@ -180,14 +180,14 @@ public class OutcomeServiceImpl implements OutcomeService {
                     switch (c){
                         case 'A': //Primera autorización
                             return AlmacenUtils.getResponseEntity("PRIMERA AUTORIZACIÓN POR: "+u.getNombre()
-                                    +"\n ES NECESARIA UNA SEGUNDA AUTORIZACIÓN PARA APROBAR SALIDA.", HttpStatus.OK);
+                                    +"\\n ES NECESARIA UNA SEGUNDA AUTORIZACIÓN PARA APROBAR SALIDA.", HttpStatus.OK);
                         case 'B': //Segunda autorización
                             updateInstance(user, id);
                             return AlmacenUtils.getResponseEntity("SEGUNDA AUTORIZACIÓN POR: "+u.getNombre()
-                                    +"\n SALIDA DE PRODUCTOS APROBADA.", HttpStatus.OK );
+                                    +"\\n SALIDA DE PRODUCTOS APROBADA.", HttpStatus.OK );
                         case 'C': //Autorizaciones identicos
                             return AlmacenUtils.getResponseEntity("ADVERTENCIA: SE REQUIERE UN USUARIO DISTINTO AL PRIMER AUTORIZADOR '"+u.getNombre()
-                                    +"' PARA APROBAR LA SALIDA DE PRODUCTOS. ", HttpStatus.OK);
+                                    +"' PARA APROBAR LA SALIDA DE PRODUCTOS. ", HttpStatus.NOT_ACCEPTABLE);
                         default:
                             return AlmacenUtils.getResponseEntity("HA OCURRIDO UN ERROR IMPREVISTO CON AUTORIZADORES", HttpStatus.OK );
                     }
@@ -313,8 +313,6 @@ public class OutcomeServiceImpl implements OutcomeService {
         String sql = "SELECT id FROM user WHERE email = ?";
         Integer userId = jdbcTemplate.queryForObject(sql, new String[]{user}, Integer.class);
         User u=userDao.findByRol(userId);
-        //outcome.setEstado(true);
-        //outcome.setUserAuth(u);
         createJGuia(outcome);
     }
 
