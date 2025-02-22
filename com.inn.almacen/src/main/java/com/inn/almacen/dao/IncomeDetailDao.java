@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 public interface IncomeDetailDao extends JpaRepository<IncomeDetail, Integer>{
     IncomeDetail getById(@Param("id") Integer id);
-    //List<IncomeDetailWrapper> getAllIncomeDetail();
     List<IncomeDetailView> getAllIncomeDetail();
     List<KardexDetailWrapper> getAllByFk(@Param("income_fk") Integer income_fk);
     List<KardexDetailWrapper> getAllOrderByFk(@Param("income_fk") Integer income_fk);

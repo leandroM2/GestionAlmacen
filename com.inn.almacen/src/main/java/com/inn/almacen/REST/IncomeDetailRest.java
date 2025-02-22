@@ -17,7 +17,6 @@ public interface IncomeDetailRest {
 
     @GetMapping(path = "/get")
     ResponseEntity<List<IncomeDetailWrapper>> getAllIncomeDetail();
-    //ResponseEntity<List<IncomeDetailView>> getAllIncomeDetail();
 
     @PostMapping(path = "/update")
     ResponseEntity<String> updateIncomeDetail(@RequestBody Map<String, String> requestMap);

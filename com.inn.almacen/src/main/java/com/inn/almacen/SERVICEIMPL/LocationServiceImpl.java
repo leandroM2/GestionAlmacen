@@ -140,11 +140,9 @@ public class LocationServiceImpl implements LocationService {
 
     private Location getLocationFromMap(Map<String, String> requestMap, boolean isUpd) {
         Location location=new Location();
-        if(isUpd){
-            location.setLocationId(Integer.parseInt(requestMap.get("locationId")));
-        }
+        if(isUpd) location.setLocationId(Integer.parseInt(requestMap.get("locationId")));
         location.setLocationFloor(requestMap.get("locationFloor"));
-        location.setLocationState(true);
+        if(!isUpd) location.setLocationState(true);
         return location;
     }
 

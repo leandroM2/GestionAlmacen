@@ -5,7 +5,6 @@ import com.inn.almacen.POJO.*;
 import com.inn.almacen.SERVICE.ArchivesService;
 import com.inn.almacen.SERVICE.IncomeService;
 import com.inn.almacen.SERVICE.PricesService;
-import com.inn.almacen.SERVICE.UserService;
 import com.inn.almacen.UTILS.AlmacenUtils;
 import com.inn.almacen.WRAPPER.IncomeWrapper;
 import com.inn.almacen.WRAPPER.KardexDetailWrapper;
@@ -60,10 +59,7 @@ public class IncomeServiceImpl implements IncomeService {
     PricesDao pd;
 
     @Autowired
-    UserService userService;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    protected JdbcTemplate jdbcTemplate;
     @Override
     public ResponseEntity<String> addNewIncome(Map<String, String> requestMap) {
         log.info("Entra a add new income");

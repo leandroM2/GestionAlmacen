@@ -41,6 +41,8 @@ public class OutcomeWrapper {
 
     private String userConfirmName;
 
+
+
     public OutcomeWrapper(Integer id, java.util.Date fecha, String tipoPago, String factura, Boolean estado,
                           Integer clientId, String clientRazonSocial, Long clientRuc, String clientCorreo,
                           Integer clientContacto, String clientDireccion, Integer userId, String userNombre,
