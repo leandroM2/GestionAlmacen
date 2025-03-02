@@ -37,8 +37,8 @@ public class CategoryServiceImpl implements CategoryService {
                     categoryDao.save(getCategoryFromMap(requestMap, false));
                     return AlmacenUtils.getResponseEntity
                             ("Nueva categoría agregada con exito.", HttpStatus.OK);
-                    
                 }
+                return AlmacenUtils.getResponseEntity(AlmacenConstants.DATA_INVALIDA, HttpStatus.BAD_REQUEST);
             }else{
                 return AlmacenUtils.getResponseEntity(AlmacenConstants.ACCESO_NO_AUTORIZADO,HttpStatus.UNAUTHORIZED);
             }

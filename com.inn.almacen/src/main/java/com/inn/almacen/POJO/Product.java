@@ -13,14 +13,14 @@ import java.io.Serializable;
 @NamedQuery(name = "Product.getByIdView",
         query = "select new com.inn.almacen.WRAPPER.ProductView" +
                 "(p.prodId, p.prodDesc, p.prodCode, p.prodStock, " +
-                "p.prodState, p.category.catId, p.supplier.id," +
+                "p.prodState, p.category.catId, p.supplierDetail.id," +
                 " p.type.typeId, p.location.locationId)  " +
                 " from Product p where p.prodId=:prodId")
 
 @NamedQuery(name = "Product.getAllProduct",
         query = "select new com.inn.almacen.WRAPPER.ProductView" +
                 "(p.prodId, p.prodDesc, p.prodCode, p.prodStock, " +
-                "p.prodState, p.category.catId, p.supplier.id," +
+                "p.prodState, p.category.catId, p.supplierDetail.id," +
                 " p.type.typeId, p.location.locationId)  " +
                 "from Product p")
 
@@ -59,7 +59,7 @@ public class Product implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supplier_fk", nullable = false)
-    private Supplier supplier;
+    private SupplierDetail supplierDetail;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "type_fk", nullable = false)

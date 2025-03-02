@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -163,9 +162,9 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
                             outcomeDetail.getOutcome().getUserAuth().getId(), outcomeDetail.getOutcome().getUserAuth().getNombre(), outcomeDetail.getProduct().getProdId(),
                             outcomeDetail.getProduct().getProdDesc(), outcomeDetail.getProduct().getProdCode(),
                             outcomeDetail.getProduct().getProdStock(), outcomeDetail.getProduct().getProdState(), outcomeDetail.getProduct().getCategory().getCatId(),
-                            outcomeDetail.getProduct().getCategory().getCatName(), outcomeDetail.getProduct().getSupplier().getId(),
-                            outcomeDetail.getProduct().getSupplier().getRazonSocial(), outcomeDetail.getProduct().getSupplier().getRuc(),
-                            outcomeDetail.getProduct().getSupplier().getContacto(),
+                            outcomeDetail.getProduct().getCategory().getCatName(), outcomeDetail.getProduct().getSupplierDetail().getId(),
+                            outcomeDetail.getProduct().getSupplierDetail().getSupplier().getRazonSocial(), outcomeDetail.getProduct().getSupplierDetail().getSupplier().getRuc(),
+                            outcomeDetail.getProduct().getSupplierDetail().getSupplier().getContacto(),
                             outcomeDetail.getProduct().getType().getTypeId(), outcomeDetail.getProduct().getType().getTypeName(),
                             outcomeDetail.getProduct().getLocation().getLocationId(), outcomeDetail.getProduct().getLocation().getLocationFloor()));
                     return new ResponseEntity<>(myList,HttpStatus.OK);
@@ -287,7 +286,7 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
             User uauth=ud.getById(o.getUserAuth().getId());
             Product prod=productDao.getById(unit.getProdId());
             Category c=cd.getById(prod.getCategory().getCatId());
-            Supplier s=sd.getById(prod.getSupplier().getId());
+            Supplier s=sd.getById(prod.getSupplierDetail().getId());
             Type t=td.getById(prod.getType().getTypeId());
             Location l=ld.getById(prod.getLocation().getLocationId());
             Prices p=pd.getById(unit.getProdId());

@@ -36,19 +36,22 @@ public class ProductServiceImpl implements ProductService {
     PricesService pricesService;
 
     @Autowired
-    CategoryDao cd;
+    CategoryDao categoryDao;
 
     @Autowired
-    SupplierDao sd;
+    SupplierDao supplierDao;
 
     @Autowired
-    LocationDao ld;
+    SupplierDetailDao supplierDetailDao;
 
     @Autowired
-    TypeDao td;
+    LocationDao locationDao;
 
     @Autowired
-    PricesDao pd;
+    TypeDao typeDao;
+
+    @Autowired
+    PricesDao pricesDao;
 
     @Override
     public ResponseEntity<String> addNewProduct(Map<String, String> requestMap) {
@@ -172,9 +175,10 @@ public class ProductServiceImpl implements ProductService {
         category.setCatId(Integer.parseInt(requestMap.get("catId")));
         product.setCategory(category);
 
-        Supplier supplier=new Supplier();
-        supplier.setId(Integer.parseInt(requestMap.get("supplierId")));
-        product.setSupplier(supplier);
+        SupplierDetail supplierDetail=supplierDetailDao.getById(Integer.parseInt(requestMap.get("supplierId")));
+        product.setSupplierDetail(supplierDetail);
+        Supplier s= supplierDao.getById(supplierDetail.getSupplier().getId());
+
 
         Type type =new Type();
         type.setTypeId(Integer.parseInt(requestMap.get("typeId")));
@@ -199,7 +203,7 @@ public class ProductServiceImpl implements ProductService {
             return product;
         }
 
-        String prodId = (requestMap.get("supplierId").length()==1) ? "0"+requestMap.get("supplierId") : requestMap.get("supplierId");
+        String prodId = (s.getId().toString().length()==1) ? "0"+s.getId().toString() : s.getId().toString();
         prodId=prodId.concat((requestMap.get("catId").length()==1) ? "0"+requestMap.get("catId") : requestMap.get("catId"));
         prodId=prodId.concat((requestMap.get("typeId").length()==1) ? "0"+requestMap.get("typeId") : requestMap.get("typeId"));
         Integer count=productDao.getCountCorr(prodId);
@@ -218,7 +222,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private Boolean validateCorr(Map<String, String> requestMap){
-        String prodId = (requestMap.get("supplierId").length()==1) ? "0"+requestMap.get("supplierId") : requestMap.get("supplierId");
+        SupplierDetail supplierDetail=supplierDetailDao.getById(Integer.parseInt(requestMap.get("supplierId")));
+        Supplier s= supplierDao.getById(supplierDetail.getSupplier().getId());
+
+        String prodId = (s.getId().toString().length()==1) ? "0"+s.getId().toString() : s.getId().toString();
         prodId=prodId.concat((requestMap.get("catId").length()==1) ? "0"+requestMap.get("catId") : requestMap.get("catId"));
         prodId=prodId.concat((requestMap.get("typeId").length()==1) ? "0"+requestMap.get("typeId") : requestMap.get("typeId"));
 
@@ -243,15 +250,16 @@ public class ProductServiceImpl implements ProductService {
         Iterator<ProductView> iterator = pv.iterator();
         while (iterator.hasNext()) {
             ProductView unit = iterator.next();
-            Category c=cd.getById(unit.getCatId());
-            Supplier s=sd.getById(unit.getSupplierId());
-            Type t=td.getById(unit.getTypeId());
-            Location l=ld.getById(unit.getLocationId());
-            Prices p=pd.getById(unit.getId());
+            Category c= categoryDao.getById(unit.getCatId());
+            SupplierDetail sd= supplierDetailDao.getById(unit.getSupplierDetailId());
+            Supplier s=supplierDao.getById(sd.getSupplier().getId());
+            Type t= typeDao.getById(unit.getTypeId());
+            Location l= locationDao.getById(unit.getLocationId());
+            Prices p= pricesDao.getById(unit.getId());
             pw.add(new ProductWrapper(unit.getId(), unit.getProdDesc(), unit.getProdCode(),
                     unit.getProdStock(), unit.getProdState(), unit.getCatId(),
-                    c.getCatName(), unit.getSupplierId(),
-                    s.getRazonSocial(), s.getRuc(),
+                    c.getCatName(), unit.getSupplierDetailId(), sd.getSupDetId(), sd.getSupDetFactory(),
+                    sd.getSupDetAddress(), sd.getSupDetNumber(), s.getId(), s.getRazonSocial(), s.getRuc(),
                     s.getContacto(), unit.getTypeId(),
                     t.getTypeName(), unit.getLocationId(),
                     l.getLocationFloor(), p.getProdId(),

@@ -273,9 +273,9 @@ public class IncomeServiceImpl implements IncomeService {
         parameters.put("REPORT_DIR", Paths.get("src", "main", "resources", "templates") + File.separator);
         parameters.put("incomeId", kardexId("", income.getId()));
         parameters.put("incomeFecha",String.valueOf(income.getFecha()));
-        parameters.put("supplierRazonSocial",String.valueOf(incomeDetail.getProduct().getSupplier().getRazonSocial()));
-        parameters.put("supplierRuc",String.valueOf(incomeDetail.getProduct().getSupplier().getRuc()));
-        parameters.put("supplierContacto",String.valueOf(incomeDetail.getProduct().getSupplier().getContacto()));
+        parameters.put("supplierRazonSocial",String.valueOf(incomeDetail.getProduct().getSupplierDetail().getSupplier().getRazonSocial()));
+        parameters.put("supplierRuc",String.valueOf(incomeDetail.getProduct().getSupplierDetail().getSupplier().getRuc()));
+        parameters.put("supplierContacto",String.valueOf(incomeDetail.getProduct().getSupplierDetail().getSupplier().getContacto()));
         parameters.put("tipoPago",income.getTipoPago());
         parameters.put("userNombre",String.valueOf(income.getUser().getNombre()));
         parameters.put("userAuth", String.valueOf(income.getUserAuth().getNombre()));

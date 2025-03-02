@@ -154,8 +154,8 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
                             incomeDetail.getProduct().getProdId(), incomeDetail.getProduct().getProdDesc(), incomeDetail.getProduct().getProdCode(),
                             incomeDetail.getProduct().getProdStock(), incomeDetail.getProduct().getProdState(),
                             incomeDetail.getProduct().getCategory().getCatId(), incomeDetail.getProduct().getCategory().getCatName(),
-                            incomeDetail.getProduct().getSupplier().getId(), incomeDetail.getProduct().getSupplier().getRazonSocial(),
-                            incomeDetail.getProduct().getSupplier().getRuc(), incomeDetail.getProduct().getSupplier().getContacto(),
+                            incomeDetail.getProduct().getSupplierDetail().getSupplier().getId(), incomeDetail.getProduct().getSupplierDetail().getSupplier().getRazonSocial(),
+                            incomeDetail.getProduct().getSupplierDetail().getSupplier().getRuc(), incomeDetail.getProduct().getSupplierDetail().getSupplier().getContacto(),
                             incomeDetail.getProduct().getType().getTypeId(), incomeDetail.getProduct().getType().getTypeName(),
                             incomeDetail.getProduct().getLocation().getLocationId(), incomeDetail.getProduct().getLocation().getLocationFloor()));
                     return new ResponseEntity<>(myList,HttpStatus.OK);
@@ -270,7 +270,7 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
             User uAuth=ud.getById(i.getUserAuth().getId());
             Product prod=productDao.getById(unit.getProdId());
             Category c=cd.getById(prod.getCategory().getCatId());
-            Supplier s=sd.getById(prod.getSupplier().getId());
+            Supplier s=sd.getById(prod.getSupplierDetail().getId());
             Type t=td.getById(prod.getType().getTypeId());
             Location l=ld.getById(prod.getLocation().getLocationId());
             Prices p=pd.getById(unit.getProdId());
