@@ -53,7 +53,7 @@ public class CategoryServiceImpl implements CategoryService {
         log.info("Dentro de Get All Category");
         try {
             if(!Strings.isNullOrEmpty(filterValue) && filterValue.equalsIgnoreCase("true")){
-                return new ResponseEntity<List<Category>>(categoryDao.getAllCategory(),HttpStatus.OK);
+                return new ResponseEntity<>(categoryDao.getAllCategory(), HttpStatus.OK);
             }
             return new ResponseEntity<>(categoryDao.findAll(), HttpStatus.OK);
 

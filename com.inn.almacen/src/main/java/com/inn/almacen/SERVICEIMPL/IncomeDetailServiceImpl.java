@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -30,8 +29,6 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
     @Autowired
     ProductDao productDao;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
     @Autowired
     JwtFilter jwtFilter;
 
@@ -185,14 +182,14 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
         return false;
     }
 
-    private IncomeDetail getIncomeDetailFromMap(Map<String, String> requestMap, boolean esAdd){
+    private IncomeDetail getIncomeDetailFromMap(Map<String, String> requestMap, boolean isUpd){
         Income income=new Income();
         income.setId(Integer.parseInt(requestMap.get("incomeId")));
 
         Product product=productDao.getById(requestMap.get("prodId"));
 
         IncomeDetail incomeDetail=new IncomeDetail();
-        if(esAdd) incomeDetail.setId(Integer.parseInt(requestMap.get("id")));
+        if(isUpd) incomeDetail.setId(Integer.parseInt(requestMap.get("id")));
         incomeDetail.setIncome(income);
         incomeDetail.setProduct(product);
         incomeDetail.setPrecioVentaUnit(Float.parseFloat(requestMap.get("precioVentaUnit")));
@@ -202,59 +199,58 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
         incomeDetail.setCantidad(cant);
         Boolean state=validateState(Integer.parseInt(requestMap.get("incomeId")));
         if(state){
-            Integer stock=updateProduct(product.getProdId(), cant, incomeDetail.getId(), esAdd);
-            incomeDetail.setSaldo(stock);
+            Integer prodStock=updateProduct(product.getProdId(), cant, incomeDetail.getId(), isUpd);
+            incomeDetail.setSaldo(prodStock);
         }
         return incomeDetail;
     }
 
     private Boolean validateState(Integer incomeId){
-        Income income;
-        income=incomeDao.getById(incomeId);
-        Boolean state=income.getEstado();
-        return state;
+        Income income=incomeDao.getById(incomeId);
+        return income.getEstado();
     }
 
-    private Integer updateProduct(String id, Integer cant, Integer incomeId, boolean esAdd){
+    private Integer updateProduct(String prodId, Integer cant, Integer incomeDetailId, boolean isUpd){
         log.info("Hemos llegado hasta actualizacion de stock producto.");
-        String sql = "SELECT prodStock FROM product WHERE prodId = ?";
-        Integer stock = jdbcTemplate.queryForObject(sql, new String[]{id}, Integer.class);
-        if(esAdd){
-            sql = "SELECT cantidad FROM income_detail WHERE id = ?";
-            Integer oldCant = jdbcTemplate.queryForObject(sql, new Integer[]{incomeId}, Integer.class);
+
+        Product prod=productDao.getById(prodId);
+        Integer prodStock=prod.getProdStock();
+
+        if(isUpd){
+            IncomeDetail incomeD=incomeDetailDao.getById(incomeDetailId);
+            Integer oldCant=incomeD.getCantidad();
+
             if(cant!=oldCant){
                 log.info("Estamos actualizando Income detail.");
                 Integer total = (cant > oldCant) ? cant-oldCant : oldCant-cant;
-                boolean oper = (cant > oldCant) ? true : false;
+                boolean op = (cant > oldCant) ? true : false;
 
-                if(oper){
-                    stock=stock+total;
+                if(op){
+                    prodStock=prodStock+total;
                 }else{
-                    stock=stock-total;
+                    prodStock=prodStock-total;
                 }
-                sql = "UPDATE product SET prodStock = ? WHERE prodId = ?";
-                jdbcTemplate.update(sql, stock, id);
+                prod.setProdStock(prodStock);
+                productDao.save(prod);
             }
             log.info("Cantidades no fueron modificadas por user.");
         }else{
             log.info("Estamos insertando Income detail.");
-            stock=stock+cant;
-            sql = "UPDATE product SET prodStock = ? WHERE prodId = ?";
-            jdbcTemplate.update(sql, stock, id);
+            prod.setProdStock(prodStock+cant);
+            productDao.save(prod);
         }
-        return stock;
+        return prodStock;
     }
 
-    private String restoreProduct(Integer cant, String productId, Integer incomeId){
+    private String restoreProduct(Integer cant, String prodId, Integer incomeId){
         log.info("Se retirará el stock actualizado en producto si registro fue autorizado");
         String msg;
         Income income=incomeDao.getById(incomeId);
         if(income.getEstado()){
-            String sql = "SELECT prodStock from product WHERE prodId = ?";
-            Integer stock = jdbcTemplate.queryForObject(sql, new String[]{productId}, Integer.class);
-            stock=stock-cant;
-            sql = "UPDATE product SET prodStock = ? WHERE prodId = ?";
-            jdbcTemplate.update(sql, stock, productId);
+            Product prod=productDao.getById(prodId);
+            Integer stock=prod.getProdStock()-cant;
+            prod.setProdStock(stock);
+            productDao.save(prod);
             msg="El stock asignado por entrada ha sido retirado del producto";
         }else{
             msg="Stock de productos no fueron modificados debido a que el registro nunca fue autorizado";
@@ -271,7 +267,7 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
             IncomeDetailView unit = iterator.next();
             Income i=incomeDao.getById(unit.getIncomeId());
             User u=ud.getById(i.getUser().getId());
-            User uauth=ud.getById(i.getUserAuth().getId());
+            User uAuth=ud.getById(i.getUserAuth().getId());
             Product prod=productDao.getById(unit.getProdId());
             Category c=cd.getById(prod.getCategory().getCatId());
             Supplier s=sd.getById(prod.getSupplier().getId());
@@ -281,7 +277,7 @@ public class IncomeDetailServiceImpl implements IncomeDetailService {
             idw.add(new IncomeDetailWrapper
                     (unit.getId(), unit.getCantidad(), unit.getPrecioVentaUnit(), unit.getOldPrecioVenta(),
                     unit.getSaldo(), i.getId(), i.getFecha(), i.getEstado(), u.getId(), u.getNombre(),
-                    uauth.getId(), uauth.getNombre(), prod.getProdId(), prod.getProdDesc(), prod.getProdCode(),
+                    uAuth.getId(), uAuth.getNombre(), prod.getProdId(), prod.getProdDesc(), prod.getProdCode(),
                     prod.getProdStock(), prod.getProdState(), c.getCatId(), c.getCatName(), s.getId(),
                     s.getRazonSocial(), s.getRuc(), s.getContacto(), t.getTypeId(), t.getTypeName(), l.getLocationId(),
                     l.getLocationFloor()));

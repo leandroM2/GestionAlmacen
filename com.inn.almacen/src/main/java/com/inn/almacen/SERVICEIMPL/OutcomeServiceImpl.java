@@ -23,7 +23,6 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -43,9 +42,6 @@ public class OutcomeServiceImpl implements OutcomeService {
 
     @Autowired
     JwtFilter jwtFilter;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     OutcomeDetailDao outcomeDetailDao;
@@ -166,23 +162,23 @@ public class OutcomeServiceImpl implements OutcomeService {
         return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
     @Override
-    public ResponseEntity<String> authorizeOutcome(Integer id){
+    public ResponseEntity<String> authorizeOutcome(Integer outcomeId){
         try {
             if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin()){
-                Optional optional=outcomeDao.findById(id);
-                if(!optional.isEmpty() && validateDetails(id)){
-                    String user=jwtFilter.getCurrentUser();
-                    User u=userDao.findByEmailId(user);
+                Optional optional=outcomeDao.findById(outcomeId);
+                if(!optional.isEmpty() && validateDetails(outcomeId)){
+                    String userEmail=jwtFilter.getCurrentUser();
+                    User u=userDao.findByEmailId(userEmail);
                     if(validateSign(u.getNombre())){
                         return AlmacenUtils.getResponseEntity("USUARIO "+jwtFilter.getCurrentUser()+" NO CUENTA CON FIRMA DENTRO DEL SISTEMA.", HttpStatus.CONFLICT);
                     }
-                    Character c=updateState(user, id);
+                    Character c=updateState(userEmail, outcomeId);
                     switch (c){
                         case 'A': //Primera autorización
                             return AlmacenUtils.getResponseEntity("PRIMERA AUTORIZACIÓN POR: "+u.getNombre()
                                     +"\\n ES NECESARIA UNA SEGUNDA AUTORIZACIÓN PARA APROBAR SALIDA.", HttpStatus.OK);
                         case 'B': //Segunda autorización
-                            updateInstance(user, id);
+                            updateInstance(outcomeId);
                             return AlmacenUtils.getResponseEntity("SEGUNDA AUTORIZACIÓN POR: "+u.getNombre()
                                     +"\\n SALIDA DE PRODUCTOS APROBADA.", HttpStatus.OK );
                         case 'C': //Autorizaciones identicos
@@ -301,18 +297,15 @@ public class OutcomeServiceImpl implements OutcomeService {
         }
     }
 
-    private Boolean validateDetails(Integer id) {
-        String sql="SELECT count(*) FROM outcome_detail WHERE outcome_fk = ?";
-        Integer det= jdbcTemplate.queryForObject(sql, new Integer[]{id}, Integer.class);
+    private Boolean validateDetails(Integer outcomeId) {
+        List<KardexDetailWrapper> odw=outcomeDetailDao.getAllByFk(outcomeId);
+        Integer det=odw.size();
         Boolean val=det>0 ? true :  false;
         return val;
     }
 
-    private void updateInstance(String user, Integer id){
-        Outcome outcome=outcomeDao.getById(id);
-        String sql = "SELECT id FROM user WHERE email = ?";
-        Integer userId = jdbcTemplate.queryForObject(sql, new String[]{user}, Integer.class);
-        User u=userDao.findByRol(userId);
+    private void updateInstance(Integer outcomeId){
+        Outcome outcome=outcomeDao.getById(outcomeId);
         createJGuia(outcome);
     }
 
@@ -328,7 +321,7 @@ public class OutcomeServiceImpl implements OutcomeService {
         return false;
     }
 
-    private Outcome getOutcomeFromMap(Map<String, String> requestMap, boolean esAdd) {
+    private Outcome getOutcomeFromMap(Map<String, String> requestMap, boolean isUpd) {
         Outcome outcome=new Outcome();
         Client client=new Client();
         User user=new User();
@@ -337,19 +330,23 @@ public class OutcomeServiceImpl implements OutcomeService {
         User userConfirm=new User();
         userConfirm.setId(0);
 
-        String name=jwtFilter.getCurrentUser();
-        String sql = "SELECT id FROM user WHERE email = ?";
-        Integer userId = jdbcTemplate.queryForObject(sql, new String[]{name}, Integer.class);
-        sql="SELECT COUNT(*) FROM outcome";
-        Integer tot= jdbcTemplate.queryForObject(sql, Integer.class);
+        String userEmail=jwtFilter.getCurrentUser();
+        User u=userDao.findByEmail(userEmail);
+        Integer userId = u.getId();
+
+        List<OutcomeWrapper> ow=outcomeDao.getAllOutcome();
+        Integer tot= ow.size();
+
         user.setId(userId);
-        if(esAdd) outcome.setId(Integer.parseInt(requestMap.get("id")));
+        if(isUpd){
+            outcome=outcomeDao.getById(Integer.parseInt(requestMap.get("id")));
+        }
         client.setId(Integer.parseInt(requestMap.get("clientId")));
 
         outcome.setFecha(Date.valueOf(requestMap.get("fecha")));
         outcome.setTipoPago(requestMap.get("tipoPago"));
         outcome.setFactura(factura(requestMap.get("fecha"), tot+1));
-        outcome.setEstado(requestMap.containsKey("estado") ? Boolean.parseBoolean(requestMap.get("estado")) : false);
+        if (!isUpd) outcome.setEstado(false);
         outcome.setClient(client);
         outcome.setUser(user);
         outcome.setUserAuth(userAuth);
@@ -361,19 +358,6 @@ public class OutcomeServiceImpl implements OutcomeService {
     private String factura(String fecha, Integer rawId){
         String formattedDate = fecha.replace("-", "");
         StringBuilder id = new StringBuilder("DNX" +formattedDate);
-        Integer auxId=rawId;
-        if(auxId==0) auxId++;
-        double cont=Math.floor(Math.log10(Math.abs(auxId)) + 1);
-        cont=5-cont;
-        for (Integer i = 0; i<cont; i++){
-            id.append("0");
-        }
-        id.append(rawId);
-        return id.toString();
-    }
-
-    private String factid(String ini, Integer rawId){
-        StringBuilder id = new StringBuilder(ini);
         Integer auxId=rawId;
         if(auxId==0) auxId++;
         double cont=Math.floor(Math.log10(Math.abs(auxId)) + 1);
@@ -401,31 +385,32 @@ public class OutcomeServiceImpl implements OutcomeService {
     private Character updateState(String userEmail, Integer outcomeId){
         log.info("Hemos llegado hasta actualizacion de estado de salida");
         String sql;
-        sql = "SELECT id FROM user WHERE email = ?";
-        Integer userId = jdbcTemplate.queryForObject(sql, new String[]{userEmail}, Integer.class);
+        User u=userDao.findByEmail(userEmail);
+        Integer userId = u.getId();
 
         //Nuevo cod doble verificacion
         Outcome outcome=outcomeDao.getById(outcomeId);
         if(outcome.getUserAuth().getId().equals(0)){
-            sql = "UPDATE outcome SET autorizador_fk=? WHERE id = ?";
-            jdbcTemplate.update(sql, userId, outcomeId);
+            outcome.setUserAuth(u);
+            outcomeDao.save(outcome);
             return 'A'; //Primera verificación
         }else{
             boolean eql = (outcome.getUserAuth().getId().equals(userId)) ? true : false;
             if(!eql){
-                sql = "UPDATE outcome SET estado = true, confirm_fk=? WHERE id = ?";
-                jdbcTemplate.update(sql, userId, outcomeId);
-                sql = "SELECT id FROM outcome_detail WHERE outcome_fk=?";
-                // Obtener una lista de Strings
-                List<Integer> ids = jdbcTemplate.queryForList(sql, new Integer[]{outcomeId}, Integer.class);
+                outcome.setEstado(true);
+                outcome.setUserConfirm(u);
+                outcomeDao.save(outcome);
 
+                /*Prueba*/
+                List<KardexDetailWrapper> od=outcomeDetailDao.getAllByFk(outcomeId);
                 log.info("Vamos a efectuar las actualizaciones de monto y precio en los productos");
                 Integer i=0;
-                while(i<ids.size()){
-                    OutcomeDetail outcomeDetail=outcomeDetailDao.getById(ids.get(i));
+                while(i<od.size()){
+                    OutcomeDetail outcomeDetail=outcomeDetailDao.getById(od.get(i).getId());
                     updateProduct(outcomeDetail.getProduct().getProdId(), outcomeDetail.getId(), outcomeDetail.getCantidad());
                     i++;
                 }
+                /*End prueba*/
                 return 'B'; //Segunda verificación
             }
             return 'C'; //Autorizadores idénticos
@@ -433,17 +418,17 @@ public class OutcomeServiceImpl implements OutcomeService {
         }
     }
 
-    private void updateProduct(String prod_id, Integer outcomeDetailId, Integer cant){
+    private void updateProduct(String prodId, Integer outcomeDetailId, Integer cant){
         log.info("Hemos llegado hasta actualizacion de prod_stock y precio producto.");
-        String sql;
-        Product product=productDao.getById(prod_id);
+        Product product=productDao.getById(prodId);
         log.info("Estamos insertando y precios a Outcome detail.");
-        Integer prod_stock=product.getProdStock();
-        prod_stock=prod_stock-cant;
-        sql = "UPDATE product SET prod_stock = ? WHERE prod_id = ?";
-        jdbcTemplate.update(sql, prod_stock, prod_id);
-        sql= "UPDATE outcome_detail SET saldo = ? WHERE id= ?";
-        jdbcTemplate.update(sql, prod_stock, outcomeDetailId);
+        Integer prodStock=product.getProdStock();
+        product.setProdStock(prodStock-cant);
+        productDao.save(product);
+
+        OutcomeDetail od=outcomeDetailDao.getById(outcomeDetailId);
+        od.setSaldo(prodStock-cant);
+        outcomeDetailDao.save(od);
         log.info("Valores de prod_stock y precio de producto y outcome detail actualizado");
     }
 }

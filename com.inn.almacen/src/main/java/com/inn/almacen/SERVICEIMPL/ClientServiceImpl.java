@@ -52,7 +52,7 @@ public class ClientServiceImpl implements ClientService {
         log.info("Dentro de get all client");
         try {
             if(!Strings.isNullOrEmpty(filterValue) && filterValue.equalsIgnoreCase("true")){
-                return new ResponseEntity<List<Client>>(clientDao.getAllClient(), HttpStatus.OK);
+                return new ResponseEntity<>(clientDao.getAllClient(), HttpStatus.OK);
             }
             return new ResponseEntity<>(clientDao.findAll(), HttpStatus.OK);
         }catch (Exception e){
