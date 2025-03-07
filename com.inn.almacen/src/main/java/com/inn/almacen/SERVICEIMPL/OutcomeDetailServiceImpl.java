@@ -36,25 +36,28 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
     Jasypt jasypt;
 
     @Autowired
-    CategoryDao cd;
+    CategoryDao categoryDao;
 
     @Autowired
-    SupplierDao sd;
+    SupplierDao supplierDao;
 
     @Autowired
-    LocationDao ld;
+    LocationDao locationDao;
 
     @Autowired
-    TypeDao td;
+    TypeDao typeDao;
 
     @Autowired
-    PricesDao pd;
+    PricesDao pricesDao;
 
     @Autowired
-    UserDao ud;
+    UserDao userDao;
 
     @Autowired
     ClientDao clientDao;
+
+    @Autowired
+    ClientDetailDao clientDetailDao;
     @Override
     public ResponseEntity<String> addNewOutcomeDetail(Map<String, String> requestMap) {
         try {
@@ -155,9 +158,12 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
                     List<OutcomeDetailWrapper> myList = new ArrayList<>();
                     myList.add(new OutcomeDetailWrapper(outcomeDetail.getId(),outcomeDetail.getCantidad(), outcomeDetail.getPrecioDeVenta(), outcomeDetail.getSaldo(),
                             outcomeDetail.getOutcome().getId(), outcomeDetail.getOutcome().getFecha(), outcomeDetail.getOutcome().getEstado(),
-                            outcomeDetail.getOutcome().getClient().getId(), outcomeDetail.getOutcome().getClient().getRazonSocial(),
-                            outcomeDetail.getOutcome().getClient().getRuc(), outcomeDetail.getOutcome().getClient().getCorreo(),
-                            outcomeDetail.getOutcome().getClient().getContacto(), outcomeDetail.getOutcome().getClient().getDireccion(),
+                            outcomeDetail.getOutcome().getClientDetail().getId(), outcomeDetail.getOutcome().getClientDetail().getCliDetId(),
+                            outcomeDetail.getOutcome().getClientDetail().getCliDetFactory(), outcomeDetail.getOutcome().getClientDetail().getCliDetAddress(),
+                            outcomeDetail.getOutcome().getClientDetail().getCliDetNumber(),
+                            outcomeDetail.getOutcome().getClientDetail().getClient().getId(), outcomeDetail.getOutcome().getClientDetail().getClient().getRazonSocial(),
+                            outcomeDetail.getOutcome().getClientDetail().getClient().getRuc(), outcomeDetail.getOutcome().getClientDetail().getClient().getCorreo(),
+                            outcomeDetail.getOutcome().getClientDetail().getClient().getContacto(), outcomeDetail.getOutcome().getClientDetail().getClient().getDireccion(),
                             outcomeDetail.getOutcome().getUser().getId(), outcomeDetail.getOutcome().getUser().getNombre(),
                             outcomeDetail.getOutcome().getUserAuth().getId(), outcomeDetail.getOutcome().getUserAuth().getNombre(), outcomeDetail.getProduct().getProdId(),
                             outcomeDetail.getProduct().getProdDesc(), outcomeDetail.getProduct().getProdCode(),
@@ -281,21 +287,26 @@ public class OutcomeDetailServiceImpl implements OutcomeDetailService {
         while (iterator.hasNext()) {
             OutcomeDetailView unit = iterator.next();
             Outcome o=outcomeDao.getById(unit.getOutcomeId());
-            Client cl=clientDao.getById(o.getClient().getId());
-            User u=ud.getById(o.getUser().getId());
-            User uauth=ud.getById(o.getUserAuth().getId());
+
+            ClientDetail cd=clientDetailDao.getById(o.getClientDetail().getId());
+
+            Client cl=clientDao.getById(cd.getClient().getId());
+            User u= userDao.getById(o.getUser().getId());
+            User uAuth= userDao.getById(o.getUserAuth().getId());
             Product prod=productDao.getById(unit.getProdId());
-            Category c=cd.getById(prod.getCategory().getCatId());
-            Supplier s=sd.getById(prod.getSupplierDetail().getId());
-            Type t=td.getById(prod.getType().getTypeId());
-            Location l=ld.getById(prod.getLocation().getLocationId());
-            Prices p=pd.getById(unit.getProdId());
+            Category c= categoryDao.getById(prod.getCategory().getCatId());
+            Supplier s= supplierDao.getById(prod.getSupplierDetail().getId());
+            Type t= typeDao.getById(prod.getType().getTypeId());
+            Location l= locationDao.getById(prod.getLocation().getLocationId());
+            Prices p= pricesDao.getById(unit.getProdId());
             odw.add(new OutcomeDetailWrapper
                     (unit.getId(), unit.getCantidad(), unit.getPrecioDeVenta(),
                             unit.getSaldo(), o.getId(), o.getFecha(), o.getEstado(),
+                            cd.getId(), cd.getCliDetId(), cd.getCliDetFactory(), cd.getCliDetAddress(), cd.getCliDetNumber(),
+
                             cl.getId(), cl.getRazonSocial(), cl.getRuc(), cl.getCorreo(), cl.getContacto(), cl.getDireccion(),
                             u.getId(), u.getNombre(),
-                            uauth.getId(), uauth.getNombre(),
+                            uAuth.getId(), uAuth.getNombre(),
                             prod.getProdId(), prod.getProdDesc(), prod.getProdCode(),
                             prod.getProdStock(), prod.getProdState(),
                             c.getCatId(), c.getCatName(),

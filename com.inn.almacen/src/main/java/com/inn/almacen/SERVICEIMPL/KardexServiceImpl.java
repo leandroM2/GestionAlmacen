@@ -250,7 +250,8 @@ public class KardexServiceImpl implements KardexService {
             String ini="E";
             String KID=kardexId(ini, rawId);
             InDetail=incomeDetailDao.getAllByFk(IW.getId());
-            KW.add(new KardexWrapper(KID, IW.getFecha() , IW.getFecha().getTime(), IW.getTipoPago(),"-" ,IW.getEstado(),"Entrada","-",KID,InDetail));
+            KW.add(new KardexWrapper(KID, IW.getFecha() , IW.getFecha().getTime(), IW.getTipoPago(),
+                    "-" ,IW.getEstado(),"Entrada","-","-",KID, InDetail));
         }
         return KW;
     }
@@ -266,7 +267,8 @@ public class KardexServiceImpl implements KardexService {
             String KID=kardexId(ini, rawId);
             outDetail=outcomeDetailDao.getAllByFk(OW.getId());
             outDetailBuilt=kardexDetailBuilder(outDetail);
-            KW.add(new KardexWrapper(KID, OW.getFecha(), OW.getFecha().getTime(), OW.getTipoPago(), OW.getFactura() ,OW.getEstado(),"Salida",OW.getClientRazonSocial(),KID,outDetailBuilt));
+            KW.add(new KardexWrapper(KID, OW.getFecha(), OW.getFecha().getTime(), OW.getTipoPago(), OW.getFactura(),
+                    OW.getEstado(),"Salida",OW.getClientRazonSocial(), OW.getCliDetFactory(), KID,outDetailBuilt));
         }
         return KW;
     }
@@ -306,7 +308,9 @@ public class KardexServiceImpl implements KardexService {
         String KID=kardexId(ini, rawId);
         OutDetail=outcomeDetailDao.getAllByFk(outcome.getId());
         log.info("Dentro de kardexoutcomebyid "+OutDetail);
-        KW.add(new KardexWrapper(KID, outcome.getFecha(), outcome.getFecha().getTime(), outcome.getTipoPago(), outcome.getFactura(), outcome.getEstado(),"Salida",outcome.getClient().getRazonSocial(),KID,OutDetail));
+        KW.add(new KardexWrapper(KID, outcome.getFecha(), outcome.getFecha().getTime(), outcome.getTipoPago(),
+                outcome.getFactura(), outcome.getEstado(),"Salida",
+                outcome.getClientDetail().getClient().getRazonSocial(), outcome.getClientDetail().getCliDetFactory(), KID,OutDetail));
         return KW;
     }
 
@@ -319,7 +323,8 @@ public class KardexServiceImpl implements KardexService {
         String KID=kardexId(ini, rawId);
         InDetail=incomeDetailDao.getAllByFk(income.getId());
         log.info("Dentro de kardexincomebyid "+InDetail);
-        KW.add(new KardexWrapper(KID, income.getFecha(), income.getFecha().getTime(), income.getTipoPago(), "-", income.getEstado(),"Entrada","-",KID,InDetail));
+        KW.add(new KardexWrapper(KID, income.getFecha(), income.getFecha().getTime(), income.getTipoPago(), "-",
+                income.getEstado(),"Entrada","-","-", KID,InDetail));
         return KW;
     }
 

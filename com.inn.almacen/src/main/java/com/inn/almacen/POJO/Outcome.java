@@ -8,8 +8,22 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Date;
 
-@NamedQuery(name = "Outcome.getById", query = "select new com.inn.almacen.WRAPPER.OutcomeWrapper(o.id, o.fecha, o.tipoPago, o.factura, o.estado, o.client.id, o.client.razonSocial, o.client.ruc, o.client.correo, o.client.contacto, o.client.direccion, o.user.id, o.user.nombre, o.userAuth.id, o.userAuth.nombre, o.userConfirm.id, o.userConfirm.nombre) from Outcome o where o.id=:id")
-@NamedQuery(name = "Outcome.getAllOutcome", query = "select new com.inn.almacen.WRAPPER.OutcomeWrapper(o.id, o.fecha, o.tipoPago, o.factura, o.estado, o.client.id, o.client.razonSocial, o.client.ruc, o.client.correo, o.client.contacto, o.client.direccion, o.user.id, o.user.nombre, o.userAuth.id, o.userAuth.nombre, o.userConfirm.id, o.userConfirm.nombre) from Outcome o")
+@NamedQuery(name = "Outcome.getById",
+        query = "select new com.inn.almacen.WRAPPER.OutcomeWrapper(o.id, o.fecha, o.tipoPago, o.factura, o.estado, " +
+                "o.clientDetail.id, o.clientDetail.cliDetId, o.clientDetail.cliDetFactory, o.clientDetail.cliDetAddress, "+
+                "o.clientDetail.cliDetNumber, "+
+                "o.clientDetail.client.id, o.clientDetail.client.razonSocial, o.clientDetail.client.ruc, " +
+                " o.clientDetail.client.correo, o.clientDetail.client.contacto, o.clientDetail.client.direccion, " +
+                "o.user.id, o.user.nombre, o.userAuth.id, o.userAuth.nombre, o.userConfirm.id, o.userConfirm.nombre) " +
+                "from Outcome o where o.id=:id")
+@NamedQuery(name = "Outcome.getAllOutcome",
+        query = "select new com.inn.almacen.WRAPPER.OutcomeWrapper(o.id, o.fecha, o.tipoPago, o.factura, o.estado, " +
+                "o.clientDetail.id, o.clientDetail.cliDetId, o.clientDetail.cliDetFactory, o.clientDetail.cliDetAddress, "+
+                "o.clientDetail.cliDetNumber, "+
+                "o.clientDetail.client.id, o.clientDetail.client.razonSocial, o.clientDetail.client.ruc, " +
+                " o.clientDetail.client.correo, o.clientDetail.client.contacto, o.clientDetail.client.direccion, " +
+                "o.user.id, o.user.nombre, o.userAuth.id, o.userAuth.nombre, o.userConfirm.id, o.userConfirm.nombre) " +
+                "from Outcome o")
 
 @Data
 @Entity
@@ -38,7 +52,7 @@ public class Outcome implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_fk", nullable = false)
-    private Client client;
+    private ClientDetail clientDetail;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receptor_fk", nullable = false)

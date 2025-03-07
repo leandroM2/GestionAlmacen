@@ -23,13 +23,14 @@ public class KardexWrapper {
     private String tipoMov;
 
     private String persona;
+    private String personaDet;
 
     private String archivesId;
 
-    private List<KardexDetailWrapper> detalles;
+    private List<KardexDetailWrapper> details;
 
     public KardexWrapper(String id, java.util.Date fecha, Long time, String tipoPago, String factura, Boolean estado, String tipoMov,
-                         String persona, String archivesId, List<KardexDetailWrapper> detalles) {
+                         String persona, String personaDet, String archivesId, List<KardexDetailWrapper> details) {
         this.id = id;
         this.fecha = (Date) fecha;
         this.time=time;
@@ -38,7 +39,8 @@ public class KardexWrapper {
         this.estado = estado;
         this.tipoMov = tipoMov;
         this.persona=persona;
+        this.personaDet=personaDet;
         this.archivesId = archivesId;
-        this.detalles = detalles;
+        this.details = details;
     }
 }

@@ -25,5 +25,8 @@ public interface ProductRest {
     @PostMapping(path = "/get/{prodId}")
     ResponseEntity<List<ProductWrapper>> getById(@PathVariable String prodId);
 
+    @PostMapping(path = "/get/sup/{supplierId}")
+    ResponseEntity<List<ProductWrapper>> getBySupplierDetailId(@PathVariable Integer supplierId);
+
 
 }

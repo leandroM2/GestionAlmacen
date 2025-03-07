@@ -10,10 +10,7 @@ import com.inn.almacen.WRAPPER.KardexDetailWrapper;
 import com.inn.almacen.WRAPPER.OutcomeWrapper;
 import com.inn.almacen.WRAPPER.RemisionWrapper;
 import com.inn.almacen.constens.AlmacenConstants;
-import com.inn.almacen.dao.OutcomeDao;
-import com.inn.almacen.dao.OutcomeDetailDao;
-import com.inn.almacen.dao.ProductDao;
-import com.inn.almacen.dao.UserDao;
+import com.inn.almacen.dao.*;
 import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfWriter;
@@ -54,6 +51,9 @@ public class OutcomeServiceImpl implements OutcomeService {
 
     @Autowired
     UserDao userDao;
+
+    @Autowired
+    ClientDetailDao clientDetailDao;
 
     @Override
     public ResponseEntity<String> addNewOutcome(Map<String, String> requestMap) {
@@ -145,10 +145,15 @@ public class OutcomeServiceImpl implements OutcomeService {
                 if(!optional.isEmpty()){
                     Outcome outcome=outcomeDao.getById(id);
                     List<OutcomeWrapper> myList = new ArrayList<>();
-                    myList.add(new OutcomeWrapper(outcome.getId(), outcome.getFecha(),outcome.getTipoPago(), outcome.getFactura(), outcome.getEstado() , outcome.getClient().getId(),
-                            outcome.getClient().getRazonSocial(), outcome.getClient().getRuc(), outcome.getClient().getCorreo(),
-                            outcome.getClient().getContacto(), outcome.getClient().getDireccion(), outcome.getUser().getId(),
-                            outcome.getUser().getNombre(), outcome.getUserAuth().getId(), outcome.getUserAuth().getNombre(),
+                    myList.add(new OutcomeWrapper(outcome.getId(), outcome.getFecha(),outcome.getTipoPago(),
+                            outcome.getFactura(), outcome.getEstado(),
+                            outcome.getClientDetail().getId(), outcome.getClientDetail().getCliDetId(),
+                            outcome.getClientDetail().getCliDetFactory(), outcome.getClientDetail().getCliDetAddress(),
+                            outcome.getClientDetail().getCliDetNumber(),
+                            outcome.getClientDetail().getClient().getId(), outcome.getClientDetail().getClient().getRazonSocial(),
+                            outcome.getClientDetail().getClient().getRuc(), outcome.getClientDetail().getClient().getCorreo(),
+                            outcome.getClientDetail().getClient().getContacto(), outcome.getClientDetail().getClient().getDireccion(),
+                            outcome.getUser().getId(), outcome.getUser().getNombre(), outcome.getUserAuth().getId(), outcome.getUserAuth().getNombre(),
                             outcome.getUserConfirm().getId(), outcome.getUserConfirm().getNombre()));
                     return new ResponseEntity<>(myList,HttpStatus.OK);
                 }
@@ -237,9 +242,9 @@ public class OutcomeServiceImpl implements OutcomeService {
         parameters.put("outcomeFactura",outcome.getFactura());
         parameters.put("outcomeUser",outcome.getUser().getNombre());
         parameters.put("outcomeUserAuth",outcome.getUserAuth().getNombre());
-        parameters.put("clientRazonSocial",outcome.getClient().getRazonSocial());
-        parameters.put("clientRuc",String.valueOf(outcome.getClient().getRuc()));
-        parameters.put("clientContacto",String.valueOf(outcome.getClient().getContacto()));
+        parameters.put("clientRazonSocial",outcome.getClientDetail().getClient().getRazonSocial());
+        parameters.put("clientRuc",String.valueOf(outcome.getClientDetail().getClient().getRuc()));
+        parameters.put("clientContacto",String.valueOf(outcome.getClientDetail().getClient().getContacto()));
         String doc="remision.jrxml";
         if(outcome.getEstado()){
             LocalDate currentDate = LocalDate.now();
@@ -323,7 +328,6 @@ public class OutcomeServiceImpl implements OutcomeService {
 
     private Outcome getOutcomeFromMap(Map<String, String> requestMap, boolean isUpd) {
         Outcome outcome=new Outcome();
-        Client client=new Client();
         User user=new User();
         User userAuth=new User();
         userAuth.setId(0);
@@ -341,13 +345,14 @@ public class OutcomeServiceImpl implements OutcomeService {
         if(isUpd){
             outcome=outcomeDao.getById(Integer.parseInt(requestMap.get("id")));
         }
-        client.setId(Integer.parseInt(requestMap.get("clientId")));
+        ClientDetail clientDetail=clientDetailDao.getById(Integer.parseInt(requestMap.get("clientId")));
 
         outcome.setFecha(Date.valueOf(requestMap.get("fecha")));
         outcome.setTipoPago(requestMap.get("tipoPago"));
         outcome.setFactura(factura(requestMap.get("fecha"), tot+1));
         if (!isUpd) outcome.setEstado(false);
-        outcome.setClient(client);
+
+        outcome.setClientDetail(clientDetail);
         outcome.setUser(user);
         outcome.setUserAuth(userAuth);
         outcome.setUserConfirm(userConfirm);

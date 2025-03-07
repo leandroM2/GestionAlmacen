@@ -9,6 +9,7 @@ import com.inn.almacen.SERVICE.ProductService;
 import com.inn.almacen.UTILS.AlmacenUtils;
 import com.inn.almacen.WRAPPER.ProductView;
 import com.inn.almacen.WRAPPER.ProductWrapper;
+import com.inn.almacen.WRAPPER.SupplierDetailWrapper;
 import com.inn.almacen.constens.AlmacenConstants;
 import com.inn.almacen.dao.*;
 import lombok.extern.slf4j.Slf4j;
@@ -123,9 +124,9 @@ public class ProductServiceImpl implements ProductService {
                 log.info("PRUEBA: "+!pp.getProdId().isEmpty());
                 if(!pp.getProdId().isEmpty()){
                     ProductView pv=productDao.getByIdView(prodId);
-                    List<ProductView> listpv=new ArrayList<>();
-                    listpv.add(pv);
-                    return new ResponseEntity<>(productBuilder(listpv),HttpStatus.OK);
+                    List<ProductView> listPV=new ArrayList<>();
+                    listPV.add(pv);
+                    return new ResponseEntity<>(productBuilder(listPV),HttpStatus.OK);
                 }
                 return new ResponseEntity<>(new ArrayList<>(),HttpStatus.NO_CONTENT);
             }else{
@@ -135,6 +136,48 @@ public class ProductServiceImpl implements ProductService {
             e.printStackTrace();
         }
         return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<ProductWrapper>> getBySupplierDetailId(Integer supplierId) {
+        log.info("Dentro de get product by id");
+        try {
+            if (jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
+                List<ProductView> productViews=getProductByDetails(supplierId);
+                if(!productViews.isEmpty()){
+                    return new ResponseEntity<>(productBuilder(productViews),HttpStatus.OK);
+                }
+                return new ResponseEntity<>(new ArrayList<>(),HttpStatus.NO_CONTENT);
+            }else{
+                return new ResponseEntity<>(new ArrayList<>(),HttpStatus.UNAUTHORIZED);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private List<ProductView> getProductByDetails(Integer supplierId) {
+        List<ProductView> productViews=new ArrayList<>();
+        List<SupplierDetailWrapper> supplierDetail=supplierDetailDao.getAllBySupplier(supplierId);
+        if (supplierDetail.isEmpty()){
+            return new ArrayList<>();
+        }else{
+            Iterator<SupplierDetailWrapper> iterator = supplierDetail.iterator();
+            log.info("PRUEBA LISTA iterador: "+supplierDetail);
+            while (iterator.hasNext()) {
+                SupplierDetailWrapper supDet = iterator.next();
+                List<ProductView> productV =(productDao.getBySupplierDetailId(supDet.getId()));
+                log.info("PRUEBA LISTA ProductV: "+productV.get(0));
+                int i=0;
+                while(i < productV.size()){
+                    log.info("PRUEBA LISTA: "+productV.get(i));
+                    productViews.add(productV.get(i));
+                    i++;
+                }
+            }
+            return productViews;
+        }
     }
 
     @Override

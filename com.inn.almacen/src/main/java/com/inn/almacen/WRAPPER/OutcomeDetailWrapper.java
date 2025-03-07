@@ -21,6 +21,16 @@ public class OutcomeDetailWrapper {
 
     private Boolean outcomeEstado;
 
+    private Integer outcomeClientDetailId;
+
+    private Integer cliDetId;
+
+    private String cliDetFactory;
+
+    private String cliDetAddress;
+
+    private String cliDetNumber;
+
     private Integer outcomeClientId;
 
     private String outcomeClientRazonSocial;
@@ -72,7 +82,9 @@ public class OutcomeDetailWrapper {
     private String locationName;
 
     public OutcomeDetailWrapper(Integer id, Integer cantidad, Float precioDeVenta, Integer saldo, Integer outcomeId,
-                                Date outcomeFecha, Boolean outcomeEstado, Integer outcomeClientId,
+                                Date outcomeFecha, Boolean outcomeEstado, Integer outcomeClientDetailId,
+                                Integer cliDetId, String cliDetFactory, String cliDetAddress,String cliDetNumber,
+                                Integer outcomeClientId,
                                 String outcomeClientRazonSocial, Long outcomeClientRuc, String outcomeClientCorreo,
                                 Integer outcomeClientContacto, String outcomeClientDireccion, Integer outcomeUserId,
                                 String outcomeUserNombre, Integer outcomeUserAuthId, String outcomeUserAuthNombre,
@@ -88,6 +100,13 @@ public class OutcomeDetailWrapper {
         this.outcomeId = outcomeId;
         this.outcomeFecha = outcomeFecha;
         this.outcomeEstado = outcomeEstado;
+
+        this.outcomeClientDetailId=outcomeClientDetailId;
+        this.cliDetId=cliDetId;
+        this.cliDetFactory=cliDetFactory;
+        this.cliDetAddress=cliDetAddress;
+        this.cliDetNumber=cliDetNumber;
+
         this.outcomeClientId = outcomeClientId;
         this.outcomeClientRazonSocial = outcomeClientRazonSocial;
         this.outcomeClientRuc = outcomeClientRuc;

@@ -69,6 +69,17 @@ public class ProductRestImpl implements ProductRest {
         }catch (Exception e){
             e.printStackTrace();
         }
-        return new ResponseEntity<List<ProductWrapper>>( new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<ProductWrapper>> getBySupplierDetailId(Integer supplierId) {
+        try {
+            return productService.getBySupplierDetailId(supplierId);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

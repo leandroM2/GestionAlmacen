@@ -28,6 +28,13 @@ import java.io.Serializable;
         query = "select COUNT(p) from Product p where " +
                 "p.prodId like CONCAT(:prodId,'%')")
 
+@NamedQuery(name = "Product.getBySupplierDetailId",
+        query = "select new com.inn.almacen.WRAPPER.ProductView" +
+                "(p.prodId, p.prodDesc, p.prodCode, p.prodStock, " +
+                "p.prodState, p.category.catId, p.supplierDetail.id," +
+                " p.type.typeId, p.location.locationId)  " +
+                " from Product p where p.supplierDetail.id=:supplierDetailId")
+
 @Data
 @Entity
 @DynamicUpdate

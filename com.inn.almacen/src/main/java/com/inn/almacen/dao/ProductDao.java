@@ -13,4 +13,6 @@ public interface ProductDao extends JpaRepository<Product, Integer> {
     ProductView getByIdView(@Param("prodId") String prodId);
     List<ProductView> getAllProduct();
     Integer getCountCorr(@Param("prodId") String prodId);
+
+    List<ProductView> getBySupplierDetailId(@Param("supplierDetailId") Integer supplierDetailId);
 }
