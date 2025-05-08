@@ -1,6 +1,7 @@
 package com.inn.almacen.REST;
 
 import com.inn.almacen.POJO.Supplier;
+import com.inn.almacen.WRAPPER.SupplierWrapper;
 import com.inn.almacen.WRAPPER.UserWrapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,9 @@ public interface SupplierRest {
     @GetMapping(path = "/get")
     ResponseEntity<List<Supplier>> getAllSupplier(@RequestParam(required = false)
                                                   String filterValue);
+    @GetMapping(path = "/getAcc")
+    ResponseEntity<List<SupplierWrapper>> getAllSuppAcc(@RequestParam(required = false)
+                                                        String filterValue);
 
     @PostMapping(path = "/update")
     ResponseEntity<String> updateSupplier(@RequestBody(required = true)

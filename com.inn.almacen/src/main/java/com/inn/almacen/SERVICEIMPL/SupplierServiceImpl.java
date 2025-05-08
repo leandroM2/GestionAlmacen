@@ -5,8 +5,11 @@ import com.inn.almacen.JWT.JwtFilter;
 import com.inn.almacen.POJO.Supplier;
 import com.inn.almacen.SERVICE.SupplierService;
 import com.inn.almacen.UTILS.AlmacenUtils;
+import com.inn.almacen.WRAPPER.SupplierDetailWrapper;
+import com.inn.almacen.WRAPPER.SupplierWrapper;
 import com.inn.almacen.constens.AlmacenConstants;
 import com.inn.almacen.dao.SupplierDao;
+import com.inn.almacen.dao.SupplierDetailDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +28,8 @@ public class SupplierServiceImpl implements SupplierService {
     @Autowired
     SupplierDao supplierDao;
 
+    @Autowired
+    SupplierDetailDao supplierDetailDao;
     @Autowired
     JwtFilter jwtFilter;
 
@@ -52,7 +57,7 @@ public class SupplierServiceImpl implements SupplierService {
         log.info("Dentro de get all supplier");
         try {
             if(!Strings.isNullOrEmpty(filterValue) && filterValue.equalsIgnoreCase("true")){
-                return new ResponseEntity<List<Supplier>>(supplierDao.getAllSupplier(), HttpStatus.OK);
+                return new ResponseEntity<>(supplierDao.getAllSupplier(), HttpStatus.OK);
             }
             return new ResponseEntity<>(supplierDao.findAll(), HttpStatus.OK);
 
@@ -61,6 +66,32 @@ public class SupplierServiceImpl implements SupplierService {
         }
         return new ResponseEntity<List<Supplier>>(new ArrayList(),HttpStatus.INTERNAL_SERVER_ERROR);
 
+    }
+
+    @Override
+    public ResponseEntity<List<SupplierWrapper>> getAllSuppAcc(String filterValue) {
+        try {
+            log.info("Dentro de get all supplier Accordion");
+            if(jwtFilter.isAdmin() || jwtFilter.isSuperAdmin() || jwtFilter.isUser()){
+                List<SupplierWrapper> sw=this.supplierTotal();
+                return new ResponseEntity<>(sw, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.UNAUTHORIZED);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private List<SupplierWrapper> supplierTotal(){
+        List<Supplier> SupHeader=supplierDao.getAllSupplier();
+        List<SupplierWrapper> sw=new ArrayList<>();
+        List<SupplierDetailWrapper> SupDetail;
+        for(Supplier S: SupHeader){
+            SupDetail=supplierDetailDao.getAllBySupplier(S.getId());
+            sw.add(new SupplierWrapper(S.getId(), S.getRazonSocial(), S.getRuc(), S.getContacto(), SupDetail, false));
+        }
+        return sw;
     }
 
     @Override

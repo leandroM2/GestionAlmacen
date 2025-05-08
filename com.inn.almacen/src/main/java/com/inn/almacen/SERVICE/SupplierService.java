@@ -1,6 +1,7 @@
 package com.inn.almacen.SERVICE;
 
 import com.inn.almacen.POJO.Supplier;
+import com.inn.almacen.WRAPPER.SupplierWrapper;
 import com.inn.almacen.WRAPPER.UserWrapper;
 import org.springframework.http.ResponseEntity;
 
@@ -12,6 +13,8 @@ public interface SupplierService {
     ResponseEntity<String> addNewSupplier(Map<String, String> requestMap);
 
     ResponseEntity<List<Supplier>> getAllSupplier(String filterValue);
+
+    ResponseEntity<List<SupplierWrapper>> getAllSuppAcc(String filterValue);
 
     ResponseEntity<String> updateSupplier(Map<String, String> requestMap);
 
